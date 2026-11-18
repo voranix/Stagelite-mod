@@ -4,13 +4,13 @@ Mod de **luces de escenario simples** para **Minecraft Forge 1.20.1**, pensado p
 
 Sin DMX ni software externo: color, brillo, efectos, movimiento y programación básica de shows, con un panel de faders como una mesa de luces.
 
-> **Estado: primera versión (0.1.0). El código nunca se ha compilado ni probado en el juego** (se escribió sin acceso a los repositorios de Forge). Es posible que haya que corregir algún error de compilación o detalle visual. Ver "Primer arranque".
+> **Estado: primera versión (0.2.0). El código nunca se ha compilado ni probado en el juego** (se escribió sin acceso a los repositorios de Forge). Es posible que haya que corregir algún error de compilación o detalle visual. Ver "Primer arranque".
 
 ## Obtener el .jar (sin instalar nada)
 
 1. Crea un repositorio en GitHub y sube todo el contenido de esta carpeta.
 2. Ve a la pestaña **Actions**. El workflow **Build StageLite** se ejecuta solo (o pulsa *Run workflow*).
-3. Cuando termine (unos minutos), entra en la ejecución y descarga el artefacto **stagelite-jar**: dentro está `stagelite-0.1.0.jar`.
+3. Cuando termine (unos minutos), entra en la ejecución y descarga el artefacto **stagelite-jar**: dentro está `stagelite-0.2.0.jar`.
 4. Pon ese `.jar` en la carpeta `mods` del servidor **y** de cada jugador (hace falta en ambos lados). Requiere Forge 1.20.1 (47.x).
 
 Si el workflow falla, abre el paso "Compilar": el mensaje dice qué línea corregir. Se puede pegar a Claude Code para que lo arregle.
@@ -25,6 +25,34 @@ Si el workflow falla, abre el paso "Compilar": el mensaje dice qué línea corre
 | **Estroboscopio** `stagelite:strobe_light` | Barra de estrobo (viene con efecto estrobo). |
 
 Se colocan mirando hacia la cara donde haces clic (en el techo apuntan hacia abajo). Son **indestructibles en supervivencia**: solo se quitan en creativo. Los jugadores sin permiso no pueden cambiarlas.
+
+
+## Dispositivos nuevos (0.2.0)
+
+Todos se colocan, se abren con clic derecho (solo staff) y se pueden meter en **grupos** (1-99), así que funcionan con la consola, las escenas, los shows y `/stagelite`.
+
+| Bloque | Qué hace | Faders propios |
+|---|---|---|
+| **Láser** `laser` | Abanico de rayos finos que giran/barren (usa Movimiento) | Rayos |
+| **Máquina de humo** `smoke_machine` | Echa humo (partículas). Con color distinto de blanco, humo de color. Efecto *estrobo* = a ráfagas | Alcance (Brillo = cantidad) |
+| **Máquina de fuego** `fire_machine` | Chorro de llamas **solo visual** (no quema ni daña) | Altura |
+| **Lanzador de fuegos artificiales** `firework_launcher` | Dispara cohetes reales de su color (*arcoíris* = colores al azar) | Altura (Vel. = ritmo) |
+| **Bola disco** `disco_ball` | Bola de espejos que gira con rayos de colores | Rayos |
+| **Holograma** `hologram` | Muestra una **imagen desde un link web** flotando | Tamaño, Giro, casilla del link |
+| **Consola de luces** `light_console` | Un canal por cada grupo: ON/OFF, 10 colores, Brillo, Vel., Efecto, Movimiento; además Apagón, escenas y shows | — |
+
+### Holograma
+- Pega en la casilla un link **directo a una imagen** (PNG, JPG, GIF -primer cuadro- o BMP, máx. 4 MB). Un link de YouTube o de una página web **no funciona**; tampoco hay video.
+- Cada jugador descarga la imagen desde su propio cliente: el sitio de la imagen ve la IP de los jugadores. Se bloquean direcciones privadas/locales. Quien no quiera descargar nada: `hologramsEnabled = false` en `stagelite-client.toml`.
+- *Mira al jugador* = siempre de frente; *Fijo* = queda en una dirección (fader Giro).
+
+### Consola
+Clic derecho (staff). Muestra los grupos que tengan luces **cargadas**. Pasa el ratón sobre `G1 x4` para ver qué dispositivos hay en el grupo. Las escenas y shows son los mismos de los comandos. Las escenas guardan encendido, color, brillo, efecto, movimiento y velocidad (no cambian el link, tamaño ni otros ajustes propios de cada dispositivo).
+
+### Notas
+- El láser no se corta con bloques (atraviesa paredes); los rayos de la bola disco tampoco.
+- Los fuegos artificiales son cohetes de Minecraft: su explosión hace daño cerca. Se pueden desactivar con `fireworksEnabled = false` en `stagelite-common.toml`.
+- La versión del protocolo de red cambió: servidor y jugadores deben tener la misma versión del mod.
 
 ## El panel de faders
 
@@ -87,7 +115,7 @@ Escenas y shows se guardan con el mundo. Solo afectan a luces **en chunks cargad
 Requisitos: **JDK 17**. El wrapper de Gradle (`gradlew`) no está incluido: abre la carpeta en IntelliJ como proyecto Gradle, o copia `gradlew`, `gradlew.bat` y `gradle/` del MDK oficial de Forge 1.20.1.
 
 ```
-./gradlew build        # genera build/libs/stagelite-0.1.0.jar
+./gradlew build        # genera build/libs/stagelite-0.2.0.jar
 ./gradlew runClient    # abre Minecraft con el mod para probar
 ./gradlew runServer    # servidor de pruebas
 ```
@@ -126,7 +154,7 @@ com.stagelite
 ## Ideas para después
 
 - Control por redstone.
-- Más tipos de luz (láser, bola de espejos) y efectos (persecución entre luces de un grupo, sincronizada a BPM).
+- Efectos (persecución entre luces de un grupo, sincronizada a BPM).
 - Pantalla para armar shows sin comandos.
 - Texturas más trabajadas (las actuales son provisionales, generadas por código).
 

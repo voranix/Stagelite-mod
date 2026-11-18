@@ -7,6 +7,7 @@ import net.minecraftforge.common.ForgeConfigSpec;
 public final class StageLiteConfig {
     public static final ForgeConfigSpec SPEC;
     public static final ForgeConfigSpec.IntValue PERMISSION_LEVEL;
+    public static final ForgeConfigSpec.BooleanValue FIREWORKS_ENABLED;
 
     static {
         ForgeConfigSpec.Builder b = new ForgeConfigSpec.Builder();
@@ -14,6 +15,9 @@ public final class StageLiteConfig {
                 .comment("Nivel de permiso necesario para editar luces y usar /stagelite.",
                         "2 = operadores (por defecto). Puedes darle OP a tu staff o usar un plugin de permisos que lo mapee.")
                 .defineInRange("permissionLevel", 2, 0, 4);
+        FIREWORKS_ENABLED = b
+                .comment("Permite que los lanzadores de fuegos artificiales disparen cohetes reales (hacen dano cerca de la explosion).")
+                .define("fireworksEnabled", true);
         SPEC = b.build();
     }
 

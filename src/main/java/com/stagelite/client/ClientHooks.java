@@ -1,6 +1,8 @@
 package com.stagelite.client;
 
+import com.stagelite.client.screen.ConsoleScreen;
 import com.stagelite.client.screen.StageLightScreen;
+import com.stagelite.network.ConsoleSnapshot;
 import com.stagelite.light.FixtureType;
 import com.stagelite.light.LightData;
 import net.minecraft.client.Minecraft;
@@ -15,5 +17,15 @@ public final class ClientHooks {
     public static void openLightScreen(BlockPos pos, int typeId, CompoundTag tag) {
         Minecraft.getInstance().setScreen(
                 new StageLightScreen(pos, FixtureType.byId(typeId), LightData.fromTag(tag)));
+    }
+
+    /** Abre la consola, o si ya esta abierta en ese bloque solo actualiza los datos. */
+    public static void openConsole(BlockPos pos, ConsoleSnapshot snap) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.screen instanceof ConsoleScreen open && open.pos().equals(pos)) {
+            open.update(snap);
+        } else {
+            mc.setScreen(new ConsoleScreen(pos, snap));
+        }
     }
 }

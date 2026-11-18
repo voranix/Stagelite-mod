@@ -15,9 +15,12 @@ public final class ModTabs {
     public static final RegistryObject<CreativeModeTab> MAIN = TABS.register("main",
             () -> CreativeModeTab.builder()
                     .title(Component.translatable("itemGroup.stagelite"))
-                    .icon(() -> new ItemStack(ModBlocks.lightItems().get(0).get()))
+                    .icon(() -> new ItemStack(ModBlocks.LIGHT_CONSOLE_ITEM.get()))
                     .displayItems((params, output) ->
-                            ModBlocks.lightItems().forEach(item -> output.accept(item.get())))
+                    {
+                        output.accept(ModBlocks.LIGHT_CONSOLE_ITEM.get());
+                        ModBlocks.lightItems().forEach(item -> output.accept(item.get()));
+                    })
                     .build());
 
     private ModTabs() {

@@ -3,6 +3,10 @@ package com.stagelite.block;
 import com.stagelite.blockentity.StageLightBlockEntity;
 import com.stagelite.config.StageLiteConfig;
 import com.stagelite.light.FixtureType;
+import com.stagelite.light.LightData;
+import com.stagelite.registry.ModBlockEntities;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import com.stagelite.network.ModNetwork;
 import com.stagelite.network.OpenLightScreenPacket;
 import net.minecraft.core.BlockPos;
@@ -57,7 +61,7 @@ public class StageLightBlock extends Block implements EntityBlock {
                 .noOcclusion()
                 .lightLevel(state -> state.getValue(LIGHT)));
         this.type = type;
-        registerDefaultState(stateDefinition.any().setValue(FACING, Direction.SOUTH).setValue(LIGHT, 15));
+        registerDefaultState(stateDefinition.any().setValue(FACING, Direction.SOUTH).setValue(LIGHT, 0));
     }
 
     public FixtureType fixtureType() {
@@ -72,7 +76,10 @@ public class StageLightBlock extends Block implements EntityBlock {
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        return defaultBlockState().setValue(FACING, context.getClickedFace());
+        LightData defaults = new LightData();
+        type.applyDefaults(defaults);
+        return defaultBlockState().setValue(FACING, context.getClickedFace())
+                .setValue(LIGHT, type.lightLevel(defaults));
     }
 
     @Override
@@ -94,6 +101,19 @@ public class StageLightBlock extends Block implements EntityBlock {
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new StageLightBlockEntity(pos, state);
+    }
+
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> beType) {
+        if (!type.ticks() || beType != ModBlockEntities.STAGE_LIGHT.get()) {
+            return null;
+        }
+        return (lvl, p, st, be) -> {
+            if (be instanceof StageLightBlockEntity light) {
+                light.tick(lvl);
+            }
+        };
     }
 
     @Override

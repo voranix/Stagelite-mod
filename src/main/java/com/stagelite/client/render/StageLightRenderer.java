@@ -6,6 +6,7 @@ import com.mojang.math.Axis;
 import com.stagelite.StageLite;
 import com.stagelite.block.StageLightBlock;
 import com.stagelite.blockentity.StageLightBlockEntity;
+import com.stagelite.client.HologramImages;
 import com.stagelite.config.ClientConfig;
 import com.stagelite.light.FixtureType;
 import com.stagelite.light.LightData;
@@ -18,6 +19,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ClipContext;
@@ -41,6 +43,11 @@ public class StageLightRenderer implements BlockEntityRenderer<StageLightBlockEn
     private static final ResourceLocation TEX_BODY = new ResourceLocation(StageLite.MODID, "textures/block/stage_light_body.png");
     private static final ResourceLocation TEX_ACCENT = new ResourceLocation(StageLite.MODID, "textures/block/stage_light_accent.png");
     private static final ResourceLocation TEX_LENS = new ResourceLocation(StageLite.MODID, "textures/block/stage_light_lens.png");
+
+    private static final ResourceLocation TEX_DISCO = new ResourceLocation(StageLite.MODID, "textures/block/disco_facet.png");
+    private static final ResourceLocation TEX_HOLO_EMPTY = new ResourceLocation(StageLite.MODID, "textures/block/hologram_empty.png");
+    private static final ResourceLocation TEX_HOLO_LOADING = new ResourceLocation(StageLite.MODID, "textures/block/hologram_loading.png");
+    private static final ResourceLocation TEX_HOLO_ERROR = new ResourceLocation(StageLite.MODID, "textures/block/hologram_error.png");
 
     /** Inclinacion base de la cabeza movil cuando se mueve (para que el barrido se note). */
     private static final float MOVING_BASE_TILT = 35f;
@@ -87,15 +94,36 @@ public class StageLightRenderer implements BlockEntityRenderer<StageLightBlockEn
         boolean beamVisible = lit && bright > 0.001f;
         boolean moves = type.moves();
 
-        // Los modelos fijos ya estan en el JSON del bloque: sin haz no hay nada que dibujar.
-        if (!moves && !beamVisible) {
-            return;
-        }
-
         int rgb = LightFx.color(d, time);
         float r = (rgb >> 16 & 255) / 255f;
         float g = (rgb >> 8 & 255) / 255f;
         float b = (rgb & 255) / 255f;
+
+        // Dispositivos con dibujado propio (el resto de los modelos fijos ya estan en el JSON del bloque)
+        switch (type) {
+            case SMOKE:
+            case FIRE:
+            case FIREWORK:
+                return; // solo particulas / cohetes
+            case LASER:
+                if (beamVisible) {
+                    renderLaser(be, pose, buffers, d, facing, time, r, g, b, bright);
+                }
+                return;
+            case DISCO:
+                renderDisco(pose, buffers, packedLight, packedOverlay, d, time, lit, r, g, b, bright);
+                return;
+            case HOLOGRAM:
+                renderHologram(be, pose, buffers, d, facing, time, r, g, b, bright);
+                return;
+            default:
+                break;
+        }
+
+        // Sin haz y sin partes moviles no hay nada que dibujar.
+        if (!moves && !beamVisible) {
+            return;
+        }
 
         pose.pushPose();
         pose.translate(0.5, 0.5, 0.5);
@@ -123,6 +151,236 @@ public class StageLightRenderer implements BlockEntityRenderer<StageLightBlockEn
         }
 
         pose.popPose();
+    }
+
+
+    // ------------------------------------------------------------------ laser
+
+    private static void renderLaser(StageLightBlockEntity be, PoseStack pose, MultiBufferSource buffers, LightData d,
+                                    Direction facing, float time, float r, float g, float b, float bright) {
+        boolean moving = d.movement != Movement.NONE;
+        float pan = moving ? LightFx.pan(d, time) : 0f;
+        float tilt = moving ? LightFx.tilt(d, time) : 0f;
+
+        pose.pushPose();
+        pose.translate(0.5, 0.5, 0.5);
+        pose.mulPose(FACING_ROT[facing.get3DDataValue()]);
+        pose.mulPose(Axis.ZP.rotationDegrees(pan));
+        pose.mulPose(Axis.XP.rotationDegrees(tilt));
+
+        Matrix4f m = pose.last().pose();
+        VertexConsumer vc = buffers.getBuffer(RenderType.lightning());
+        int n = 2 + d.extra * 2;
+        float fan = Math.min(80f, d.spread * 2f);
+        float start = FixtureType.LASER.beamStart();
+        float a = 0.9f * (d.intensity / 100f) * bright;
+        for (int i = 0; i < n; i++) {
+            float ang = (float) Math.toRadians(n == 1 ? 0f : (i / (n - 1f) - 0.5f) * 2f * fan);
+            float dx = Mth.sin(ang);
+            float dz = Mth.cos(ang);
+            float x0 = dx * start;
+            float z0 = dz * start;
+            float x1 = dx * (start + d.length);
+            float z1 = dz * (start + d.length);
+            // Nucleo fino (vertical y horizontal) y halo mas ancho y tenue
+            ribbon(vc, m, x0, 0, z0, x1, 0, z1, 0, 1, 0, 0.012f, r, g, b, a, a * 0.6f);
+            ribbon(vc, m, x0, 0, z0, x1, 0, z1, dz, 0, -dx, 0.012f, r, g, b, a, a * 0.6f);
+            ribbon(vc, m, x0, 0, z0, x1, 0, z1, 0, 1, 0, 0.05f, r, g, b, a * 0.2f, a * 0.05f);
+            ribbon(vc, m, x0, 0, z0, x1, 0, z1, dz, 0, -dx, 0.05f, r, g, b, a * 0.2f, a * 0.05f);
+        }
+        pose.popPose();
+    }
+
+    /** Cinta de dos caras entre dos puntos; (ox,oy,oz) es la direccion del ancho. */
+    private static void ribbon(VertexConsumer vc, Matrix4f m, float ax, float ay, float az, float bx, float by, float bz,
+                               float ox, float oy, float oz, float w, float r, float g, float b, float a0, float a1) {
+        float px = ox * w;
+        float py = oy * w;
+        float pz = oz * w;
+        vertex(vc, m, ax - px, ay - py, az - pz, r, g, b, a0);
+        vertex(vc, m, ax + px, ay + py, az + pz, r, g, b, a0);
+        vertex(vc, m, bx + px, by + py, bz + pz, r, g, b, a1);
+        vertex(vc, m, bx - px, by - py, bz - pz, r, g, b, a1);
+        vertex(vc, m, bx - px, by - py, bz - pz, r, g, b, a1);
+        vertex(vc, m, bx + px, by + py, bz + pz, r, g, b, a1);
+        vertex(vc, m, ax + px, ay + py, az + pz, r, g, b, a0);
+        vertex(vc, m, ax - px, ay - py, az - pz, r, g, b, a0);
+    }
+
+    // ------------------------------------------------------------------ bola disco
+
+    private static final int DISCO_LAT = 8;
+    private static final int DISCO_LON = 12;
+    private static final float DISCO_R = 0.27f;
+
+    private static void renderDisco(PoseStack pose, MultiBufferSource buffers, int light, int overlay, LightData d,
+                                    float time, boolean lit, float r, float g, float b, float bright) {
+        float spin = time * d.speed * 1.2f;
+        pose.pushPose();
+        pose.translate(0.5, 0.5, 0.5);
+        pose.mulPose(Axis.YP.rotationDegrees(spin));
+
+        // Bola de espejitos: cada faceta brilla en su momento
+        PoseStack.Pose p = pose.last();
+        VertexConsumer vc = buffers.getBuffer(RenderType.entityCutoutNoCull(TEX_DISCO));
+        for (int la = 0; la < DISCO_LAT; la++) {
+            float lat0 = (float) (Math.PI * (la / (float) DISCO_LAT - 0.5));
+            float lat1 = (float) (Math.PI * ((la + 1) / (float) DISCO_LAT - 0.5));
+            for (int lo = 0; lo < DISCO_LON; lo++) {
+                float lon0 = (float) (2 * Math.PI * lo / DISCO_LON);
+                float lon1 = (float) (2 * Math.PI * (lo + 1) / DISCO_LON);
+                float sparkle = lit ? Math.max(0f, Mth.sin(time * 0.35f + (la * 7 + lo * 13) * 1.7f)) : 0f;
+                sparkle = sparkle * sparkle * sparkle;
+                float base = lit ? 0.45f : 0.35f;
+                float k = Math.min(1f, base + sparkle);
+                int cr = Math.round(255 * Math.min(1f, k * (0.6f + 0.4f * r + sparkle)));
+                int cg = Math.round(255 * Math.min(1f, k * (0.6f + 0.4f * g + sparkle)));
+                int cb = Math.round(255 * Math.min(1f, k * (0.6f + 0.4f * b + sparkle)));
+                int facetLight = sparkle > 0.3f ? LightTexture.FULL_BRIGHT : light;
+                float mlat = (lat0 + lat1) / 2f;
+                float mlon = (lon0 + lon1) / 2f;
+                float nx = Mth.cos(mlat) * Mth.cos(mlon);
+                float ny = Mth.sin(mlat);
+                float nz = Mth.cos(mlat) * Mth.sin(mlon);
+                quad(p, vc,
+                        sx(lat0, lon0), sy(lat0), sz(lat0, lon0),
+                        sx(lat1, lon0), sy(lat1), sz(lat1, lon0),
+                        sx(lat1, lon1), sy(lat1), sz(lat1, lon1),
+                        sx(lat0, lon1), sy(lat0), sz(lat0, lon1),
+                        nx, ny, nz, facetLight, overlay, cr, cg, cb);
+            }
+        }
+        pose.popPose();
+
+        if (!lit || bright <= 0.001f) {
+            return;
+        }
+
+        // Rayos de luz que giran con la bola
+        pose.pushPose();
+        pose.translate(0.5, 0.5, 0.5);
+        Matrix4f m = pose.last().pose();
+        VertexConsumer lv = buffers.getBuffer(RenderType.lightning());
+        int rays = 6 + d.extra * 3;
+        float a = 0.55f * (d.intensity / 100f) * bright;
+        for (int i = 0; i < rays; i++) {
+            float az = (float) Math.toRadians(i * 137.5f + spin * 1.5f);
+            float el = (float) Math.toRadians(-55f + 110f * ((i * 0.618f) % 1f));
+            float ce = Mth.cos(el);
+            float dx = ce * Mth.cos(az);
+            float dy = Mth.sin(el);
+            float dz = ce * Mth.sin(az);
+            float len = d.length * (0.5f + 0.5f * ((i * 0.37f) % 1f));
+            float cr = r;
+            float cg = g;
+            float cb = b;
+            if (d.effect == com.stagelite.light.Effect.RAINBOW) {
+                int c = Mth.hsvToRgb(((time * 0.01f * d.speed) + i / (float) rays) % 1f, 1f, 1f);
+                cr = (c >> 16 & 255) / 255f;
+                cg = (c >> 8 & 255) / 255f;
+                cb = (c & 255) / 255f;
+            }
+            float ax = dx * DISCO_R;
+            float ay = dy * DISCO_R;
+            float az0 = dz * DISCO_R;
+            float bx = dx * (DISCO_R + len);
+            float by = dy * (DISCO_R + len);
+            float bz = dz * (DISCO_R + len);
+            float p1x = -Mth.sin(az);
+            float p1z = Mth.cos(az);
+            float p2x = -Mth.sin(el) * Mth.cos(az);
+            float p2y = Mth.cos(el);
+            float p2z = -Mth.sin(el) * Mth.sin(az);
+            ribbon(lv, m, ax, ay, az0, bx, by, bz, p1x, 0, p1z, 0.02f, cr, cg, cb, a, 0f);
+            ribbon(lv, m, ax, ay, az0, bx, by, bz, p2x, p2y, p2z, 0.02f, cr, cg, cb, a, 0f);
+        }
+        pose.popPose();
+    }
+
+    private static float sx(float lat, float lon) {
+        return DISCO_R * Mth.cos(lat) * Mth.cos(lon);
+    }
+
+    private static float sy(float lat) {
+        return DISCO_R * Mth.sin(lat);
+    }
+
+    private static float sz(float lat, float lon) {
+        return DISCO_R * Mth.cos(lat) * Mth.sin(lon);
+    }
+
+    // ------------------------------------------------------------------ holograma
+
+    private static void renderHologram(StageLightBlockEntity be, PoseStack pose, MultiBufferSource buffers, LightData d,
+                                       Direction facing, float time, float r, float g, float b, float bright) {
+        if (!d.on || d.intensity <= 0 || bright <= 0.001f || !ClientConfig.HOLOGRAMS_ENABLED.get()) {
+            return;
+        }
+        ResourceLocation tex = TEX_HOLO_EMPTY;
+        float aspect = 1f;
+        if (!d.url.isEmpty()) {
+            HologramImages.Entry e = HologramImages.get(d.url);
+            switch (e.state) {
+                case READY:
+                    tex = e.texture;
+                    aspect = e.aspect;
+                    break;
+                case LOADING:
+                    tex = TEX_HOLO_LOADING;
+                    break;
+                default:
+                    tex = TEX_HOLO_ERROR;
+                    break;
+            }
+        }
+        float height = 0.5f + d.extra * 0.5f;
+        float width = height * aspect;
+        float dist = 0.5f + height / 2f + 0.15f;
+        float cx = 0.5f + facing.getStepX() * dist;
+        float cy = 0.5f + facing.getStepY() * dist;
+        float cz = 0.5f + facing.getStepZ() * dist;
+
+        float yaw;
+        if (d.billboard) {
+            var cam = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
+            double dx = cam.x - (be.getBlockPos().getX() + cx);
+            double dz = cam.z - (be.getBlockPos().getZ() + cz);
+            yaw = (float) Math.atan2(dx, dz);
+        } else {
+            yaw = (float) Math.toRadians(d.range * 4f);
+        }
+
+        // Parpadeo suave tipo holograma
+        float flicker = 0.88f + 0.12f * Mth.sin(time * 0.9f) * Mth.sin(time * 0.37f + 1f);
+        int alpha = Math.round(255 * Math.min(1f, (d.intensity / 100f) * bright * flicker));
+        int cr = Math.round(255 * r);
+        int cg = Math.round(255 * g);
+        int cb = Math.round(255 * b);
+
+        pose.pushPose();
+        pose.translate(cx, cy, cz);
+        pose.mulPose(Axis.YP.rotation(yaw));
+        PoseStack.Pose p = pose.last();
+        VertexConsumer vc = buffers.getBuffer(RenderType.eyes(tex));
+        float hw = width / 2f;
+        float hh = height / 2f;
+        int full = LightTexture.FULL_BRIGHT;
+        // Cara delantera y trasera (la trasera se ve igual, como un holograma real)
+        quadAlpha(p, vc, -hw, -hh, 0f, -hw, hh, 0f, hw, hh, 0f, hw, -hh, 0f, 0f, 0f, 1f, full, cr, cg, cb, alpha);
+        quadAlpha(p, vc, hw, -hh, 0f, hw, hh, 0f, -hw, hh, 0f, -hw, -hh, 0f, 0f, 0f, -1f, full, cr, cg, cb, alpha);
+        pose.popPose();
+    }
+
+    private static void quadAlpha(PoseStack.Pose p, VertexConsumer vc,
+                                  float ax, float ay, float az, float bx, float by, float bz,
+                                  float cx, float cy, float cz, float dx, float dy, float dz,
+                                  float nx, float ny, float nz, int light, int r, int g, int b, int a) {
+        Matrix4f m = p.pose();
+        int overlay = net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY;
+        vc.vertex(m, ax, ay, az).color(r, g, b, a).uv(0f, 1f).overlayCoords(overlay).uv2(light).normal(p.normal(), nx, ny, nz).endVertex();
+        vc.vertex(m, bx, by, bz).color(r, g, b, a).uv(0f, 0f).overlayCoords(overlay).uv2(light).normal(p.normal(), nx, ny, nz).endVertex();
+        vc.vertex(m, cx, cy, cz).color(r, g, b, a).uv(1f, 0f).overlayCoords(overlay).uv2(light).normal(p.normal(), nx, ny, nz).endVertex();
+        vc.vertex(m, dx, dy, dz).color(r, g, b, a).uv(1f, 1f).overlayCoords(overlay).uv2(light).normal(p.normal(), nx, ny, nz).endVertex();
     }
 
     // ------------------------------------------------------------------ cabeza movil

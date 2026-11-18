@@ -29,6 +29,13 @@ public class LightData {
     public int range = 40;
     /** 0 = sin grupo, 1..99 = grupo. */
     public int group = 0;
+    /** 1..10. Segun el dispositivo: rayos del laser, humo, altura del fuego, ritmo de fuegos, tamano del holograma... */
+    public int extra = 5;
+    /** Holograma: link directo a una imagen. */
+    public String url = "";
+    /** Holograma: true = siempre mira al jugador. */
+    public boolean billboard = true;
+    public static final int MAX_URL = 256;
 
     public void clamp() {
         color &= 0xFFFFFF;
@@ -38,12 +45,42 @@ public class LightData {
         speed = Mth.clamp(speed, 1, 10);
         range = Mth.clamp(range, 0, 90);
         group = Mth.clamp(group, 0, 99);
+        extra = Mth.clamp(extra, 1, 10);
+        url = cleanUrl(url);
+    }
+
+    /** Solo http/https, sin espacios ni caracteres raros, maximo 256. Si no es valido queda vacio. */
+    public static String cleanUrl(String u) {
+        if (u == null) {
+            return "";
+        }
+        u = u.trim();
+        if (u.length() > MAX_URL) {
+            return "";
+        }
+        if (u.isEmpty()) {
+            return "";
+        }
+        String low = u.toLowerCase(java.util.Locale.ROOT);
+        if (!(low.startsWith("http://") || low.startsWith("https://"))) {
+            return "";
+        }
+        for (int i = 0; i < u.length(); i++) {
+            char c = u.charAt(i);
+            if (c <= 32 || c >= 127) {
+                return "";
+            }
+        }
+        return u;
     }
 
     public void copyFrom(LightData o) {
         copyLook(o);
         this.length = o.length;
         this.group = o.group;
+        this.extra = o.extra;
+        this.url = o.url;
+        this.billboard = o.billboard;
     }
 
     /** Copia solo el "look" (lo que guarda una escena): no cambia el grupo ni el largo. */
@@ -75,6 +112,9 @@ public class LightData {
         t.putInt("speed", speed);
         t.putInt("range", range);
         t.putInt("group", group);
+        t.putInt("extra", extra);
+        t.putString("url", url);
+        t.putBoolean("billboard", billboard);
     }
 
     public void load(CompoundTag t) {
@@ -88,6 +128,9 @@ public class LightData {
         if (t.contains("speed")) speed = t.getInt("speed");
         if (t.contains("range")) range = t.getInt("range");
         if (t.contains("group")) group = t.getInt("group");
+        if (t.contains("extra")) extra = t.getInt("extra");
+        if (t.contains("url")) url = t.getString("url");
+        if (t.contains("billboard")) billboard = t.getBoolean("billboard");
         clamp();
     }
 

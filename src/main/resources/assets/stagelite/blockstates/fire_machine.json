@@ -1,0 +1,27 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "stagelite:block/fire_machine"
+    },
+    "facing=east": {
+      "model": "stagelite:block/fire_machine",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "stagelite:block/fire_machine",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "stagelite:block/fire_machine",
+      "y": 270
+    },
+    "facing=up": {
+      "model": "stagelite:block/fire_machine",
+      "x": 270
+    },
+    "facing=down": {
+      "model": "stagelite:block/fire_machine",
+      "x": 90
+    }
+  }
+}

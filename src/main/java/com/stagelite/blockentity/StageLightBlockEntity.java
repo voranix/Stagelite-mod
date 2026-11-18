@@ -1,6 +1,9 @@
 package com.stagelite.blockentity;
 
 import com.stagelite.block.StageLightBlock;
+import com.stagelite.config.StageLiteConfig;
+import com.stagelite.light.Effects;
+import com.stagelite.light.FixtureType;
 import com.stagelite.light.LightData;
 import com.stagelite.light.LightRegistry;
 import com.stagelite.registry.ModBlockEntities;
@@ -10,6 +13,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
@@ -23,11 +27,37 @@ public class StageLightBlockEntity extends BlockEntity {
     public long clipTime = Long.MIN_VALUE;
 
     private AABB renderBox;
+    private int fireworkCooldown = 20;
 
     public StageLightBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.STAGE_LIGHT.get(), pos, state);
         if (state.getBlock() instanceof StageLightBlock block) {
             block.fixtureType().applyDefaults(data);
+        }
+    }
+
+    public FixtureType type() {
+        return getBlockState().getBlock() instanceof StageLightBlock b ? b.fixtureType() : FixtureType.SPOT;
+    }
+
+    /** Se llama cada tick en cliente y servidor para humo, fuego y fuegos artificiales. */
+    public void tick(Level lvl) {
+        FixtureType type = type();
+        if (!data.on || data.intensity <= 0) {
+            return;
+        }
+        if (lvl.isClientSide) {
+            if (type == FixtureType.SMOKE) {
+                Effects.smoke(lvl, worldPosition, getBlockState().getValue(StageLightBlock.FACING), data);
+            } else if (type == FixtureType.FIRE) {
+                Effects.fire(lvl, worldPosition, getBlockState().getValue(StageLightBlock.FACING), data);
+            }
+        } else if (type == FixtureType.FIREWORK && StageLiteConfig.FIREWORKS_ENABLED.get()) {
+            if (--fireworkCooldown <= 0) {
+                int interval = Math.max(20, 220 - data.speed * 20);
+                fireworkCooldown = interval;
+                Effects.launchFirework(lvl, worldPosition, getBlockState().getValue(StageLightBlock.FACING), data);
+            }
         }
     }
 
@@ -65,7 +95,7 @@ public class StageLightBlockEntity extends BlockEntity {
         }
         setChanged();
         BlockState state = getBlockState();
-        int wanted = data.blockLightLevel();
+        int wanted = type().lightLevel(data);
         if (state.getValue(StageLightBlock.LIGHT) != wanted) {
             level.setBlock(worldPosition, state.setValue(StageLightBlock.LIGHT, wanted), 3);
         } else {
