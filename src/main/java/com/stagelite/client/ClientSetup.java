@@ -3,8 +3,8 @@ package com.stagelite.client;
 import com.stagelite.StageLite;
 import com.stagelite.client.render.StageLightRenderer;
 import com.stagelite.registry.ModBlockEntities;
-import net.minecraft.client.renderer.entity.EntityRenderersEvent;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
