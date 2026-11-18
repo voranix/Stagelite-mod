@@ -96,8 +96,8 @@ public class StageLightRenderer implements BlockEntityRenderer<StageLightBlockEn
         boolean moves = type.moves();
 
         // Luces fijas inclinadas: el modelo del bloque se oculta (TILTED) y se dibuja aqui girado junto con el haz.
-        if (type.tiltable() && !moves && d.tilt != 0) {
-            renderTiltedBody(be, pose, buffers, packedLight, packedOverlay, facing, d.tilt);
+        if (type.tiltable() && !moves && (d.tilt != 0 || d.yaw != 0)) {
+            renderTiltedBody(be, pose, buffers, packedLight, packedOverlay, facing, d.tilt, d.yaw);
         }
 
         int rgb = LightFx.color(d, time);
@@ -135,6 +135,7 @@ public class StageLightRenderer implements BlockEntityRenderer<StageLightBlockEn
         pose.translate(0.5, 0.5, 0.5);
         pose.mulPose(FACING_ROT[facing.get3DDataValue()]);
         if (!moves) {
+            pose.mulPose(Axis.YP.rotationDegrees(d.yaw));
             pose.mulPose(Axis.XP.rotationDegrees(-d.tilt));
         }
 
@@ -147,13 +148,14 @@ public class StageLightRenderer implements BlockEntityRenderer<StageLightBlockEn
             // La horquilla gira alrededor del eje de la base (Z); la cabeza se inclina en X.
             pose.mulPose(Axis.ZP.rotationDegrees(pan));
             drawYoke(buffers, pose, packedLight, packedOverlay);
+            pose.mulPose(Axis.YP.rotationDegrees(d.yaw));
             pose.mulPose(Axis.XP.rotationDegrees(baseTilt + tilt - d.tilt));
             int lensLight = lit ? LightTexture.FULL_BRIGHT : packedLight;
             drawHead(buffers, pose, packedLight, lensLight, packedOverlay, lit ? r : 0.35f, lit ? g : 0.35f, lit ? b : 0.35f);
         }
 
         if (beamVisible) {
-            float length = (moves || d.tilt != 0) ? d.length : clippedLength(be, level, d, facing, type);
+            float length = (moves || d.tilt != 0 || d.yaw != 0) ? d.length : clippedLength(be, level, d, facing, type);
             if (length > 0.05f) {
                 drawBeam(buffers, pose, d, type, length, r, g, b, bright);
             }
@@ -164,12 +166,13 @@ public class StageLightRenderer implements BlockEntityRenderer<StageLightBlockEn
 
 
     private static void renderTiltedBody(StageLightBlockEntity be, PoseStack pose, MultiBufferSource buffers,
-                                          int light, int overlay, Direction facing, int tilt) {
+                                          int light, int overlay, Direction facing, int tilt, int yaw) {
         BlockState base = be.getBlockState().setValue(StageLightBlock.TILTED, false);
         Quaternionf rot = FACING_ROT[facing.get3DDataValue()];
         pose.pushPose();
         pose.translate(0.5, 0.5, 0.5);
         pose.mulPose(rot);
+        pose.mulPose(Axis.YP.rotationDegrees(yaw));
         pose.mulPose(Axis.XP.rotationDegrees(-tilt));
         pose.mulPose(new Quaternionf(rot).conjugate());
         pose.translate(-0.5, -0.5, -0.5);
@@ -188,6 +191,7 @@ public class StageLightRenderer implements BlockEntityRenderer<StageLightBlockEn
         pose.pushPose();
         pose.translate(0.5, 0.5, 0.5);
         pose.mulPose(FACING_ROT[facing.get3DDataValue()]);
+        pose.mulPose(Axis.YP.rotationDegrees(d.yaw));
         pose.mulPose(Axis.XP.rotationDegrees(-d.tilt));
         pose.mulPose(Axis.ZP.rotationDegrees(pan));
         pose.mulPose(Axis.XP.rotationDegrees(tilt));

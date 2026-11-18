@@ -31,7 +31,7 @@ public class ConsoleScreen extends Screen {
     private static final int[] PRESETS = {
             0xFFFFFF, 0xFF0000, 0xFF8000, 0xFFFF00, 0x00FF00, 0x00FFFF, 0x0040FF, 0x8000FF, 0xFF00FF, 0xFF60B0
     };
-    private static final int STRIP_W = 96;
+    private static final int STRIP_W = 128;
     private static final int GAP = 6;
     private static final int FADER_H = 80;
 
@@ -136,6 +136,15 @@ public class ConsoleScreen extends Screen {
                     }, () -> { }, this::flush);
             tilt.setTooltip(Tooltip.create(Component.translatable("tip.stagelite.tilt")));
             addRenderableWidget(tilt);
+
+            FaderWidget yaw = new FaderWidget(x + 96, yF, 30, FADER_H, Component.translatable("fader.stagelite.yaw"),
+                    -90, 90, g.look.yaw, 0x40C0A0,
+                    v -> {
+                        g.look.yaw = v;
+                        pending.put(gn * 100 + ConsoleActionPacket.GROUP_YAW, new int[]{ConsoleActionPacket.GROUP_YAW, gn, v});
+                    }, () -> { }, this::flush);
+            yaw.setTooltip(Tooltip.create(Component.translatable("tip.stagelite.yaw")));
+            addRenderableWidget(yaw);
 
             addRenderableWidget(Button.builder(Component.translatable(g.look.effect.key()), btn -> {
                         g.look.effect = g.look.effect.next();

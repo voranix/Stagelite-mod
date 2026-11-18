@@ -31,6 +31,8 @@ public class LightData {
     public int group = 0;
     /** Inclinacion fija en grados, -90..90 (positivo = hacia arriba). */
     public int tilt = 0;
+    /** Giro fijo hacia un lado, en grados, -90..90. */
+    public int yaw = 0;
     /** 1..10. Segun el dispositivo: rayos del laser, humo, altura del fuego, ritmo de fuegos, tamano del holograma... */
     public int extra = 5;
     /** Holograma: link directo a una imagen. */
@@ -49,6 +51,7 @@ public class LightData {
         group = Mth.clamp(group, 0, 99);
         extra = Mth.clamp(extra, 1, 10);
         tilt = Mth.clamp(tilt, -90, 90);
+        yaw = Mth.clamp(yaw, -90, 90);
         url = cleanUrl(url);
     }
 
@@ -58,6 +61,9 @@ public class LightData {
             return "";
         }
         u = u.trim();
+        if (u.matches("local:[0-9a-f]{24}")) {
+            return u;
+        }
         if (u.length() > MAX_URL) {
             return "";
         }
@@ -97,6 +103,7 @@ public class LightData {
         this.speed = o.speed;
         this.range = o.range;
         this.tilt = o.tilt;
+        this.yaw = o.yaw;
     }
 
     public CompoundTag toTag() {
@@ -118,6 +125,7 @@ public class LightData {
         t.putInt("group", group);
         t.putInt("extra", extra);
         t.putInt("tilt", tilt);
+        t.putInt("yaw", yaw);
         t.putString("url", url);
         t.putBoolean("billboard", billboard);
     }
@@ -135,6 +143,7 @@ public class LightData {
         if (t.contains("group")) group = t.getInt("group");
         if (t.contains("extra")) extra = t.getInt("extra");
         if (t.contains("tilt")) tilt = t.getInt("tilt");
+        if (t.contains("yaw")) yaw = t.getInt("yaw");
         if (t.contains("url")) url = t.getString("url");
         if (t.contains("billboard")) billboard = t.getBoolean("billboard");
         clamp();

@@ -6,7 +6,7 @@ import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public final class ModNetwork {
-    private static final String PROTOCOL = "2";
+    private static final String PROTOCOL = "3";
 
     public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(StageLite.MODID, "main"),
@@ -23,6 +23,10 @@ public final class ModNetwork {
                 OpenLightScreenPacket::encode, OpenLightScreenPacket::decode, OpenLightScreenPacket::handle);
         CHANNEL.registerMessage(id++, OpenConsolePacket.class,
                 OpenConsolePacket::encode, OpenConsolePacket::decode, OpenConsolePacket::handle);
+        CHANNEL.registerMessage(id++, ImageChunkPacket.class,
+                ImageChunkPacket::encode, ImageChunkPacket::decode, ImageChunkPacket::handle);
+        CHANNEL.registerMessage(id++, ImageRequestPacket.class,
+                ImageRequestPacket::encode, ImageRequestPacket::decode, ImageRequestPacket::handle);
         CHANNEL.registerMessage(id++, ConsoleActionPacket.class,
                 ConsoleActionPacket::encode, ConsoleActionPacket::decode, ConsoleActionPacket::handle);
         CHANNEL.registerMessage(id++, UpdateLightPacket.class,

@@ -4,7 +4,18 @@ import com.stagelite.light.FixtureType;
 import com.stagelite.light.LightData;
 import com.stagelite.network.ModNetwork;
 import com.stagelite.network.UpdateLightPacket;
+import com.stagelite.client.HologramImages;
+import com.stagelite.network.ImageChunkPacket;
+import com.stagelite.network.ImageIds;
 import net.minecraft.client.Minecraft;
+import org.lwjgl.PointerBuffer;
+import org.lwjgl.system.MemoryStack;
+import org.lwjgl.util.tinyfd.TinyFileDialogs;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
@@ -29,8 +40,8 @@ public class StageLightScreen extends Screen {
     private static final int[] PRESETS = {
             0xFFFFFF, 0xFF0000, 0xFF8000, 0xFFFF00, 0x00FF00, 0x00FFFF, 0x0040FF, 0x8000FF, 0xFF00FF, 0xFF60B0
     };
-    private static final int PANEL_W = 480;
-    private static final int FADER_PITCH = 34;
+    private static final int PANEL_W = 470;
+    private static final int FADER_PITCH = 30;
     private static final int FADER_H = 96;
 
     private final BlockPos pos;
@@ -40,6 +51,7 @@ public class StageLightScreen extends Screen {
     private FaderWidget faderR;
     private FaderWidget faderG;
     private EditBox urlBox;
+    private Component status = Component.empty();
     private FaderWidget faderB;
 
     private int left;
@@ -104,6 +116,8 @@ public class StageLightScreen extends Screen {
         }
         if (type.tiltable()) {
             addFader(fx, fy, "tilt", -90, 90, data.tilt, 0x40C0A0, v -> data.tilt = v);
+            fx += FADER_PITCH;
+            addFader(fx, fy, "yaw", -90, 90, data.yaw, 0x40C0A0, v -> data.yaw = v);
             fx += FADER_PITCH;
         }
         if (type == FixtureType.HOLOGRAM) {
@@ -173,19 +187,110 @@ public class StageLightScreen extends Screen {
         addRenderableWidget(Button.builder(Component.translatable("gui.stagelite.done"), btn -> onClose())
                 .bounds(bx, by + 4, bw, 20).build());
 
-        // Holograma: casilla para pegar el link de la imagen
+        // Holograma: casilla para pegar un link, o elegir / arrastrar una imagen del computador
         if (type.usesUrl()) {
-            urlBox = new EditBox(this.font, left, top + 152, PANEL_W - 120, 18, Component.translatable("gui.stagelite.url"));
-            urlBox.setMaxLength(LightData.MAX_URL);
+            urlBox = new EditBox(this.font, left, top + 152, PANEL_W - 130, 18, Component.translatable("gui.stagelite.url"));
+            urlBox.setMaxLength(1024);
             urlBox.setHint(Component.translatable("gui.stagelite.url_hint"));
             urlBox.setValue(data.url);
             urlBox.setTooltip(Tooltip.create(Component.translatable("tip.stagelite.url")));
             urlBox.setResponder(text -> {
-                data.url = text.trim();
-                markDirty();
+                String t = text.trim();
+                if (t.isEmpty() || t.regionMatches(true, 0, "http", 0, 4) || t.startsWith(ImageIds.PREFIX)) {
+                    data.url = t;
+                    markDirty();
+                }
             });
             addRenderableWidget(urlBox);
+            addRenderableWidget(Button.builder(Component.translatable("gui.stagelite.pick_file"), btn -> pickFile())
+                    .bounds(left + PANEL_W - 126, top + 152, 126, 18)
+                    .tooltip(Tooltip.create(Component.translatable("tip.stagelite.pick_file"))).build());
         }
+    }
+
+    // ------------------------------------------------------------------ imagenes locales
+
+    private void pickFile() {
+        status = Component.translatable("gui.stagelite.img_dialog");
+        Thread t = new Thread(() -> {
+            String picked = null;
+            try (MemoryStack stack = MemoryStack.stackPush()) {
+                PointerBuffer filters = stack.mallocPointer(5);
+                filters.put(stack.UTF8("*.png")).put(stack.UTF8("*.jpg")).put(stack.UTF8("*.jpeg"))
+                        .put(stack.UTF8("*.gif")).put(stack.UTF8("*.bmp"));
+                filters.flip();
+                picked = TinyFileDialogs.tinyfd_openFileDialog("StageLite", "", filters, "Imagenes", false);
+            } catch (Throwable ex) {
+                Minecraft.getInstance().execute(() -> status = Component.translatable("gui.stagelite.img_nodialog"));
+                return;
+            }
+            final String file = picked;
+            Minecraft.getInstance().execute(() -> {
+                if (file == null) {
+                    status = Component.empty();
+                } else {
+                    importFile(file);
+                }
+            });
+        }, "StageLite-filedialog");
+        t.setDaemon(true);
+        t.start();
+    }
+
+    /** Lee una imagen del computador, la sube al servidor y deja el holograma apuntando a ella. */
+    private void importFile(String pathText) {
+        try {
+            String t = pathText.trim();
+            if (t.length() > 1 && t.startsWith("\"") && t.endsWith("\"")) {
+                t = t.substring(1, t.length() - 1);
+            }
+            Path path = Path.of(t);
+            long size = Files.size(path);
+            if (size > ImageIds.MAX_CLIENT_BYTES) {
+                status = Component.translatable("gui.stagelite.img_big", ImageIds.MAX_CLIENT_BYTES / 1024);
+                return;
+            }
+            byte[] bytes = Files.readAllBytes(path);
+            if (!ImageIds.isImage(bytes)) {
+                status = Component.translatable("gui.stagelite.img_bad");
+                return;
+            }
+            String hash = ImageIds.hash(bytes);
+            HologramImages.saveLocal(hash, bytes);
+            int total = (bytes.length + ImageIds.CHUNK - 1) / ImageIds.CHUNK;
+            for (int i = 0; i < total; i++) {
+                int from = i * ImageIds.CHUNK;
+                int to = Math.min(bytes.length, from + ImageIds.CHUNK);
+                ModNetwork.CHANNEL.sendToServer(new ImageChunkPacket(hash, i, total, Arrays.copyOfRange(bytes, from, to)));
+            }
+            String url = ImageIds.PREFIX + hash;
+            data.url = url;
+            urlBox.setValue(url);
+            markDirty();
+            status = Component.translatable("gui.stagelite.img_ok", path.getFileName().toString());
+        } catch (IOException | RuntimeException ex) {
+            status = Component.translatable("gui.stagelite.img_err");
+        }
+    }
+
+    @Override
+    public void onFilesDrop(List<Path> paths) {
+        if (type.usesUrl() && !paths.isEmpty()) {
+            importFile(paths.get(0).toString());
+        }
+    }
+
+    @Override
+    public boolean keyPressed(int key, int scancode, int mods) {
+        // Enter en la casilla con una ruta de archivo (por ejemplo C:\fotos\logo.png)
+        if (urlBox != null && urlBox.isFocused() && (key == 257 || key == 335)) {
+            String t = urlBox.getValue().trim();
+            if (!t.isEmpty() && !t.regionMatches(true, 0, "http", 0, 4) && !t.startsWith(ImageIds.PREFIX)) {
+                importFile(t);
+                return true;
+            }
+        }
+        return super.keyPressed(key, scancode, mods);
     }
 
     private Component billboardLabel() {
@@ -193,7 +298,7 @@ public class StageLightScreen extends Screen {
     }
 
     private FaderWidget addFader(int x, int y, String key, int min, int max, int value, int color, IntConsumer setter) {
-        FaderWidget fader = new FaderWidget(x, y, 30, FADER_H, Component.translatable("fader.stagelite." + key),
+        FaderWidget fader = new FaderWidget(x, y, 28, FADER_H, Component.translatable("fader.stagelite." + key),
                 min, max, value, color, setter, this::markDirty, this::commit);
         fader.setTooltip(Tooltip.create(Component.translatable("tip.stagelite." + key)));
         addRenderableWidget(fader);
@@ -259,7 +364,7 @@ public class StageLightScreen extends Screen {
         this.renderBackground(g);
 
         // Fondo del panel
-        int bottom = top + (type.usesUrl() ? 176 : 148);
+        int bottom = top + (type.usesUrl() ? 190 : 148);
         g.fill(left - 8, top - 24, left + PANEL_W + 8, bottom, 0xD0101014);
         g.fill(left - 8, top - 24, left + PANEL_W + 8, top - 23, 0xFF505058);
         g.fill(left - 8, bottom - 1, left + PANEL_W + 8, bottom, 0xFF505058);
@@ -279,6 +384,9 @@ public class StageLightScreen extends Screen {
         }
 
         super.render(g, mouseX, mouseY, partialTick);
+        if (type.usesUrl()) {
+            g.drawString(this.font, status, left, top + 174, 0xA0D0FF, false);
+        }
 
         // Etiqueta del grupo (entre - y +)
         Component group = Component.translatable("gui.stagelite.group",

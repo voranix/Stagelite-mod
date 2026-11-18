@@ -42,6 +42,7 @@ Todos se colocan, se abren con clic derecho (solo staff) y se pueden meter en **
 | **Consola de luces** `light_console` | Un canal por cada grupo: ON/OFF, 10 colores, Brillo, Vel., Efecto, Movimiento; además Apagón, escenas y shows | — |
 
 ### Holograma
+- **Imagen del computador:** pulsa *Elegir archivo...*, arrastra la imagen a la ventana del panel, o escribe la ruta y pulsa Enter. Se sube al servidor (carpeta `stagelite_images` del mundo, máx. `maxImageKB` = 2048 KB por defecto) y todos los jugadores la ven; cada cliente la guarda en `stagelite_cache`.
 - Pega en la casilla un link **directo a una imagen** (PNG, JPG, BMP o **GIF animado**, máx. 8 MB; los GIF muy grandes se reducen de tamaño/cuadros para ahorrar memoria). Un link de YouTube o de una página web **no funciona**; tampoco hay video.
 - Cada jugador descarga la imagen desde su propio cliente: el sitio de la imagen ve la IP de los jugadores. Se bloquean direcciones privadas/locales. Quien no quiera descargar nada: `hologramsEnabled = false` en `stagelite-client.toml`.
 - *Mira al jugador* = siempre de frente; *Fijo* = queda en una dirección (fader Giro).
@@ -80,6 +81,7 @@ Todos admiten TAB para autocompletar. Las luces del mismo **grupo** (1-99) se co
 | `/stagelite group <n> effect <static\|pulse\|strobe\|rainbow>` | Efecto |
 | `/stagelite group <n> move <none\|sweep\|nod\|circle\|eight>` | Movimiento (solo cabezas móviles) |
 | `/stagelite group <n> speed <1-10>` | Velocidad |
+| `/stagelite group <n> yaw <-90..90>` | Giro fijo hacia un lado (junto con tilt permite apuntar a cualquier dirección) |
 | `/stagelite group <n> tilt <-90..90>` | Inclinación fija (+ arriba, - abajo) de focos, láser, paneles y estrobos |
 | `/stagelite scene save\|load\|delete <nombre>` / `scene list` | Escenas (el look de todos los grupos) |
 | `/stagelite show create <nombre>` | Crea un show vacío |

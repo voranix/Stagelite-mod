@@ -2,6 +2,11 @@ package com.stagelite.client;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import com.stagelite.StageLite;
+import com.stagelite.network.ImageIds;
+import com.stagelite.network.ImageRequestPacket;
+import com.stagelite.network.ModNetwork;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.ResourceLocation;
@@ -52,6 +57,10 @@ public final class HologramImages {
         private int[] delays;
         private int totalMs;
         private int current;
+        /** Imagen local: esperando que el servidor la envie. */
+        private boolean awaiting;
+        private long requestedAt;
+        private int retries;
     }
 
     private static final int MAX_BYTES = 8 * 1024 * 1024;
@@ -80,12 +89,24 @@ public final class HologramImages {
             e = new Entry();
             CACHE.put(url, e);
             final Entry entry = e;
-            POOL.submit(() -> load(url, entry));
+            if (url.startsWith(ImageIds.PREFIX)) {
+                startLocal(url, entry);
+            } else {
+                POOL.submit(() -> load(url, entry));
+            }
         }
         long now = System.currentTimeMillis();
         e.lastUsed = now;
         if (e.state == State.READY && e.frames != null) {
             animate(e, now);
+        } else if (e.state == State.LOADING && e.awaiting && now - e.requestedAt > 15000) {
+            if (e.retries >= 3) {
+                e.state = State.FAILED;
+            } else {
+                e.retries++;
+                e.requestedAt = now;
+                ModNetwork.CHANNEL.sendToServer(new ImageRequestPacket(url.substring(ImageIds.PREFIX.length())));
+            }
         }
         return e;
     }
@@ -147,11 +168,109 @@ public final class HologramImages {
         }
     }
 
+    // ------------------------------------------------------------------ imagenes locales (subidas por el staff)
+
+    private static final Map<String, byte[][]> INCOMING = new HashMap<>();
+
+    private static Path cacheDir() {
+        return Minecraft.getInstance().gameDirectory.toPath().resolve("stagelite_cache");
+    }
+
+    /** Guarda una imagen local en la cache de este cliente (la usa quien la sube, para no pedirla de vuelta). */
+    public static void saveLocal(String hash, byte[] bytes) {
+        if (!ImageIds.validHash(hash)) {
+            return;
+        }
+        try {
+            Files.createDirectories(cacheDir());
+            Files.write(cacheDir().resolve(hash), bytes);
+        } catch (IOException ignored) {
+            // si no se puede guardar, se pedira al servidor
+        }
+    }
+
+    private static void startLocal(String url, Entry entry) {
+        String hash = url.substring(ImageIds.PREFIX.length());
+        if (!ImageIds.validHash(hash)) {
+            entry.state = State.FAILED;
+            return;
+        }
+        Path file = cacheDir().resolve(hash);
+        POOL.submit(() -> {
+            try {
+                if (Files.isRegularFile(file) && Files.size(file) <= 8L * 1024 * 1024) {
+                    process(url, Files.readAllBytes(file), entry);
+                    return;
+                }
+            } catch (IOException ignored) {
+                // se pide al servidor
+            }
+            Minecraft.getInstance().execute(() -> {
+                entry.awaiting = true;
+                entry.requestedAt = System.currentTimeMillis();
+                ModNetwork.CHANNEL.sendToServer(new ImageRequestPacket(hash));
+            });
+        });
+    }
+
+    /** Llega un trozo desde el servidor (hilo principal). */
+    public static void onChunk(String hash, int index, int total, byte[] data) {
+        Entry entry = CACHE.get(ImageIds.PREFIX + hash);
+        if (entry == null || !ImageIds.validHash(hash)) {
+            return;
+        }
+        if (total == 0) {
+            entry.state = State.FAILED; // el servidor no tiene esa imagen
+            return;
+        }
+        if (total < 0 || total > 400 || index < 0 || index >= total) {
+            return;
+        }
+        byte[][] parts = INCOMING.get(hash);
+        if (parts == null || parts.length != total) {
+            parts = new byte[total][];
+            INCOMING.put(hash, parts);
+        }
+        parts[index] = data;
+        for (byte[] p : parts) {
+            if (p == null) {
+                return;
+            }
+        }
+        INCOMING.remove(hash);
+        int size = 0;
+        for (byte[] p : parts) {
+            size += p.length;
+        }
+        byte[] all = new byte[size];
+        int pos = 0;
+        for (byte[] p : parts) {
+            System.arraycopy(p, 0, all, pos, p.length);
+            pos += p.length;
+        }
+        if (!ImageIds.hash(all).equals(hash) || !ImageIds.isImage(all)) {
+            entry.state = State.FAILED;
+            return;
+        }
+        entry.awaiting = false;
+        POOL.submit(() -> {
+            saveLocal(hash, all);
+            process(ImageIds.PREFIX + hash, all, entry);
+        });
+    }
+
     // ------------------------------------------------------------------ descarga (hilo aparte)
 
     private static void load(String url, Entry entry) {
         try {
-            byte[] bytes = fetch(url);
+            process(url, fetch(url), entry);
+        } catch (Exception ex) {
+            entry.state = State.FAILED;
+        }
+    }
+
+    private static void process(String url, byte[] bytes, Entry entry) {
+        try {
             List<BufferedImage> imgs = new ArrayList<>();
             List<Integer> delays = new ArrayList<>();
             decode(bytes, imgs, delays);

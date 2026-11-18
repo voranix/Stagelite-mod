@@ -8,6 +8,7 @@ public final class StageLiteConfig {
     public static final ForgeConfigSpec SPEC;
     public static final ForgeConfigSpec.IntValue PERMISSION_LEVEL;
     public static final ForgeConfigSpec.BooleanValue FIREWORKS_ENABLED;
+    public static final ForgeConfigSpec.IntValue MAX_IMAGE_KB;
 
     static {
         ForgeConfigSpec.Builder b = new ForgeConfigSpec.Builder();
@@ -18,6 +19,9 @@ public final class StageLiteConfig {
         FIREWORKS_ENABLED = b
                 .comment("Permite que los lanzadores de fuegos artificiales disparen cohetes reales (hacen dano cerca de la explosion).")
                 .define("fireworksEnabled", true);
+        MAX_IMAGE_KB = b
+                .comment("Tamano maximo (en KB) de las imagenes locales que el staff sube al holograma. Se guardan en la carpeta stagelite_images del mundo.")
+                .defineInRange("maxImageKB", 2048, 64, 8192);
         SPEC = b.build();
     }
 
