@@ -8,6 +8,9 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -33,3 +36,15 @@ jobs:
           name: stagelite-jar
           path: build/libs/*.jar
           if-no-files-found: error
+
+      # Publica el .jar en la pestaña "Releases" (enlace directo de descarga)
+      - name: Publicar release "latest"
+        if: github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete latest --yes --cleanup-tag || true
+          gh release create latest build/libs/*.jar \
+            --title "StageLite - ultimo build" \
+            --notes "Compilado automaticamente desde el commit ${GITHUB_SHA::7}. Poner el .jar en la carpeta mods (servidor y jugadores), Forge 1.20.1." \
+            --target "$GITHUB_SHA"
