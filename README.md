@@ -50,6 +50,7 @@ Todos se colocan, se abren con clic derecho (solo staff) y se pueden meter en **
 Clic derecho (staff). Muestra los grupos que tengan luces **cargadas**. Pasa el ratón sobre `G1 x4` para ver qué dispositivos hay en el grupo. Las escenas y shows son los mismos de los comandos. Las escenas guardan encendido, color, brillo, efecto, movimiento y velocidad (no cambian el link, tamaño ni otros ajustes propios de cada dispositivo).
 
 ### Notas
+- Al inclinar una luz fija, el modelo del bloque se inclina junto con el haz.
 - El láser no se corta con bloques (atraviesa paredes); los rayos de la bola disco tampoco.
 - Los fuegos artificiales son cohetes de Minecraft: su explosión hace daño cerca. Se pueden desactivar con `fireworksEnabled = false` en `stagelite-common.toml`.
 - La versión del protocolo de red cambió: servidor y jugadores deben tener la misma versión del mod.

@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "stagelite:block/stage_light_body"
+  },
+  "elements": []
+}

@@ -25,6 +25,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -94,6 +95,11 @@ public class StageLightRenderer implements BlockEntityRenderer<StageLightBlockEn
         boolean beamVisible = lit && bright > 0.001f;
         boolean moves = type.moves();
 
+        // Luces fijas inclinadas: el modelo del bloque se oculta (TILTED) y se dibuja aqui girado junto con el haz.
+        if (type.tiltable() && !moves && d.tilt != 0) {
+            renderTiltedBody(be, pose, buffers, packedLight, packedOverlay, facing, d.tilt);
+        }
+
         int rgb = LightFx.color(d, time);
         float r = (rgb >> 16 & 255) / 255f;
         float g = (rgb >> 8 & 255) / 255f;
@@ -128,7 +134,9 @@ public class StageLightRenderer implements BlockEntityRenderer<StageLightBlockEn
         pose.pushPose();
         pose.translate(0.5, 0.5, 0.5);
         pose.mulPose(FACING_ROT[facing.get3DDataValue()]);
-        pose.mulPose(Axis.XP.rotationDegrees(-d.tilt));
+        if (!moves) {
+            pose.mulPose(Axis.XP.rotationDegrees(-d.tilt));
+        }
 
         if (moves) {
             boolean moving = d.movement != Movement.NONE;
@@ -139,7 +147,7 @@ public class StageLightRenderer implements BlockEntityRenderer<StageLightBlockEn
             // La horquilla gira alrededor del eje de la base (Z); la cabeza se inclina en X.
             pose.mulPose(Axis.ZP.rotationDegrees(pan));
             drawYoke(buffers, pose, packedLight, packedOverlay);
-            pose.mulPose(Axis.XP.rotationDegrees(baseTilt + tilt));
+            pose.mulPose(Axis.XP.rotationDegrees(baseTilt + tilt - d.tilt));
             int lensLight = lit ? LightTexture.FULL_BRIGHT : packedLight;
             drawHead(buffers, pose, packedLight, lensLight, packedOverlay, lit ? r : 0.35f, lit ? g : 0.35f, lit ? b : 0.35f);
         }
@@ -154,6 +162,20 @@ public class StageLightRenderer implements BlockEntityRenderer<StageLightBlockEn
         pose.popPose();
     }
 
+
+    private static void renderTiltedBody(StageLightBlockEntity be, PoseStack pose, MultiBufferSource buffers,
+                                          int light, int overlay, Direction facing, int tilt) {
+        BlockState base = be.getBlockState().setValue(StageLightBlock.TILTED, false);
+        Quaternionf rot = FACING_ROT[facing.get3DDataValue()];
+        pose.pushPose();
+        pose.translate(0.5, 0.5, 0.5);
+        pose.mulPose(rot);
+        pose.mulPose(Axis.XP.rotationDegrees(-tilt));
+        pose.mulPose(new Quaternionf(rot).conjugate());
+        pose.translate(-0.5, -0.5, -0.5);
+        Minecraft.getInstance().getBlockRenderer().renderSingleBlock(base, pose, buffers, light, overlay);
+        pose.popPose();
+    }
 
     // ------------------------------------------------------------------ laser
 
@@ -171,7 +193,7 @@ public class StageLightRenderer implements BlockEntityRenderer<StageLightBlockEn
         pose.mulPose(Axis.XP.rotationDegrees(tilt));
 
         Matrix4f m = pose.last().pose();
-        VertexConsumer vc = buffers.getBuffer(RenderType.lightning());
+        VertexConsumer vc = buffers.getBuffer(ModRenderTypes.BEAM);
         int n = 2 + d.extra * 2;
         float fan = Math.min(80f, d.spread * 2f);
         float start = FixtureType.LASER.beamStart();
@@ -262,7 +284,7 @@ public class StageLightRenderer implements BlockEntityRenderer<StageLightBlockEn
         pose.pushPose();
         pose.translate(0.5, 0.5, 0.5);
         Matrix4f m = pose.last().pose();
-        VertexConsumer lv = buffers.getBuffer(RenderType.lightning());
+        VertexConsumer lv = buffers.getBuffer(ModRenderTypes.BEAM);
         int rays = 6 + d.extra * 3;
         float a = 0.55f * (d.intensity / 100f) * bright;
         for (int i = 0; i < rays; i++) {
@@ -447,7 +469,7 @@ public class StageLightRenderer implements BlockEntityRenderer<StageLightBlockEn
         float z1 = z0 + length;
 
         Matrix4f m = pose.last().pose();
-        VertexConsumer vc = buffers.getBuffer(RenderType.lightning());
+        VertexConsumer vc = buffers.getBuffer(ModRenderTypes.BEAM);
 
         int sides = ClientConfig.BEAM_SIDES.get();
         ensureTable(sides);

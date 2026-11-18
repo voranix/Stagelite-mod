@@ -1,27 +1,45 @@
 {
   "variants": {
-    "facing=north": {
+    "facing=north,tilted=false": {
       "model": "stagelite:block/strobe_light"
     },
-    "facing=east": {
+    "facing=north,tilted=true": {
+      "model": "stagelite:block/empty"
+    },
+    "facing=east,tilted=false": {
       "model": "stagelite:block/strobe_light",
       "y": 90
     },
-    "facing=south": {
+    "facing=east,tilted=true": {
+      "model": "stagelite:block/empty"
+    },
+    "facing=south,tilted=false": {
       "model": "stagelite:block/strobe_light",
       "y": 180
     },
-    "facing=west": {
+    "facing=south,tilted=true": {
+      "model": "stagelite:block/empty"
+    },
+    "facing=west,tilted=false": {
       "model": "stagelite:block/strobe_light",
       "y": 270
     },
-    "facing=up": {
+    "facing=west,tilted=true": {
+      "model": "stagelite:block/empty"
+    },
+    "facing=up,tilted=false": {
       "model": "stagelite:block/strobe_light",
       "x": 270
     },
-    "facing=down": {
+    "facing=up,tilted=true": {
+      "model": "stagelite:block/empty"
+    },
+    "facing=down,tilted=false": {
       "model": "stagelite:block/strobe_light",
       "x": 90
+    },
+    "facing=down,tilted=true": {
+      "model": "stagelite:block/empty"
     }
   }
 }

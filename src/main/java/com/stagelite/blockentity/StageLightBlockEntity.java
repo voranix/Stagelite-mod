@@ -95,9 +95,12 @@ public class StageLightBlockEntity extends BlockEntity {
         }
         setChanged();
         BlockState state = getBlockState();
-        int wanted = type().lightLevel(data);
-        if (state.getValue(StageLightBlock.LIGHT) != wanted) {
-            level.setBlock(worldPosition, state.setValue(StageLightBlock.LIGHT, wanted), 3);
+        FixtureType t = type();
+        BlockState wanted = state
+                .setValue(StageLightBlock.LIGHT, t.lightLevel(data))
+                .setValue(StageLightBlock.TILTED, t.tiltable() && !t.moves() && data.tilt != 0);
+        if (wanted != state) {
+            level.setBlock(worldPosition, wanted, 3);
         } else {
             level.sendBlockUpdated(worldPosition, state, state, 3);
         }

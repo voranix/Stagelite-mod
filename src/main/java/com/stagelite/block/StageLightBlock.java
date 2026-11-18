@@ -29,6 +29,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.MapColor;
@@ -48,6 +49,8 @@ public class StageLightBlock extends Block implements EntityBlock {
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
     /** Nivel de luz de bloque, lo actualiza el block entity. */
     public static final IntegerProperty LIGHT = IntegerProperty.create("light", 0, 15);
+    /** true = el modelo fijo se oculta y lo dibuja el renderer inclinado. */
+    public static final BooleanProperty TILTED = BooleanProperty.create("tilted");
 
     private static final VoxelShape SHAPE = Block.box(3, 3, 3, 13, 13, 13);
 
@@ -61,7 +64,7 @@ public class StageLightBlock extends Block implements EntityBlock {
                 .noOcclusion()
                 .lightLevel(state -> state.getValue(LIGHT)));
         this.type = type;
-        registerDefaultState(stateDefinition.any().setValue(FACING, Direction.SOUTH).setValue(LIGHT, 0));
+        registerDefaultState(stateDefinition.any().setValue(FACING, Direction.SOUTH).setValue(LIGHT, 0).setValue(TILTED, false));
     }
 
     public FixtureType fixtureType() {
@@ -70,7 +73,7 @@ public class StageLightBlock extends Block implements EntityBlock {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING, LIGHT);
+        builder.add(FACING, LIGHT, TILTED);
     }
 
     @Nullable
