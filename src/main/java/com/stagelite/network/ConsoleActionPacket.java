@@ -38,6 +38,7 @@ public class ConsoleActionPacket {
     public static final int SHOW_STOP = 11;
     public static final int REFRESH = 12;
     public static final int SCENE_DELETE = 13;
+    public static final int GROUP_TILT = 14;
 
     private final BlockPos pos;
     private final int action;
@@ -105,6 +106,9 @@ public class ConsoleActionPacket {
                 break;
             case GROUP_SPEED:
                 GroupControl.edit(group, d -> d.speed = value);
+                break;
+            case GROUP_TILT:
+                GroupControl.edit(group, d -> d.tilt = value);
                 break;
             case BLACKOUT:
                 GroupControl.editAll(d -> d.on = false);

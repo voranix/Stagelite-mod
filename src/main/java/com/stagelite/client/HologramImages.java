@@ -9,7 +9,13 @@ import net.minecraft.resources.ResourceLocation;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
+import java.awt.AlphaComposite;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import javax.imageio.metadata.IIOMetadata;
+import org.w3c.dom.Node;
+import java.util.ArrayList;
+import java.util.List;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -27,8 +33,8 @@ import java.util.concurrent.Executors;
  * Descarga y guarda las imagenes de los hologramas (solo en el cliente).
  *
  * Seguridad: solo http/https en los puertos normales, no se conecta a direcciones privadas o locales
- * (127.x, 192.168.x, 10.x...), maximo 4 MB por imagen y maximo 24 imagenes en memoria.
- * Solo imagenes (PNG, JPG, GIF -primer cuadro-, BMP). No admite video.
+ * (127.x, 192.168.x, 10.x...), maximo 8 MB por imagen y maximo 24 imagenes en memoria.
+ * Solo imagenes (PNG, JPG, GIF animado, BMP). No admite video.
  */
 public final class HologramImages {
     public enum State {
@@ -41,9 +47,16 @@ public final class HologramImages {
         public float aspect = 1f;
         private long lastUsed;
         private DynamicTexture dynamic;
+        /** Solo GIF animado: cuadros, tiempo de cada uno (ms) y cuadro mostrado ahora. */
+        private List<NativeImage> frames;
+        private int[] delays;
+        private int totalMs;
+        private int current;
     }
 
-    private static final int MAX_BYTES = 4 * 1024 * 1024;
+    private static final int MAX_BYTES = 8 * 1024 * 1024;
+    private static final int MAX_FRAMES = 120;
+    private static final double MAX_ANIM_PIXELS = 16_000_000.0;
     private static final int MAX_ENTRIES = 24;
     private static final int MAX_SIDE = 512;
     private static final long MAX_PIXELS = 25_000_000L;
@@ -69,8 +82,43 @@ public final class HologramImages {
             final Entry entry = e;
             POOL.submit(() -> load(url, entry));
         }
-        e.lastUsed = System.currentTimeMillis();
+        long now = System.currentTimeMillis();
+        e.lastUsed = now;
+        if (e.state == State.READY && e.frames != null) {
+            animate(e, now);
+        }
         return e;
+    }
+
+    /** Pasa al cuadro del GIF que toca segun la hora. */
+    private static void animate(Entry e, long now) {
+        int t = (int) (now % e.totalMs);
+        int idx = 0;
+        int acc = 0;
+        for (int i = 0; i < e.delays.length; i++) {
+            acc += e.delays[i];
+            if (t < acc) {
+                idx = i;
+                break;
+            }
+        }
+        if (idx != e.current && e.dynamic != null && e.dynamic.getPixels() != null) {
+            e.dynamic.getPixels().copyFrom(e.frames.get(idx));
+            e.dynamic.upload();
+            e.current = idx;
+        }
+    }
+
+    private static void free(Entry e) {
+        if (e.texture != null) {
+            Minecraft.getInstance().getTextureManager().release(e.texture);
+        }
+        if (e.frames != null) {
+            for (NativeImage f : e.frames) {
+                f.close();
+            }
+            e.frames = null;
+        }
     }
 
     private static void evictIfNeeded() {
@@ -86,10 +134,7 @@ public final class HologramImages {
             }
         }
         if (oldestKey != null) {
-            Entry gone = CACHE.remove(oldestKey);
-            if (gone.texture != null) {
-                Minecraft.getInstance().getTextureManager().release(gone.texture);
-            }
+            free(CACHE.remove(oldestKey));
         }
     }
 
@@ -97,10 +142,7 @@ public final class HologramImages {
     public static void clear() {
         Iterator<Entry> it = CACHE.values().iterator();
         while (it.hasNext()) {
-            Entry e = it.next();
-            if (e.texture != null) {
-                Minecraft.getInstance().getTextureManager().release(e.texture);
-            }
+            free(it.next());
             it.remove();
         }
     }
@@ -110,38 +152,51 @@ public final class HologramImages {
     private static void load(String url, Entry entry) {
         try {
             byte[] bytes = fetch(url);
-            BufferedImage img = decode(bytes);
-            if (img == null) {
+            List<BufferedImage> imgs = new ArrayList<>();
+            List<Integer> delays = new ArrayList<>();
+            decode(bytes, imgs, delays);
+            if (imgs.isEmpty()) {
                 throw new IOException("not an image");
             }
-            int w = img.getWidth();
-            int h = img.getHeight();
+            int w = imgs.get(0).getWidth();
+            int h = imgs.get(0).getHeight();
             float scale = Math.min(1f, MAX_SIDE / (float) Math.max(w, h));
+            if (imgs.size() > 1) {
+                scale = Math.min(scale, (float) Math.sqrt(MAX_ANIM_PIXELS / ((double) imgs.size() * w * h)));
+            }
             int tw = Math.max(1, Math.round(w * scale));
             int th = Math.max(1, Math.round(h * scale));
-            NativeImage ni = new NativeImage(tw, th, false);
-            for (int y = 0; y < th; y++) {
-                int sy = Math.min(h - 1, (int) (y / scale));
-                for (int x = 0; x < tw; x++) {
-                    int sx = Math.min(w - 1, (int) (x / scale));
-                    int argb = img.getRGB(sx, sy);
-                    int a = argb >>> 24;
-                    int r = (argb >> 16) & 255;
-                    int g = (argb >> 8) & 255;
-                    int b = argb & 255;
-                    ni.setPixelRGBA(x, y, (a << 24) | (b << 16) | (g << 8) | r);
-                }
+            List<NativeImage> frames = new ArrayList<>();
+            for (BufferedImage img : imgs) {
+                frames.add(toNative(img, tw, th, scale));
             }
+            int[] delayArr = new int[delays.size()];
+            int total = 0;
+            for (int i = 0; i < delayArr.length; i++) {
+                delayArr[i] = delays.get(i);
+                total += delayArr[i];
+            }
+            final int totalMs = Math.max(1, total);
             final float aspect = Math.max(0.25f, Math.min(4f, tw / (float) th));
             Minecraft.getInstance().execute(() -> {
                 try {
-                    DynamicTexture tex = new DynamicTexture(ni);
+                    NativeImage first = new NativeImage(tw, th, false);
+                    first.copyFrom(frames.get(0));
+                    DynamicTexture tex = new DynamicTexture(first);
                     ResourceLocation loc = new ResourceLocation(StageLite.MODID,
                             "holo/" + Integer.toHexString(url.hashCode()) + "_" + (counter++));
                     Minecraft.getInstance().getTextureManager().register(loc, tex);
                     entry.dynamic = tex;
                     entry.texture = loc;
                     entry.aspect = aspect;
+                    if (frames.size() > 1) {
+                        entry.frames = frames;
+                        entry.delays = delayArr;
+                        entry.totalMs = totalMs;
+                        entry.current = 0;
+                    } else {
+                        frames.get(0).close();
+                    }
                     entry.state = State.READY;
                 } catch (Exception ex) {
                     entry.state = State.FAILED;
@@ -152,24 +207,147 @@ public final class HologramImages {
         }
     }
 
-    private static BufferedImage decode(byte[] bytes) throws IOException {
+    private static NativeImage toNative(BufferedImage img, int tw, int th, float scale) {
+        int w = img.getWidth();
+        int h = img.getHeight();
+        NativeImage ni = new NativeImage(tw, th, false);
+        for (int y = 0; y < th; y++) {
+            int sy = Math.min(h - 1, (int) (y / scale));
+            for (int x = 0; x < tw; x++) {
+                int sx = Math.min(w - 1, (int) (x / scale));
+                int argb = img.getRGB(sx, sy);
+                int a = argb >>> 24;
+                int r = (argb >> 16) & 255;
+                int g = (argb >> 8) & 255;
+                int b = argb & 255;
+                ni.setPixelRGBA(x, y, (a << 24) | (b << 16) | (g << 8) | r);
+            }
+        }
+        return ni;
+    }
+
+    /** Lee una imagen (1 cuadro) o un GIF animado (varios cuadros ya compuestos, con sus tiempos en ms). */
+    private static void decode(byte[] bytes, List<BufferedImage> out, List<Integer> delays) throws IOException {
         try (ImageInputStream in = ImageIO.createImageInputStream(new ByteArrayInputStream(bytes))) {
             Iterator<ImageReader> readers = ImageIO.getImageReaders(in);
             if (!readers.hasNext()) {
-                return null;
+                return;
             }
             ImageReader reader = readers.next();
             try {
-                reader.setInput(in, true, true);
+                reader.setInput(in, false, false);
+                if ("gif".equalsIgnoreCase(reader.getFormatName())) {
+                    readGif(reader, out, delays);
+                    if (!out.isEmpty()) {
+                        return;
+                    }
+                }
                 long w = reader.getWidth(0);
                 long h = reader.getHeight(0);
                 if (w <= 0 || h <= 0 || w * h > MAX_PIXELS) {
-                    return null;
+                    return;
                 }
-                return reader.read(0);
+                out.add(reader.read(0));
+                delays.add(100);
             } finally {
                 reader.dispose();
             }
+        }
+    }
+
+    private static void readGif(ImageReader reader, List<BufferedImage> out, List<Integer> delays) throws IOException {
+        int n = Math.min(reader.getNumImages(true), MAX_FRAMES);
+        int sw = 0;
+        int sh = 0;
+        IIOMetadata sm = reader.getStreamMetadata();
+        if (sm != null) {
+            Node root = sm.getAsTree("javax_imageio_gif_stream_1.0");
+            Node lsd = child(root, "LogicalScreenDescriptor");
+            if (lsd != null) {
+                sw = intAttr(lsd, "logicalScreenWidth");
+                sh = intAttr(lsd, "logicalScreenHeight");
+            }
+        }
+        if (sw <= 0 || sh <= 0) {
+            sw = reader.getWidth(0);
+            sh = reader.getHeight(0);
+        }
+        if (sw <= 0 || sh <= 0 || (long) sw * sh > MAX_PIXELS) {
+            return;
+        }
+        // Limite de memoria mientras se decodifica: se recortan cuadros si el GIF es muy grande.
+        n = Math.max(1, Math.min(n, (int) (24_000_000L / ((long) sw * sh))));
+        BufferedImage canvas = new BufferedImage(sw, sh, BufferedImage.TYPE_INT_ARGB);
+        for (int i = 0; i < n; i++) {
+            BufferedImage frame = reader.read(i);
+            int left = 0;
+            int top = 0;
+            int delay = 100;
+            String disposal = "none";
+            IIOMetadata fm = reader.getImageMetadata(i);
+            if (fm != null) {
+                Node root = fm.getAsTree("javax_imageio_gif_image_1.0");
+                Node desc = child(root, "ImageDescriptor");
+                if (desc != null) {
+                    left = intAttr(desc, "imageLeftPosition");
+                    top = intAttr(desc, "imageTopPosition");
+                }
+                Node gce = child(root, "GraphicControlExtension");
+                if (gce != null) {
+                    int d = intAttr(gce, "delayTime") * 10;
+                    delay = d < 20 ? 100 : d;
+                    Node dm = gce.getAttributes().getNamedItem("disposalMethod");
+                    if (dm != null) {
+                        disposal = dm.getNodeValue();
+                    }
+                }
+            }
+            BufferedImage before = null;
+            if ("restoreToPrevious".equals(disposal)) {
+                before = copy(canvas);
+            }
+            Graphics2D g = canvas.createGraphics();
+            g.drawImage(frame, left, top, null);
+            g.dispose();
+            out.add(copy(canvas));
+            delays.add(delay);
+            if ("restoreToBackgroundColor".equals(disposal)) {
+                Graphics2D g2 = canvas.createGraphics();
+                g2.setComposite(AlphaComposite.Clear);
+                g2.fillRect(left, top, frame.getWidth(), frame.getHeight());
+                g2.dispose();
+            } else if (before != null) {
+                canvas = before;
+            }
+        }
+    }
+
+    private static BufferedImage copy(BufferedImage src) {
+        BufferedImage c = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = c.createGraphics();
+        g.drawImage(src, 0, 0, null);
+        g.dispose();
+        return c;
+    }
+
+    private static Node child(Node parent, String name) {
+        for (Node c = parent.getFirstChild(); c != null; c = c.getNextSibling()) {
+            if (name.equals(c.getNodeName())) {
+                return c;
+            }
+        }
+        return null;
+    }
+
+    private static int intAttr(Node node, String name) {
+        Node a = node.getAttributes().getNamedItem(name);
+        if (a == null) {
+            return 0;
+        }
+        try {
+            return Integer.parseInt(a.getNodeValue());
+        } catch (NumberFormatException e) {
+            return 0;
         }
     }
 

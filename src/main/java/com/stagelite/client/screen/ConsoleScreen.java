@@ -31,7 +31,7 @@ public class ConsoleScreen extends Screen {
     private static final int[] PRESETS = {
             0xFFFFFF, 0xFF0000, 0xFF8000, 0xFFFF00, 0x00FF00, 0x00FFFF, 0x0040FF, 0x8000FF, 0xFF00FF, 0xFF60B0
     };
-    private static final int STRIP_W = 64;
+    private static final int STRIP_W = 96;
     private static final int GAP = 6;
     private static final int FADER_H = 80;
 
@@ -78,14 +78,14 @@ public class ConsoleScreen extends Screen {
         page = Mth.clamp(page, 0, Math.max(0, (total - 1) / perPage));
         shown = Math.max(0, Math.min(perPage, total - page * perPage));
         panelW = Math.max(shown * (STRIP_W + GAP) - GAP, 380);
-        int totalH = 12 + 20 + 49 + FADER_H + 2 + 36 + 6 + 50;
+        int totalH = 12 + 20 + 22 + FADER_H + 2 + 36 + 6 + 50;
         left = (this.width - panelW) / 2;
         top = Math.max(18, (this.height - totalH) / 2);
         stripsX = left + (panelW - Math.max(0, shown * (STRIP_W + GAP) - GAP)) / 2;
 
         int yOn = top + 12;
         int ySw = yOn + 20;
-        int yF = ySw + 49;
+        int yF = ySw + 22;
         int yEff = yF + FADER_H + 2;
         int yMov = yEff + 18;
 
@@ -103,7 +103,7 @@ public class ConsoleScreen extends Screen {
 
             for (int c = 0; c < PRESETS.length; c++) {
                 final int color = PRESETS[c];
-                SwatchWidget sw = new SwatchWidget(x + (c % 2) * (STRIP_W / 2), ySw + (c / 2) * 9, STRIP_W / 2 - 1, 8, color, () -> {
+                SwatchWidget sw = new SwatchWidget(x + (c % 5) * (STRIP_W / 5), ySw + (c / 5) * 9, STRIP_W / 5 - 1, 8, color, () -> {
                     g.look.color = color;
                     send(ConsoleActionPacket.GROUP_COLOR, gn, color, "");
                 });
@@ -127,6 +127,15 @@ public class ConsoleScreen extends Screen {
                     }, () -> { }, this::flush);
             speed.setTooltip(Tooltip.create(Component.translatable("tip.stagelite.speed")));
             addRenderableWidget(speed);
+
+            FaderWidget tilt = new FaderWidget(x + 64, yF, 30, FADER_H, Component.translatable("fader.stagelite.tilt"),
+                    -90, 90, g.look.tilt, 0x40C0A0,
+                    v -> {
+                        g.look.tilt = v;
+                        pending.put(gn * 100 + ConsoleActionPacket.GROUP_TILT, new int[]{ConsoleActionPacket.GROUP_TILT, gn, v});
+                    }, () -> { }, this::flush);
+            tilt.setTooltip(Tooltip.create(Component.translatable("tip.stagelite.tilt")));
+            addRenderableWidget(tilt);
 
             addRenderableWidget(Button.builder(Component.translatable(g.look.effect.key()), btn -> {
                         g.look.effect = g.look.effect.next();
@@ -282,7 +291,7 @@ public class ConsoleScreen extends Screen {
     @Override
     public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
         this.renderBackground(g);
-        int bottom = top + 12 + 20 + 49 + FADER_H + 2 + 36 + 6 + 50;
+        int bottom = top + 12 + 20 + 22 + FADER_H + 2 + 36 + 6 + 50;
         g.fill(left - 8, top - 24 + 16, left + panelW + 8, bottom, 0xD0101014);
         g.fill(left - 8, top - 8, left + panelW + 8, top - 7, 0xFF505058);
         g.drawString(this.font, this.title, left, top - 2, 0xFFFFFF, false);

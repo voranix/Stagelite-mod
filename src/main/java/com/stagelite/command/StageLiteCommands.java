@@ -148,6 +148,12 @@ public final class StageLiteCommands {
                                             }
                                             return editGroup(ctx, d -> d.movement = m);
                                         })))
+                        .then(Commands.literal("tilt")
+                                .then(Commands.argument("degrees", IntegerArgumentType.integer(-90, 90))
+                                        .executes(ctx -> {
+                                            int v = IntegerArgumentType.getInteger(ctx, "degrees");
+                                            return editGroup(ctx, d -> d.tilt = v);
+                                        })))
                         .then(Commands.literal("speed")
                                 .then(Commands.argument("value", IntegerArgumentType.integer(1, 10))
                                         .executes(ctx -> {

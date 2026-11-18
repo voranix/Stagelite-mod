@@ -113,5 +113,7 @@
   "tip.stagelite.show": "Selected show (create them with /stagelite show).",
   "tip.stagelite.show_play": "Play the show once.",
   "tip.stagelite.show_loop": "Loop the show.",
-  "tip.stagelite.show_stop": "Stop the show."
+  "tip.stagelite.show_stop": "Stop the show.",
+  "fader.stagelite.tilt": "Tilt",
+  "tip.stagelite.tilt": "Fixed tilt of the light: positive = up, negative = down."
 }

@@ -99,6 +99,11 @@ public enum FixtureType {
         }
     }
 
+    /** Admite inclinacion fija. */
+    public boolean tiltable() {
+        return hasBeam() || this == LASER;
+    }
+
     public boolean usesUrl() {
         return this == HOLOGRAM;
     }

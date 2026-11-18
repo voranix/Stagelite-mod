@@ -29,7 +29,7 @@ public class StageLightScreen extends Screen {
     private static final int[] PRESETS = {
             0xFFFFFF, 0xFF0000, 0xFF8000, 0xFFFF00, 0x00FF00, 0x00FFFF, 0x0040FF, 0x8000FF, 0xFF00FF, 0xFF60B0
     };
-    private static final int PANEL_W = 440;
+    private static final int PANEL_W = 480;
     private static final int FADER_PITCH = 34;
     private static final int FADER_H = 96;
 
@@ -100,6 +100,10 @@ public class StageLightScreen extends Screen {
         fx += FADER_PITCH;
         if (type.animates()) {
             addFader(fx, fy, "range", 0, 90, data.range, 0xA070FF, v -> data.range = v);
+            fx += FADER_PITCH;
+        }
+        if (type.tiltable()) {
+            addFader(fx, fy, "tilt", -90, 90, data.tilt, 0x40C0A0, v -> data.tilt = v);
             fx += FADER_PITCH;
         }
         if (type == FixtureType.HOLOGRAM) {

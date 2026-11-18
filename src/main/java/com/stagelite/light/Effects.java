@@ -41,7 +41,8 @@ public final class Effects {
             if (white) {
                 level.addParticle(ParticleTypes.CLOUD, true, x, y, z, vx, vy, vz);
             } else {
-                level.addParticle(new DustParticleOptions(col, 2.5f), true, x, y, z, vx, vy, vz);
+                // Las particulas de polvo reducen su velocidad inicial 10 veces: se compensa para que lleguen igual de lejos que el humo blanco.
+                level.addParticle(new DustParticleOptions(col, 2.5f), true, x, y, z, vx * 10.0, vy * 10.0, vz * 10.0);
             }
         }
     }

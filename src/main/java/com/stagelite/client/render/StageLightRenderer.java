@@ -128,6 +128,7 @@ public class StageLightRenderer implements BlockEntityRenderer<StageLightBlockEn
         pose.pushPose();
         pose.translate(0.5, 0.5, 0.5);
         pose.mulPose(FACING_ROT[facing.get3DDataValue()]);
+        pose.mulPose(Axis.XP.rotationDegrees(-d.tilt));
 
         if (moves) {
             boolean moving = d.movement != Movement.NONE;
@@ -144,7 +145,7 @@ public class StageLightRenderer implements BlockEntityRenderer<StageLightBlockEn
         }
 
         if (beamVisible) {
-            float length = moves ? d.length : clippedLength(be, level, d, facing, type);
+            float length = (moves || d.tilt != 0) ? d.length : clippedLength(be, level, d, facing, type);
             if (length > 0.05f) {
                 drawBeam(buffers, pose, d, type, length, r, g, b, bright);
             }
@@ -165,6 +166,7 @@ public class StageLightRenderer implements BlockEntityRenderer<StageLightBlockEn
         pose.pushPose();
         pose.translate(0.5, 0.5, 0.5);
         pose.mulPose(FACING_ROT[facing.get3DDataValue()]);
+        pose.mulPose(Axis.XP.rotationDegrees(-d.tilt));
         pose.mulPose(Axis.ZP.rotationDegrees(pan));
         pose.mulPose(Axis.XP.rotationDegrees(tilt));
 

@@ -113,5 +113,7 @@
   "tip.stagelite.show": "Show seleccionado (se crean con /stagelite show).",
   "tip.stagelite.show_play": "Reproducir el show una vez.",
   "tip.stagelite.show_loop": "Reproducir el show en bucle.",
-  "tip.stagelite.show_stop": "Detener el show."
+  "tip.stagelite.show_stop": "Detener el show.",
+  "fader.stagelite.tilt": "Incl.",
+  "tip.stagelite.tilt": "Inclinación fija de la luz: positivo = hacia arriba, negativo = hacia abajo."
 }
