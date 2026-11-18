@@ -1,0 +1,27 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "stagelite:block/moving_head"
+    },
+    "facing=east": {
+      "model": "stagelite:block/moving_head",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "stagelite:block/moving_head",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "stagelite:block/moving_head",
+      "y": 270
+    },
+    "facing=up": {
+      "model": "stagelite:block/moving_head",
+      "x": 270
+    },
+    "facing=down": {
+      "model": "stagelite:block/moving_head",
+      "x": 90
+    }
+  }
+}

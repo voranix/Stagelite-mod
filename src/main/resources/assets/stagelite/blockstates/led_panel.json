@@ -1,0 +1,27 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "stagelite:block/led_panel"
+    },
+    "facing=east": {
+      "model": "stagelite:block/led_panel",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "stagelite:block/led_panel",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "stagelite:block/led_panel",
+      "y": 270
+    },
+    "facing=up": {
+      "model": "stagelite:block/led_panel",
+      "x": 270
+    },
+    "facing=down": {
+      "model": "stagelite:block/led_panel",
+      "x": 90
+    }
+  }
+}
