@@ -154,6 +154,16 @@ public final class StageLiteCommands {
                                             int v = IntegerArgumentType.getInteger(ctx, "degrees");
                                             return editGroup(ctx, d -> d.tilt = v);
                                         })))
+                        .then(Commands.literal("name")
+                                .then(Commands.argument("text", StringArgumentType.greedyString())
+                                        .executes(ctx -> {
+                                            int g = IntegerArgumentType.getInteger(ctx, "n");
+                                            String text = StringArgumentType.getString(ctx, "text");
+                                            StageData.get(ctx.getSource().getServer()).setGroupName(g, text);
+                                            ctx.getSource().sendSuccess(() -> Component.translatable(
+                                                    "commands.stagelite.group_named", g, StageData.cleanName(text)), true);
+                                            return 1;
+                                        })))
                         .then(Commands.literal("yaw")
                                 .then(Commands.argument("degrees", IntegerArgumentType.integer(-90, 90))
                                         .executes(ctx -> {
@@ -223,6 +233,11 @@ public final class StageLiteCommands {
         return count;
     }
 
+    private static String nameSuffix(CommandSourceStack src, int group) {
+        String n = StageData.get(src.getServer()).groupNames.get(group);
+        return n == null ? "" : " (" + n + ")";
+    }
+
     private static int listLights(CommandSourceStack src) {
         Map<Integer, Integer> perGroup = new TreeMap<>();
         int total = 0;
@@ -237,7 +252,8 @@ public final class StageLiteCommands {
             final int c = e.getValue();
             src.sendSuccess(() -> g == 0
                     ? Component.translatable("commands.stagelite.list_ungrouped", c)
-                    : Component.translatable("commands.stagelite.list_group", g, c), false);
+                    : Component.translatable("commands.stagelite.list_group", g, c).append(
+                            Component.literal(nameSuffix(src, g))), false);
         }
         return total;
     }

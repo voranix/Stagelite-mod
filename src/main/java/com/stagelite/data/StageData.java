@@ -27,6 +27,33 @@ public class StageData extends SavedData {
 
     public final Map<String, Map<Integer, LightData>> scenes = new LinkedHashMap<>();
     public final Map<String, List<ShowStep>> shows = new LinkedHashMap<>();
+    /** Nombres opcionales de los grupos (para no olvidar que es cada uno). */
+    public final Map<Integer, String> groupNames = new TreeMap<>();
+
+    /** Deja solo caracteres imprimibles, sin espacios de sobra, maximo 24. Vacio = sin nombre. */
+    public static String cleanName(String s) {
+        if (s == null) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder();
+        for (char c : s.toCharArray()) {
+            if (!Character.isISOControl(c) && c != '\u00a7') {
+                sb.append(c);
+            }
+        }
+        String t = sb.toString().trim();
+        return t.length() > 24 ? t.substring(0, 24).trim() : t;
+    }
+
+    public void setGroupName(int group, String name) {
+        String n = cleanName(name);
+        if (n.isEmpty()) {
+            groupNames.remove(group);
+        } else {
+            groupNames.put(group, n);
+        }
+        setDirty();
+    }
 
     public static StageData get(MinecraftServer server) {
         return server.overworld().getDataStorage().computeIfAbsent(StageData::load, StageData::new, NAME);
@@ -45,6 +72,15 @@ public class StageData extends SavedData {
                 looks.put(lookTag.getInt("group"), LightData.fromTag(lookTag.getCompound("data")));
             }
             data.scenes.put(sceneTag.getString("name"), looks);
+        }
+
+        ListTag nameList = root.getList("groupNames", Tag.TAG_COMPOUND);
+        for (int i = 0; i < nameList.size(); i++) {
+            CompoundTag nt = nameList.getCompound(i);
+            String n = cleanName(nt.getString("name"));
+            if (!n.isEmpty()) {
+                data.groupNames.put(nt.getInt("group"), n);
+            }
         }
 
         ListTag showList = root.getList("shows", Tag.TAG_COMPOUND);
@@ -94,6 +130,15 @@ public class StageData extends SavedData {
             showList.add(showTag);
         }
         root.put("shows", showList);
+
+        ListTag nameList = new ListTag();
+        for (Map.Entry<Integer, String> e : groupNames.entrySet()) {
+            CompoundTag nt = new CompoundTag();
+            nt.putInt("group", e.getKey());
+            nt.putString("name", e.getValue());
+            nameList.add(nt);
+        }
+        root.put("groupNames", nameList);
         return root;
     }
 }

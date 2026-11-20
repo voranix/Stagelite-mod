@@ -20,6 +20,7 @@ public class ConsoleSnapshot {
     public static final class Group {
         public final int number;
         public final LightData look;
+        public String name = "";
         public final int[] counts = new int[FixtureType.values().length];
 
         public Group(int number, LightData look) {
@@ -52,6 +53,9 @@ public class ConsoleSnapshot {
         }
         snap.groups.addAll(map.values());
         StageData data = StageData.get(server);
+        for (Group g : snap.groups) {
+            g.name = data.groupNames.getOrDefault(g.number, "");
+        }
         snap.scenes.addAll(data.scenes.keySet());
         snap.shows.addAll(data.shows.keySet());
         snap.playing = ShowPlayer.isPlaying() && ShowPlayer.currentName() != null ? ShowPlayer.currentName() : "";
@@ -63,6 +67,7 @@ public class ConsoleSnapshot {
         for (Group g : groups) {
             buf.writeVarInt(g.number);
             buf.writeNbt(g.look.toTag());
+            buf.writeUtf(g.name, 64);
             for (int c : g.counts) {
                 buf.writeVarInt(c);
             }
@@ -84,7 +89,9 @@ public class ConsoleSnapshot {
         for (int i = 0; i < n; i++) {
             int number = buf.readVarInt();
             CompoundTag tag = buf.readNbt();
+            String nameRead = buf.readUtf(64);
             Group g = new Group(number, LightData.fromTag(tag == null ? new CompoundTag() : tag));
+            g.name = nameRead;
             for (int k = 0; k < g.counts.length; k++) {
                 g.counts[k] = buf.readVarInt();
             }

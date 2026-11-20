@@ -125,5 +125,11 @@
   "gui.stagelite.img_big": "Image too large (max %s KB).",
   "gui.stagelite.img_bad": "Invalid file: use PNG, JPG, GIF or BMP.",
   "gui.stagelite.img_ok": "Image uploaded: %s",
-  "gui.stagelite.img_err": "Could not read the file."
+  "gui.stagelite.img_err": "Could not read the file.",
+  "gui.stagelite.rename_title": "Name for group %s",
+  "gui.stagelite.rename_hint": "E.g. Stage, Dance floor, Back...",
+  "gui.stagelite.rename_ok": "Save",
+  "gui.stagelite.rename_cancel": "Cancel",
+  "tip.stagelite.rename": "Click to name this group",
+  "commands.stagelite.group_named": "Group %s: name '%s'."
 }

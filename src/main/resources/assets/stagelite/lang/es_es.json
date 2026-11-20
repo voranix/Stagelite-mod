@@ -125,5 +125,11 @@
   "gui.stagelite.img_big": "Imagen demasiado grande (máx. %s KB).",
   "gui.stagelite.img_bad": "Archivo no válido: usa PNG, JPG, GIF o BMP.",
   "gui.stagelite.img_ok": "Imagen subida: %s",
-  "gui.stagelite.img_err": "No se pudo leer el archivo."
+  "gui.stagelite.img_err": "No se pudo leer el archivo.",
+  "gui.stagelite.rename_title": "Nombre del grupo %s",
+  "gui.stagelite.rename_hint": "Ej: Escenario, Pista, Fondo...",
+  "gui.stagelite.rename_ok": "Guardar",
+  "gui.stagelite.rename_cancel": "Cancelar",
+  "tip.stagelite.rename": "Clic para ponerle nombre al grupo",
+  "commands.stagelite.group_named": "Grupo %s: nombre '%s'."
 }

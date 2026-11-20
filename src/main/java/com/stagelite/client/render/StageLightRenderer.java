@@ -288,7 +288,7 @@ public class StageLightRenderer implements BlockEntityRenderer<StageLightBlockEn
         pose.pushPose();
         pose.translate(0.5, 0.5, 0.5);
         Matrix4f m = pose.last().pose();
-        VertexConsumer lv = buffers.getBuffer(ModRenderTypes.BEAM);
+        VertexConsumer lv = buffers.getBuffer(RenderType.lightning());
         int rays = 6 + d.extra * 3;
         float a = 0.55f * (d.intensity / 100f) * bright;
         for (int i = 0; i < rays; i++) {

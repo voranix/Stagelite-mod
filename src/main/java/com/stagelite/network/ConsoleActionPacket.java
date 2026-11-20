@@ -40,6 +40,7 @@ public class ConsoleActionPacket {
     public static final int SCENE_DELETE = 13;
     public static final int GROUP_TILT = 14;
     public static final int GROUP_YAW = 15;
+    public static final int GROUP_NAME = 16;
 
     private final BlockPos pos;
     private final int action;
@@ -113,6 +114,12 @@ public class ConsoleActionPacket {
                 break;
             case GROUP_YAW:
                 GroupControl.edit(group, d -> d.yaw = value);
+                break;
+            case GROUP_NAME:
+                if (group >= 1 && group <= 99) {
+                    StageData.get(server).setGroupName(group, name);
+                }
+                refresh = true;
                 break;
             case BLACKOUT:
                 GroupControl.editAll(d -> d.on = false);

@@ -293,6 +293,21 @@ public class ConsoleScreen extends Screen {
     }
 
     @Override
+    public boolean mouseClicked(double mx, double my, int button) {
+        if (button == 0 && my >= top && my < top + 11) {
+            for (int i = 0; i < shown; i++) {
+                int x = stripsX + i * (STRIP_W + GAP);
+                if (mx >= x && mx < x + STRIP_W) {
+                    final ConsoleSnapshot.Group grp = snap.groups.get(page * perPage + i);
+                    this.minecraft.setScreen(new RenameGroupScreen(this, pos, grp.number, grp.name, n -> grp.name = n));
+                    return true;
+                }
+            }
+        }
+        return super.mouseClicked(mx, my, button);
+    }
+
+    @Override
     public boolean isPauseScreen() {
         return false;
     }
@@ -324,9 +339,14 @@ public class ConsoleScreen extends Screen {
             for (int c : grp.counts) {
                 total += c;
             }
-            g.drawString(this.font, "G" + grp.number + "  x" + total, x, top + 2, 0xFFFFFF, false);
+            String title = "G" + grp.number + (grp.name.isEmpty() ? "  x" + total : " " + grp.name);
+            g.drawString(this.font, this.font.plainSubstrByWidth(title, STRIP_W), x, top + 2, grp.name.isEmpty() ? 0xB0B0B8 : 0xFFFFFF, false);
             if (mouseX >= x && mouseX < x + STRIP_W && mouseY >= top && mouseY < top + 11) {
                 List<Component> lines = new ArrayList<>();
+                lines.add(Component.translatable("tip.stagelite.rename").withStyle(ChatFormatting.YELLOW));
+                if (!grp.name.isEmpty()) {
+                    lines.add(Component.literal(grp.name + "  (x" + total + ")"));
+                }
                 FixtureType[] types = FixtureType.values();
                 for (int k = 0; k < types.length; k++) {
                     if (grp.counts[k] > 0) {

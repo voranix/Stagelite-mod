@@ -48,7 +48,7 @@ Todos se colocan, se abren con clic derecho (solo staff) y se pueden meter en **
 - *Mira al jugador* = siempre de frente; *Fijo* = queda en una dirección (fader Giro).
 
 ### Consola
-Clic derecho (staff). Muestra los grupos que tengan luces **cargadas**. Pasa el ratón sobre `G1 x4` para ver qué dispositivos hay en el grupo. Las escenas y shows son los mismos de los comandos. Las escenas guardan encendido, color, brillo, efecto, movimiento y velocidad (no cambian el link, tamaño ni otros ajustes propios de cada dispositivo).
+Clic derecho (staff). Muestra los grupos que tengan luces **cargadas**. **Haz clic en el título de un canal (`G1`) para ponerle un nombre** (Escenario, Pista...; también `/stagelite group <n> name <texto>`). Pasa el ratón sobre el título para ver qué dispositivos hay en el grupo. Las escenas y shows son los mismos de los comandos. Las escenas guardan encendido, color, brillo, efecto, movimiento y velocidad (no cambian el link, tamaño ni otros ajustes propios de cada dispositivo).
 
 ### Notas
 - Al inclinar una luz fija, el modelo del bloque se inclina junto con el haz.
