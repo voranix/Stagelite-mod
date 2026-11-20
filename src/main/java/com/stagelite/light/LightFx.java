@@ -16,7 +16,7 @@ public final class LightFx {
         switch (d.effect) {
             case PULSE: {
                 float phase = sec * d.speed * 0.2f;
-                return 0.15f + 0.85f * (0.5f + 0.5f * Mth.sin(phase * Mth.TWO_PI));
+                return 0.15f + 0.85f * (0.5f + 0.5f * FxMath.sin(phase * Mth.TWO_PI));
             }
             case STROBE: {
                 float phase = sec * d.speed * 1.5f;
@@ -47,11 +47,11 @@ public final class LightFx {
         float p = movePhase(d, ticks);
         switch (d.movement) {
             case SWEEP:
-                return d.range * Mth.sin(p);
+                return d.range * FxMath.sin(p);
             case CIRCLE:
-                return d.range * Mth.cos(p);
+                return d.range * FxMath.cos(p);
             case EIGHT:
-                return d.range * Mth.sin(p);
+                return d.range * FxMath.sin(p);
             default:
                 return 0f;
         }
@@ -62,11 +62,11 @@ public final class LightFx {
         float p = movePhase(d, ticks);
         switch (d.movement) {
             case NOD:
-                return d.range * Mth.sin(p);
+                return d.range * FxMath.sin(p);
             case CIRCLE:
-                return d.range * Mth.sin(p);
+                return d.range * FxMath.sin(p);
             case EIGHT:
-                return d.range * 0.5f * Mth.sin(2f * p);
+                return d.range * 0.5f * FxMath.sin(2f * p);
             default:
                 return 0f;
         }

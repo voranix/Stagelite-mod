@@ -9,6 +9,7 @@ import com.stagelite.blockentity.StageLightBlockEntity;
 import com.stagelite.client.HologramImages;
 import com.stagelite.config.ClientConfig;
 import com.stagelite.light.FixtureType;
+import com.stagelite.light.FxMath;
 import com.stagelite.light.LightData;
 import com.stagelite.light.LightFx;
 import com.stagelite.light.Movement;
@@ -89,7 +90,7 @@ public class StageLightRenderer implements BlockEntityRenderer<StageLightBlockEn
         FixtureType type = lightBlock.fixtureType();
         Direction facing = be.getBlockState().getValue(StageLightBlock.FACING);
 
-        float time = level.getGameTime() + partialTick;
+        float time = (level.getGameTime() % 1_048_576L) + partialTick;
         boolean lit = d.on && d.intensity > 0;
         float bright = lit ? LightFx.brightness(d, time) : 0f;
         boolean beamVisible = lit && bright > 0.001f;
@@ -204,8 +205,8 @@ public class StageLightRenderer implements BlockEntityRenderer<StageLightBlockEn
         float a = 0.9f * (d.intensity / 100f) * bright;
         for (int i = 0; i < n; i++) {
             float ang = (float) Math.toRadians(n == 1 ? 0f : (i / (n - 1f) - 0.5f) * 2f * fan);
-            float dx = Mth.sin(ang);
-            float dz = Mth.cos(ang);
+            float dx = FxMath.sin(ang);
+            float dz = FxMath.cos(ang);
             float x0 = dx * start;
             float z0 = dz * start;
             float x1 = dx * (start + d.length);
@@ -257,7 +258,7 @@ public class StageLightRenderer implements BlockEntityRenderer<StageLightBlockEn
             for (int lo = 0; lo < DISCO_LON; lo++) {
                 float lon0 = (float) (2 * Math.PI * lo / DISCO_LON);
                 float lon1 = (float) (2 * Math.PI * (lo + 1) / DISCO_LON);
-                float sparkle = lit ? Math.max(0f, Mth.sin(time * 0.35f + (la * 7 + lo * 13) * 1.7f)) : 0f;
+                float sparkle = lit ? Math.max(0f, FxMath.sin(time * 0.35f + (la * 7 + lo * 13) * 1.7f)) : 0f;
                 sparkle = sparkle * sparkle * sparkle;
                 float base = lit ? 0.75f : 0.4f;
                 float k = Math.min(1f, base + sparkle);
@@ -268,9 +269,9 @@ public class StageLightRenderer implements BlockEntityRenderer<StageLightBlockEn
                 int facetLight = sparkle > 0.3f ? LightTexture.FULL_BRIGHT : (lit ? LightTexture.pack(11, 11) : light);
                 float mlat = (lat0 + lat1) / 2f;
                 float mlon = (lon0 + lon1) / 2f;
-                float nx = Mth.cos(mlat) * Mth.cos(mlon);
-                float ny = Mth.sin(mlat);
-                float nz = Mth.cos(mlat) * Mth.sin(mlon);
+                float nx = FxMath.cos(mlat) * FxMath.cos(mlon);
+                float ny = FxMath.sin(mlat);
+                float nz = FxMath.cos(mlat) * FxMath.sin(mlon);
                 quad(p, vc,
                         sx(lat0, lon0), sy(lat0), sz(lat0, lon0),
                         sx(lat1, lon0), sy(lat1), sz(lat1, lon0),
@@ -297,12 +298,12 @@ public class StageLightRenderer implements BlockEntityRenderer<StageLightBlockEn
         float camY = (float) (cam.y - (blockPos.getY() + 0.5));
         float camZ = (float) (cam.z - (blockPos.getZ() + 0.5));
         for (int i = 0; i < rays; i++) {
-            float az = (float) Math.toRadians(i * 137.5f + spin * 1.5f);
+            float az = (float) Math.toRadians((i * 137.5f + spin * 1.5f) % 360f);
             float el = (float) Math.toRadians(-55f + 110f * ((i * 0.618f) % 1f));
-            float ce = Mth.cos(el);
-            float dx = ce * Mth.cos(az);
-            float dy = Mth.sin(el);
-            float dz = ce * Mth.sin(az);
+            float ce = FxMath.cos(el);
+            float dx = ce * FxMath.cos(az);
+            float dy = FxMath.sin(el);
+            float dz = ce * FxMath.sin(az);
             float len = d.length * (0.5f + 0.5f * ((i * 0.37f) % 1f));
             float cr = r;
             float cg = g;
@@ -340,15 +341,15 @@ public class StageLightRenderer implements BlockEntityRenderer<StageLightBlockEn
     }
 
     private static float sx(float lat, float lon) {
-        return DISCO_R * Mth.cos(lat) * Mth.cos(lon);
+        return DISCO_R * FxMath.cos(lat) * FxMath.cos(lon);
     }
 
     private static float sy(float lat) {
-        return DISCO_R * Mth.sin(lat);
+        return DISCO_R * FxMath.sin(lat);
     }
 
     private static float sz(float lat, float lon) {
-        return DISCO_R * Mth.cos(lat) * Mth.sin(lon);
+        return DISCO_R * FxMath.cos(lat) * FxMath.sin(lon);
     }
 
     // ------------------------------------------------------------------ holograma
@@ -393,7 +394,7 @@ public class StageLightRenderer implements BlockEntityRenderer<StageLightBlockEn
         }
 
         // Parpadeo suave tipo holograma
-        float flicker = 0.88f + 0.12f * Mth.sin(time * 0.9f) * Mth.sin(time * 0.37f + 1f);
+        float flicker = 0.88f + 0.12f * FxMath.sin(time * 0.9f) * FxMath.sin(time * 0.37f + 1f);
         int alpha = Math.round(255 * Math.min(1f, (d.intensity / 100f) * bright * flicker));
         int cr = Math.round(255 * r);
         int cg = Math.round(255 * g);
