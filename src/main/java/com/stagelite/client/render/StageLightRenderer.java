@@ -96,9 +96,18 @@ public class StageLightRenderer implements BlockEntityRenderer<StageLightBlockEn
         boolean beamVisible = lit && bright > 0.001f;
         boolean moves = type.moves();
 
-        // Luces fijas inclinadas: el modelo del bloque se oculta (TILTED) y se dibuja aqui girado junto con el haz.
-        if (type.tiltable() && !moves && (d.tilt != 0 || d.yaw != 0)) {
-            renderTiltedBody(be, pose, buffers, packedLight, packedOverlay, facing, d.tilt, d.yaw);
+        // Angulos de las luces fijas: inclinacion/giro fijos + movimiento automatico (si lo hay)
+        boolean autoMove = d.movement != Movement.NONE;
+        float yawDeg = d.yaw;
+        float xpDeg = -d.tilt;
+        if (!moves && type != FixtureType.LASER && autoMove) {
+            yawDeg += LightFx.pan(d, time);
+            xpDeg += LightFx.tilt(d, time);
+        }
+
+        // El modelo del bloque se oculta (TILTED) y se dibuja aqui girado junto con el haz.
+        if (be.getBlockState().getValue(StageLightBlock.TILTED) && type.tiltable() && !moves) {
+            renderTiltedBody(be, pose, buffers, packedLight, packedOverlay, facing, xpDeg, yawDeg);
         }
 
         int rgb = LightFx.color(d, time);
@@ -136,8 +145,8 @@ public class StageLightRenderer implements BlockEntityRenderer<StageLightBlockEn
         pose.translate(0.5, 0.5, 0.5);
         pose.mulPose(FACING_ROT[facing.get3DDataValue()]);
         if (!moves) {
-            pose.mulPose(Axis.YP.rotationDegrees(d.yaw));
-            pose.mulPose(Axis.XP.rotationDegrees(-d.tilt));
+            pose.mulPose(Axis.YP.rotationDegrees(yawDeg));
+            pose.mulPose(Axis.XP.rotationDegrees(xpDeg));
         }
 
         if (moves) {
@@ -156,7 +165,7 @@ public class StageLightRenderer implements BlockEntityRenderer<StageLightBlockEn
         }
 
         if (beamVisible) {
-            float length = (moves || d.tilt != 0 || d.yaw != 0) ? d.length : clippedLength(be, level, d, facing, type);
+            float length = (moves || d.tilt != 0 || d.yaw != 0 || autoMove) ? d.length : clippedLength(be, level, d, facing, type);
             if (length > 0.05f) {
                 drawBeam(buffers, pose, d, type, length, r, g, b, bright);
             }
@@ -167,14 +176,14 @@ public class StageLightRenderer implements BlockEntityRenderer<StageLightBlockEn
 
 
     private static void renderTiltedBody(StageLightBlockEntity be, PoseStack pose, MultiBufferSource buffers,
-                                          int light, int overlay, Direction facing, int tilt, int yaw) {
+                                          int light, int overlay, Direction facing, float xpDeg, float yaw) {
         BlockState base = be.getBlockState().setValue(StageLightBlock.TILTED, false);
         Quaternionf rot = FACING_ROT[facing.get3DDataValue()];
         pose.pushPose();
         pose.translate(0.5, 0.5, 0.5);
         pose.mulPose(rot);
         pose.mulPose(Axis.YP.rotationDegrees(yaw));
-        pose.mulPose(Axis.XP.rotationDegrees(-tilt));
+        pose.mulPose(Axis.XP.rotationDegrees(xpDeg));
         pose.mulPose(new Quaternionf(rot).conjugate());
         pose.translate(-0.5, -0.5, -0.5);
         Minecraft.getInstance().getBlockRenderer().renderSingleBlock(base, pose, buffers, light, overlay);

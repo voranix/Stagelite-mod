@@ -56,7 +56,7 @@ public enum FixtureType {
 
     /** Admite movimiento (pan/tilt). */
     public boolean animates() {
-        return this == MOVING_HEAD || this == LASER;
+        return hasBeam() || this == LASER;
     }
 
     /** Dibuja un cono de luz clasico. */
@@ -97,6 +97,17 @@ public enum FixtureType {
             default:
                 return null;
         }
+    }
+
+    /**
+     * true = el modelo fijo del bloque se oculta y el renderer lo dibuja girado (luces fijas con inclinacion,
+     * giro o movimiento automatico). El laser mueve solo su abanico, no su cuerpo.
+     */
+    public boolean bodyTilted(LightData d) {
+        if (!tiltable() || moves()) {
+            return false;
+        }
+        return d.tilt != 0 || d.yaw != 0 || (d.movement != Movement.NONE && this != LASER);
     }
 
     /** Admite inclinacion fija. */

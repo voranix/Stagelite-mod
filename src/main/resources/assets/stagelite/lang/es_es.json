@@ -63,7 +63,7 @@
   "tip.stagelite.intensity": "Brillo de la luz. 0 = apagada, 100 = al máximo.",
   "tip.stagelite.spread": "Ancho del haz. Poco = rayo fino, mucho = cono ancho.",
   "tip.stagelite.length": "Hasta dónde llega el haz (en bloques).",
-  "tip.stagelite.speed": "Velocidad de los efectos y del movimiento.",
+  "tip.stagelite.speed": "Velocidad de los efectos (respiración, estrobo, arcoíris).",
   "tip.stagelite.range": "Cuánto se mueve la cabeza (en grados).",
   "tip.stagelite.effect": "Cambia cómo se comporta la luz: fija, respiración, estrobo o arcoíris.",
   "tip.stagelite.movement": "Cómo se mueve la cabeza: quieta, barrido, cabeceo, círculo u ocho.",
@@ -131,5 +131,8 @@
   "gui.stagelite.rename_ok": "Guardar",
   "gui.stagelite.rename_cancel": "Cancelar",
   "tip.stagelite.rename": "Clic para ponerle nombre al grupo",
-  "commands.stagelite.group_named": "Grupo %s: nombre '%s'."
+  "commands.stagelite.group_named": "Grupo %s: nombre '%s'.",
+  "movement.stagelite.spin": "Giro continuo",
+  "fader.stagelite.movespeed": "V.mov",
+  "tip.stagelite.movespeed": "Velocidad del movimiento y del giro (separada de la velocidad de los efectos)."
 }

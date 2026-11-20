@@ -164,6 +164,12 @@ public final class StageLiteCommands {
                                                     "commands.stagelite.group_named", g, StageData.cleanName(text)), true);
                                             return 1;
                                         })))
+                        .then(Commands.literal("movespeed")
+                                .then(Commands.argument("value", IntegerArgumentType.integer(1, 10))
+                                        .executes(ctx -> {
+                                            int v = IntegerArgumentType.getInteger(ctx, "value");
+                                            return editGroup(ctx, d -> d.moveSpeed = v);
+                                        })))
                         .then(Commands.literal("yaw")
                                 .then(Commands.argument("degrees", IntegerArgumentType.integer(-90, 90))
                                         .executes(ctx -> {

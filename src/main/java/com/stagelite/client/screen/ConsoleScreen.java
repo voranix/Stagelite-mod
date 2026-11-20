@@ -31,7 +31,7 @@ public class ConsoleScreen extends Screen {
     private static final int[] PRESETS = {
             0xFFFFFF, 0xFF0000, 0xFF8000, 0xFFFF00, 0x00FF00, 0x00FFFF, 0x0040FF, 0x8000FF, 0xFF00FF, 0xFF60B0
     };
-    private static final int STRIP_W = 128;
+    private static final int STRIP_W = 140;
     private static final int GAP = 6;
     private static final int FADER_H = 80;
 
@@ -110,7 +110,7 @@ public class ConsoleScreen extends Screen {
                 addRenderableWidget(sw);
             }
 
-            FaderWidget bright = new FaderWidget(x, yF, 30, FADER_H, Component.translatable("fader.stagelite.intensity"),
+            FaderWidget bright = new FaderWidget(x, yF, 26, FADER_H, Component.translatable("fader.stagelite.intensity"),
                     0, 100, g.look.intensity, 0xFFD060,
                     v -> {
                         g.look.intensity = v;
@@ -119,7 +119,7 @@ public class ConsoleScreen extends Screen {
             bright.setTooltip(Tooltip.create(Component.translatable("tip.stagelite.intensity")));
             addRenderableWidget(bright);
 
-            FaderWidget speed = new FaderWidget(x + 32, yF, 30, FADER_H, Component.translatable("fader.stagelite.speed"),
+            FaderWidget speed = new FaderWidget(x + 28, yF, 26, FADER_H, Component.translatable("fader.stagelite.speed"),
                     1, 10, g.look.speed, 0xA070FF,
                     v -> {
                         g.look.speed = v;
@@ -128,7 +128,16 @@ public class ConsoleScreen extends Screen {
             speed.setTooltip(Tooltip.create(Component.translatable("tip.stagelite.speed")));
             addRenderableWidget(speed);
 
-            FaderWidget tilt = new FaderWidget(x + 64, yF, 30, FADER_H, Component.translatable("fader.stagelite.tilt"),
+            FaderWidget mspeed = new FaderWidget(x + 56, yF, 26, FADER_H, Component.translatable("fader.stagelite.movespeed"),
+                    1, 10, g.look.moveSpeed, 0xA070FF,
+                    v -> {
+                        g.look.moveSpeed = v;
+                        pending.put(gn * 100 + ConsoleActionPacket.GROUP_MOVESPEED, new int[]{ConsoleActionPacket.GROUP_MOVESPEED, gn, v});
+                    }, () -> { }, this::flush);
+            mspeed.setTooltip(Tooltip.create(Component.translatable("tip.stagelite.movespeed")));
+            addRenderableWidget(mspeed);
+
+            FaderWidget tilt = new FaderWidget(x + 84, yF, 26, FADER_H, Component.translatable("fader.stagelite.tilt"),
                     -90, 90, g.look.tilt, 0x40C0A0,
                     v -> {
                         g.look.tilt = v;
@@ -137,7 +146,7 @@ public class ConsoleScreen extends Screen {
             tilt.setTooltip(Tooltip.create(Component.translatable("tip.stagelite.tilt")));
             addRenderableWidget(tilt);
 
-            FaderWidget yaw = new FaderWidget(x + 96, yF, 30, FADER_H, Component.translatable("fader.stagelite.yaw"),
+            FaderWidget yaw = new FaderWidget(x + 112, yF, 26, FADER_H, Component.translatable("fader.stagelite.yaw"),
                     -90, 90, g.look.yaw, 0x40C0A0,
                     v -> {
                         g.look.yaw = v;

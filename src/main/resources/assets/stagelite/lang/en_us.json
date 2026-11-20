@@ -63,7 +63,7 @@
   "tip.stagelite.intensity": "Light brightness. 0 = off, 100 = full.",
   "tip.stagelite.spread": "Beam width. Low = thin ray, high = wide cone.",
   "tip.stagelite.length": "How far the beam reaches (in blocks).",
-  "tip.stagelite.speed": "Speed of effects and movement.",
+  "tip.stagelite.speed": "Speed of effects (pulse, strobe, rainbow).",
   "tip.stagelite.range": "How far the head moves (in degrees).",
   "tip.stagelite.effect": "How the light behaves: static, pulse, strobe or rainbow.",
   "tip.stagelite.movement": "How the head moves: still, sweep, nod, circle or figure eight.",
@@ -131,5 +131,8 @@
   "gui.stagelite.rename_ok": "Save",
   "gui.stagelite.rename_cancel": "Cancel",
   "tip.stagelite.rename": "Click to name this group",
-  "commands.stagelite.group_named": "Group %s: name '%s'."
+  "commands.stagelite.group_named": "Group %s: name '%s'.",
+  "movement.stagelite.spin": "Continuous spin",
+  "fader.stagelite.movespeed": "M.spd",
+  "tip.stagelite.movespeed": "Speed of the movement and spin (separate from effect speed)."
 }

@@ -39,7 +39,8 @@ public final class LightFx {
     }
 
     private static float movePhase(LightData d, float ticks) {
-        return ticks / 20f * d.speed * 0.1f * Mth.TWO_PI;
+        double cycles = (ticks / 20.0) * d.moveSpeed * 0.08;
+        return (float) ((cycles - Math.floor(cycles)) * Math.PI * 2.0);
     }
 
     /** Giro horizontal (grados) del movimiento. */
@@ -52,6 +53,8 @@ public final class LightFx {
                 return d.range * FxMath.cos(p);
             case EIGHT:
                 return d.range * FxMath.sin(p);
+            case SPIN:
+                return (float) Math.toDegrees(p % (Math.PI * 2.0));
             default:
                 return 0f;
         }

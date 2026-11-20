@@ -27,6 +27,8 @@ public class LightData {
     public int speed = 5;
     /** Amplitud del movimiento en grados, 0..90. */
     public int range = 40;
+    /** Velocidad del movimiento (1..10), separada de la velocidad de los efectos. */
+    public int moveSpeed = 4;
     /** 0 = sin grupo, 1..99 = grupo. */
     public int group = 0;
     /** Inclinacion fija en grados, -90..90 (positivo = hacia arriba). */
@@ -48,6 +50,7 @@ public class LightData {
         length = Mth.clamp(length, MIN_LENGTH, MAX_LENGTH);
         speed = Mth.clamp(speed, 1, 10);
         range = Mth.clamp(range, 0, 90);
+        moveSpeed = Mth.clamp(moveSpeed, 1, 10);
         group = Mth.clamp(group, 0, 99);
         extra = Mth.clamp(extra, 1, 10);
         tilt = Mth.clamp(tilt, -90, 90);
@@ -102,6 +105,7 @@ public class LightData {
         this.movement = o.movement;
         this.speed = o.speed;
         this.range = o.range;
+        this.moveSpeed = o.moveSpeed;
         this.tilt = o.tilt;
         this.yaw = o.yaw;
     }
@@ -122,6 +126,7 @@ public class LightData {
         t.putInt("movement", movement.ordinal());
         t.putInt("speed", speed);
         t.putInt("range", range);
+        t.putInt("moveSpeed", moveSpeed);
         t.putInt("group", group);
         t.putInt("extra", extra);
         t.putInt("tilt", tilt);
@@ -140,6 +145,7 @@ public class LightData {
         if (t.contains("movement")) movement = Movement.byId(t.getInt("movement"));
         if (t.contains("speed")) speed = t.getInt("speed");
         if (t.contains("range")) range = t.getInt("range");
+        if (t.contains("moveSpeed")) moveSpeed = t.getInt("moveSpeed");
         if (t.contains("group")) group = t.getInt("group");
         if (t.contains("extra")) extra = t.getInt("extra");
         if (t.contains("tilt")) tilt = t.getInt("tilt");

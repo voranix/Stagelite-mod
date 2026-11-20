@@ -98,7 +98,7 @@ public class StageLightBlockEntity extends BlockEntity {
         FixtureType t = type();
         BlockState wanted = state
                 .setValue(StageLightBlock.LIGHT, t.lightLevel(data))
-                .setValue(StageLightBlock.TILTED, t.tiltable() && !t.moves() && (data.tilt != 0 || data.yaw != 0));
+                .setValue(StageLightBlock.TILTED, t.bodyTilted(data));
         if (wanted != state) {
             level.setBlock(worldPosition, wanted, 3);
         } else {

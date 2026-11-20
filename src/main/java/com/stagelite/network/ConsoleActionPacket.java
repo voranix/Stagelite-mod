@@ -41,6 +41,7 @@ public class ConsoleActionPacket {
     public static final int GROUP_TILT = 14;
     public static final int GROUP_YAW = 15;
     public static final int GROUP_NAME = 16;
+    public static final int GROUP_MOVESPEED = 17;
 
     private final BlockPos pos;
     private final int action;
@@ -111,6 +112,9 @@ public class ConsoleActionPacket {
                 break;
             case GROUP_TILT:
                 GroupControl.edit(group, d -> d.tilt = value);
+                break;
+            case GROUP_MOVESPEED:
+                GroupControl.edit(group, d -> d.moveSpeed = value);
                 break;
             case GROUP_YAW:
                 GroupControl.edit(group, d -> d.yaw = value);

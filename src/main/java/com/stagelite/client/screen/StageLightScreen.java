@@ -41,7 +41,7 @@ public class StageLightScreen extends Screen {
             0xFFFFFF, 0xFF0000, 0xFF8000, 0xFFFF00, 0x00FF00, 0x00FFFF, 0x0040FF, 0x8000FF, 0xFF00FF, 0xFF60B0
     };
     private static final int PANEL_W = 470;
-    private static final int FADER_PITCH = 30;
+    private static final int FADER_PITCH = 28;
     private static final int FADER_H = 96;
 
     private final BlockPos pos;
@@ -111,6 +111,8 @@ public class StageLightScreen extends Screen {
         addFader(fx, fy, "speed", 1, 10, data.speed, 0xA070FF, v -> data.speed = v);
         fx += FADER_PITCH;
         if (type.animates()) {
+            addFader(fx, fy, "movespeed", 1, 10, data.moveSpeed, 0xA070FF, v -> data.moveSpeed = v);
+            fx += FADER_PITCH;
             addFader(fx, fy, "range", 0, 90, data.range, 0xA070FF, v -> data.range = v);
             fx += FADER_PITCH;
         }
@@ -298,7 +300,7 @@ public class StageLightScreen extends Screen {
     }
 
     private FaderWidget addFader(int x, int y, String key, int min, int max, int value, int color, IntConsumer setter) {
-        FaderWidget fader = new FaderWidget(x, y, 28, FADER_H, Component.translatable("fader.stagelite." + key),
+        FaderWidget fader = new FaderWidget(x, y, 26, FADER_H, Component.translatable("fader.stagelite." + key),
                 min, max, value, color, setter, this::markDirty, this::commit);
         fader.setTooltip(Tooltip.create(Component.translatable("tip.stagelite." + key)));
         addRenderableWidget(fader);

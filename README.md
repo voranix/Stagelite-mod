@@ -79,8 +79,9 @@ Todos admiten TAB para autocompletar. Las luces del mismo **grupo** (1-99) se co
 | `/stagelite group <n> rgb <r> <g> <b>` | Color por componentes 0-255 |
 | `/stagelite group <n> intensity <0-100>` | Brillo |
 | `/stagelite group <n> effect <static\|pulse\|strobe\|rainbow>` | Efecto |
-| `/stagelite group <n> move <none\|sweep\|nod\|circle\|eight>` | Movimiento (solo cabezas móviles) |
-| `/stagelite group <n> speed <1-10>` | Velocidad |
+| `/stagelite group <n> move <none\|sweep\|nod\|circle\|eight\|spin>` | Movimiento automático (todas las luces con haz y el láser; `spin` = giro continuo) |
+| `/stagelite group <n> speed <1-10>` | Velocidad de los efectos |
+| `/stagelite group <n> movespeed <1-10>` | Velocidad del movimiento / giro |
 | `/stagelite group <n> yaw <-90..90>` | Giro fijo hacia un lado (junto con tilt permite apuntar a cualquier dirección) |
 | `/stagelite group <n> tilt <-90..90>` | Inclinación fija (+ arriba, - abajo) de focos, láser, paneles y estrobos |
 | `/stagelite scene save\|load\|delete <nombre>` / `scene list` | Escenas (el look de todos los grupos) |

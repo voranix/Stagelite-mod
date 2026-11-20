@@ -8,7 +8,9 @@ public enum Movement {
     SWEEP("sweep"),
     NOD("nod"),
     CIRCLE("circle"),
-    EIGHT("eight");
+    EIGHT("eight"),
+    /** Giro continuo de 360 grados. */
+    SPIN("spin");
 
     private final String id;
 
