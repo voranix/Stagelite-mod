@@ -117,7 +117,7 @@ public class StageLightRenderer implements BlockEntityRenderer<StageLightBlockEn
                 }
                 return;
             case DISCO:
-                renderDisco(pose, buffers, packedLight, packedOverlay, d, time, lit, r, g, b, bright);
+                renderDisco(be.getBlockPos(), pose, buffers, packedLight, packedOverlay, d, time, lit, r, g, b, bright);
                 return;
             case HOLOGRAM:
                 renderHologram(be, pose, buffers, d, facing, time, r, g, b, bright);
@@ -241,7 +241,7 @@ public class StageLightRenderer implements BlockEntityRenderer<StageLightBlockEn
     private static final int DISCO_LON = 12;
     private static final float DISCO_R = 0.27f;
 
-    private static void renderDisco(PoseStack pose, MultiBufferSource buffers, int light, int overlay, LightData d,
+    private static void renderDisco(net.minecraft.core.BlockPos blockPos, PoseStack pose, MultiBufferSource buffers, int light, int overlay, LightData d,
                                     float time, boolean lit, float r, float g, float b, float bright) {
         float spin = time * d.speed * 1.2f;
         pose.pushPose();
@@ -259,12 +259,13 @@ public class StageLightRenderer implements BlockEntityRenderer<StageLightBlockEn
                 float lon1 = (float) (2 * Math.PI * (lo + 1) / DISCO_LON);
                 float sparkle = lit ? Math.max(0f, Mth.sin(time * 0.35f + (la * 7 + lo * 13) * 1.7f)) : 0f;
                 sparkle = sparkle * sparkle * sparkle;
-                float base = lit ? 0.45f : 0.35f;
+                float base = lit ? 0.75f : 0.4f;
                 float k = Math.min(1f, base + sparkle);
-                int cr = Math.round(255 * Math.min(1f, k * (0.6f + 0.4f * r + sparkle)));
-                int cg = Math.round(255 * Math.min(1f, k * (0.6f + 0.4f * g + sparkle)));
-                int cb = Math.round(255 * Math.min(1f, k * (0.6f + 0.4f * b + sparkle)));
-                int facetLight = sparkle > 0.3f ? LightTexture.FULL_BRIGHT : light;
+                // Plateado, con un toque del color actual; los destellos van a blanco.
+                int cr = Math.round(255 * Math.min(1f, k * (0.75f + 0.25f * r) + sparkle * 0.5f));
+                int cg = Math.round(255 * Math.min(1f, k * (0.75f + 0.25f * g) + sparkle * 0.5f));
+                int cb = Math.round(255 * Math.min(1f, k * (0.75f + 0.25f * b) + sparkle * 0.5f));
+                int facetLight = sparkle > 0.3f ? LightTexture.FULL_BRIGHT : (lit ? LightTexture.pack(11, 11) : light);
                 float mlat = (lat0 + lat1) / 2f;
                 float mlon = (lon0 + lon1) / 2f;
                 float nx = Mth.cos(mlat) * Mth.cos(mlon);
@@ -288,9 +289,13 @@ public class StageLightRenderer implements BlockEntityRenderer<StageLightBlockEn
         pose.pushPose();
         pose.translate(0.5, 0.5, 0.5);
         Matrix4f m = pose.last().pose();
-        VertexConsumer lv = buffers.getBuffer(RenderType.lightning());
+        VertexConsumer lv = buffers.getBuffer(ModRenderTypes.BEAM);
         int rays = 6 + d.extra * 3;
-        float a = 0.55f * (d.intensity / 100f) * bright;
+        float a = 0.9f * (d.intensity / 100f) * bright;
+        var cam = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
+        float camX = (float) (cam.x - (blockPos.getX() + 0.5));
+        float camY = (float) (cam.y - (blockPos.getY() + 0.5));
+        float camZ = (float) (cam.z - (blockPos.getZ() + 0.5));
         for (int i = 0; i < rays; i++) {
             float az = (float) Math.toRadians(i * 137.5f + spin * 1.5f);
             float el = (float) Math.toRadians(-55f + 110f * ((i * 0.618f) % 1f));
@@ -314,13 +319,22 @@ public class StageLightRenderer implements BlockEntityRenderer<StageLightBlockEn
             float bx = dx * (DISCO_R + len);
             float by = dy * (DISCO_R + len);
             float bz = dz * (DISCO_R + len);
-            float p1x = -Mth.sin(az);
-            float p1z = Mth.cos(az);
-            float p2x = -Mth.sin(el) * Mth.cos(az);
-            float p2y = Mth.cos(el);
-            float p2z = -Mth.sin(el) * Mth.sin(az);
-            ribbon(lv, m, ax, ay, az0, bx, by, bz, p1x, 0, p1z, 0.02f, cr, cg, cb, a, 0f);
-            ribbon(lv, m, ax, ay, az0, bx, by, bz, p2x, p2y, p2z, 0.02f, cr, cg, cb, a, 0f);
+            // Cinta que siempre mira a la camara: nunca se ve "de canto"
+            float mx = camX - (ax + bx) / 2f;
+            float my = camY - (ay + by) / 2f;
+            float mz = camZ - (az0 + bz) / 2f;
+            float px = dy * mz - dz * my;
+            float py = dz * mx - dx * mz;
+            float pz = dx * my - dy * mx;
+            float pl = Mth.sqrt(px * px + py * py + pz * pz);
+            if (pl < 1.0e-4f) {
+                continue;
+            }
+            px /= pl;
+            py /= pl;
+            pz /= pl;
+            ribbon(lv, m, ax, ay, az0, bx, by, bz, px, py, pz, 0.045f, cr, cg, cb, a, a * 0.45f);
+            ribbon(lv, m, ax, ay, az0, bx, by, bz, px, py, pz, 0.14f, cr, cg, cb, a * 0.25f, 0f);
         }
         pose.popPose();
     }

@@ -52,7 +52,7 @@ Clic derecho (staff). Muestra los grupos que tengan luces **cargadas**. **Haz cl
 
 ### Notas
 - Al inclinar una luz fija, el modelo del bloque se inclina junto con el haz.
-- El láser no se corta con bloques (atraviesa paredes); los rayos de la bola disco tampoco.
+- El láser no se corta con bloques (atraviesa paredes); los rayos de la bola disco tampoco. Los rayos de la bola siempre se dibujan de frente a la cámara.
 - Los fuegos artificiales son cohetes de Minecraft: su explosión hace daño cerca. Se pueden desactivar con `fireworksEnabled = false` en `stagelite-common.toml`.
 - La versión del protocolo de red cambió: servidor y jugadores deben tener la misma versión del mod.
 
