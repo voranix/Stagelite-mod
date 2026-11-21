@@ -2,6 +2,8 @@ package com.stagelite.registry;
 
 import com.stagelite.StageLite;
 import com.stagelite.block.LightConsoleBlock;
+import com.stagelite.block.MolineteBlock;
+import com.stagelite.block.MolineteItem;
 import com.stagelite.block.StageLightBlock;
 import com.stagelite.light.FixtureType;
 import net.minecraft.world.item.BlockItem;
@@ -31,6 +33,10 @@ public final class ModBlocks {
     public static final RegistryObject<Block> FIREWORK_LAUNCHER = registerLight(FixtureType.FIREWORK);
     public static final RegistryObject<Block> DISCO_BALL = registerLight(FixtureType.DISCO);
     public static final RegistryObject<Block> HOLOGRAM = registerLight(FixtureType.HOLOGRAM);
+
+    public static final RegistryObject<Block> MOLINETE = BLOCKS.register("molinete", MolineteBlock::new);
+    public static final RegistryObject<Item> MOLINETE_ITEM = ITEMS.register("molinete",
+            () -> new MolineteItem(MOLINETE.get(), new Item.Properties()));
 
     public static final RegistryObject<Block> LIGHT_CONSOLE = BLOCKS.register("light_console", LightConsoleBlock::new);
     public static final RegistryObject<Item> LIGHT_CONSOLE_ITEM = ITEMS.register("light_console",

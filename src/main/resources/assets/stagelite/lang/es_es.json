@@ -134,5 +134,7 @@
   "commands.stagelite.group_named": "Grupo %s: nombre '%s'.",
   "movement.stagelite.spin": "Giro continuo",
   "fader.stagelite.movespeed": "V.mov",
-  "tip.stagelite.movespeed": "Velocidad del movimiento y del giro (separada de la velocidad de los efectos)."
+  "tip.stagelite.movespeed": "Velocidad del movimiento y del giro (separada de la velocidad de los efectos).",
+  "block.stagelite.molinete": "Molinete (5x5)",
+  "message.stagelite.molinete_no_space": "No hay espacio libre para el molinete (necesita 5x5 bloques sin obstáculos)."
 }

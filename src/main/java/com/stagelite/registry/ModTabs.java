@@ -19,6 +19,7 @@ public final class ModTabs {
                     .displayItems((params, output) ->
                     {
                         output.accept(ModBlocks.LIGHT_CONSOLE_ITEM.get());
+                        output.accept(ModBlocks.MOLINETE_ITEM.get());
                         ModBlocks.lightItems().forEach(item -> output.accept(item.get()));
                     })
                     .build());

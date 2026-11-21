@@ -134,5 +134,7 @@
   "commands.stagelite.group_named": "Group %s: name '%s'.",
   "movement.stagelite.spin": "Continuous spin",
   "fader.stagelite.movespeed": "M.spd",
-  "tip.stagelite.movespeed": "Speed of the movement and spin (separate from effect speed)."
+  "tip.stagelite.movespeed": "Speed of the movement and spin (separate from effect speed).",
+  "block.stagelite.molinete": "Molinete (5x5)",
+  "message.stagelite.molinete_no_space": "Not enough free space for the molinete (needs a clear 5x5 area)."
 }
