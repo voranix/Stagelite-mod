@@ -11,7 +11,7 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 
-/** Coloca las 17 piezas del molinete de una vez (el bloque donde se hace clic queda como centro). */
+/** Coloca todas las piezas del molinete de una vez (el bloque donde se hace clic queda como centro). */
 public class MolineteItem extends BlockItem {
     public MolineteItem(Block block, Properties properties) {
         super(block, properties);
@@ -24,7 +24,7 @@ public class MolineteItem extends BlockItem {
         Player player = ctx.getPlayer();
 
         for (MolinetePart part : MolinetePart.values()) {
-            BlockPos p = center.offset(part.dx, 0, part.dz);
+            BlockPos p = center.offset(part.dx, part.dy, part.dz);
             if (!level.isInWorldBounds(p) || !level.getBlockState(p).canBeReplaced()) {
                 if (player != null && !level.isClientSide) {
                     player.displayClientMessage(Component.translatable("message.stagelite.molinete_no_space"), true);
@@ -34,7 +34,7 @@ public class MolineteItem extends BlockItem {
         }
         if (!level.isClientSide) {
             for (MolinetePart part : MolinetePart.values()) {
-                BlockPos p = center.offset(part.dx, 0, part.dz);
+                BlockPos p = center.offset(part.dx, part.dy, part.dz);
                 level.setBlock(p, getBlock().defaultBlockState().setValue(MolineteBlock.PART, part), 3);
             }
             level.playSound(null, center, SoundEvents.WOOL_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F);

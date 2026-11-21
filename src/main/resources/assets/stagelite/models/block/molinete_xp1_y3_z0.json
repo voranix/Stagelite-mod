@@ -1,0 +1,133 @@
+{
+ "ambientocclusion": false,
+ "textures": {
+  "particle": "stagelite:block/molinete_palette",
+  "pal": "stagelite:block/molinete_palette",
+  "carpet": "stagelite:block/molinete_carpet"
+ },
+ "elements": [
+  {
+   "from": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "to": [
+    3.7,
+    4.0,
+    16.0
+   ],
+   "faces": {
+    "east": {
+     "uv": [
+      8.25,
+      0.25,
+      8.75,
+      0.75
+     ],
+     "texture": "#pal"
+    },
+    "up": {
+     "uv": [
+      8.25,
+      0.25,
+      8.75,
+      0.75
+     ],
+     "texture": "#pal"
+    }
+   }
+  },
+  {
+   "from": [
+    0.0,
+    4.0,
+    0.0
+   ],
+   "to": [
+    5.52,
+    7.12,
+    16.0
+   ],
+   "faces": {
+    "east": {
+     "uv": [
+      9.25,
+      0.25,
+      9.75,
+      0.75
+     ],
+     "texture": "#pal"
+    },
+    "down": {
+     "uv": [
+      9.25,
+      0.25,
+      9.75,
+      0.75
+     ],
+     "texture": "#pal"
+    },
+    "up": {
+     "uv": [
+      9.25,
+      0.25,
+      9.75,
+      0.75
+     ],
+     "texture": "#pal"
+    }
+   }
+  },
+  {
+   "from": [
+    15.4,
+    0.0,
+    2.02
+   ],
+   "to": [
+    16.0,
+    0.36,
+    13.98
+   ],
+   "faces": {
+    "west": {
+     "uv": [
+      13.25,
+      0.25,
+      13.75,
+      0.75
+     ],
+     "texture": "#pal"
+    },
+    "up": {
+     "uv": [
+      14.25,
+      0.25,
+      14.75,
+      0.75
+     ],
+     "texture": "#pal"
+    },
+    "north": {
+     "uv": [
+      13.25,
+      0.25,
+      13.75,
+      0.75
+     ],
+     "texture": "#pal"
+    },
+    "south": {
+     "uv": [
+      13.25,
+      0.25,
+      13.75,
+      0.75
+     ],
+     "texture": "#pal"
+    }
+   }
+  }
+ ]
+}

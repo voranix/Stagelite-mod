@@ -17,15 +17,9 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-/** Molinete de 5x5 bloques: 17 piezas (una por cada bloque de la huella). Se coloca de una vez con su item. */
+/** Molinete de 13x13 bloques y 5 de alto: 193 piezas (una por cada bloque de la huella). Se coloca de una vez con su item. */
 public class MolineteBlock extends Block {
     public static final EnumProperty<MolinetePart> PART = EnumProperty.create("part", MolinetePart.class);
-
-    private static final VoxelShape SHAPE_CENTER = Block.box(0, 0, 0, 16, 27.2, 16);
-    private static final VoxelShape SHAPE_INNER = Block.box(0, 0, 0, 16, 19, 16);
-    private static final VoxelShape SHAPE_OUTER = Block.box(0, 14, 0, 16, 19, 16);
-    private static final VoxelShape COLLISION_BASE = Block.box(0, 0, 0, 16, 8, 16);
-    private static final VoxelShape COLLISION_CENTER = Shapes.or(COLLISION_BASE, Block.box(3.5, 8, 3.5, 12.5, 27, 12.5));
 
     public MolineteBlock() {
         super(BlockBehaviour.Properties.of()
@@ -34,7 +28,7 @@ public class MolineteBlock extends Block {
                 .sound(SoundType.WOOL)
                 .noOcclusion()
                 .pushReaction(PushReaction.BLOCK));
-        registerDefaultState(stateDefinition.any().setValue(PART, MolinetePart.X0_Z0));
+        registerDefaultState(stateDefinition.any().setValue(PART, MolinetePart.P_X0_Y0_Z0));
     }
 
     @Override
@@ -44,20 +38,13 @@ public class MolineteBlock extends Block {
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext ctx) {
-        MolinetePart part = state.getValue(PART);
-        if (part.isCenter()) {
-            return SHAPE_CENTER;
-        }
-        return part.isInner() ? SHAPE_INNER : SHAPE_OUTER;
+        return state.getValue(PART).shape;
     }
 
     @Override
     public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext ctx) {
         MolinetePart part = state.getValue(PART);
-        if (part.isCenter()) {
-            return COLLISION_CENTER;
-        }
-        return part.isInner() ? COLLISION_BASE : Shapes.empty();
+        return part.solid() ? part.shape : Shapes.empty();
     }
 
     @Override
@@ -75,14 +62,14 @@ public class MolineteBlock extends Block {
         return true;
     }
 
-    /** Al romper una pieza (solo en creativo) se quitan las 17. */
+    /** Al romper una pieza (solo en creativo) se quitan todas. */
     @Override
     public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         if (!level.isClientSide) {
             MolinetePart mine = state.getValue(PART);
-            BlockPos center = pos.offset(-mine.dx, 0, -mine.dz);
+            BlockPos center = mine.origin(pos);
             for (MolinetePart part : MolinetePart.values()) {
-                BlockPos p = center.offset(part.dx, 0, part.dz);
+                BlockPos p = center.offset(part.dx, part.dy, part.dz);
                 BlockState other = level.getBlockState(p);
                 if (!p.equals(pos) && other.is(this) && other.getValue(PART) == part) {
                     level.setBlock(p, Blocks.AIR.defaultBlockState(), 35);

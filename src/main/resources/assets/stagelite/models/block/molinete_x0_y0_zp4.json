@@ -1,0 +1,192 @@
+{
+ "ambientocclusion": false,
+ "textures": {
+  "particle": "stagelite:block/molinete_palette",
+  "pal": "stagelite:block/molinete_palette",
+  "carpet": "stagelite:block/molinete_carpet"
+ },
+ "elements": [
+  {
+   "from": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "to": [
+    16.0,
+    2.6,
+    6.4
+   ],
+   "faces": {
+    "down": {
+     "uv": [
+      0.25,
+      0.25,
+      0.75,
+      0.75
+     ],
+     "texture": "#pal"
+    },
+    "up": {
+     "uv": [
+      0.25,
+      0.25,
+      0.75,
+      0.75
+     ],
+     "texture": "#pal"
+    },
+    "south": {
+     "uv": [
+      0.25,
+      0.25,
+      0.75,
+      0.75
+     ],
+     "texture": "#pal"
+    }
+   }
+  },
+  {
+   "from": [
+    0.0,
+    2.6,
+    0.0
+   ],
+   "to": [
+    16.0,
+    9.1,
+    2.5
+   ],
+   "faces": {
+    "down": {
+     "uv": [
+      1.25,
+      0.25,
+      1.75,
+      0.75
+     ],
+     "texture": "#pal"
+    },
+    "up": {
+     "uv": [
+      1.25,
+      0.25,
+      1.75,
+      0.75
+     ],
+     "texture": "#pal"
+    },
+    "south": {
+     "uv": [
+      1.25,
+      0.25,
+      1.75,
+      0.75
+     ],
+     "texture": "#pal"
+    }
+   }
+  },
+  {
+   "from": [
+    0.0,
+    9.1,
+    0.0
+   ],
+   "to": [
+    16.0,
+    11.7,
+    3.8
+   ],
+   "faces": {
+    "down": {
+     "uv": [
+      0.25,
+      0.25,
+      0.75,
+      0.75
+     ],
+     "texture": "#pal"
+    },
+    "up": {
+     "uv": [
+      0.25,
+      0.25,
+      0.75,
+      0.75
+     ],
+     "texture": "#pal"
+    },
+    "south": {
+     "uv": [
+      0.25,
+      0.25,
+      0.75,
+      0.75
+     ],
+     "texture": "#pal"
+    }
+   }
+  },
+  {
+   "from": [
+    5.92,
+    11.7,
+    0.0
+   ],
+   "to": [
+    10.08,
+    15.86,
+    3.28
+   ],
+   "faces": {
+    "west": {
+     "uv": [
+      7.25,
+      0.25,
+      7.75,
+      0.75
+     ],
+     "texture": "#pal"
+    },
+    "east": {
+     "uv": [
+      7.25,
+      0.25,
+      7.75,
+      0.75
+     ],
+     "texture": "#pal"
+    },
+    "down": {
+     "uv": [
+      7.25,
+      0.25,
+      7.75,
+      0.75
+     ],
+     "texture": "#pal"
+    },
+    "up": {
+     "uv": [
+      7.25,
+      0.25,
+      7.75,
+      0.75
+     ],
+     "texture": "#pal"
+    },
+    "south": {
+     "uv": [
+      7.25,
+      0.25,
+      7.75,
+      0.75
+     ],
+     "texture": "#pal"
+    }
+   }
+  }
+ ]
+}

@@ -1,0 +1,69 @@
+{
+ "ambientocclusion": false,
+ "textures": {
+  "particle": "stagelite:block/molinete_palette",
+  "pal": "stagelite:block/molinete_palette",
+  "carpet": "stagelite:block/molinete_carpet"
+ },
+ "elements": [
+  {
+   "from": [
+    0.2,
+    0.0,
+    0.2
+   ],
+   "to": [
+    15.8,
+    6.72,
+    15.8
+   ],
+   "faces": {
+    "west": {
+     "uv": [
+      10.25,
+      0.25,
+      10.75,
+      0.75
+     ],
+     "texture": "#pal"
+    },
+    "east": {
+     "uv": [
+      10.25,
+      0.25,
+      10.75,
+      0.75
+     ],
+     "texture": "#pal"
+    },
+    "up": {
+     "uv": [
+      10.25,
+      0.25,
+      10.75,
+      0.75
+     ],
+     "texture": "#pal"
+    },
+    "north": {
+     "uv": [
+      10.25,
+      0.25,
+      10.75,
+      0.75
+     ],
+     "texture": "#pal"
+    },
+    "south": {
+     "uv": [
+      10.25,
+      0.25,
+      10.75,
+      0.75
+     ],
+     "texture": "#pal"
+    }
+   }
+  }
+ ]
+}
