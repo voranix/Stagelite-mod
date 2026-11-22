@@ -14,7 +14,9 @@ public enum Effect {
     CHECKER("checker"),
     SPIRAL("spiral"),
     STRIPES("stripes"),
-    SPARKLE("sparkle");
+    SPARKLE("sparkle"),
+    /** Pulso seco al compas (BPM segun la velocidad), igual en todas las luces: sirve para ir al ritmo de la musica. */
+    BEAT("beat");
 
     private final String id;
 
@@ -33,7 +35,7 @@ public enum Effect {
 
     /** Solo tiene sentido en la pista de baile. */
     public boolean floorOnly() {
-        return ordinal() > RAINBOW.ordinal();
+        return ordinal() > RAINBOW.ordinal() && this != BEAT;
     }
 
     /** Siguiente efecto; si floor es false se saltan los patrones de pista. */

@@ -152,5 +152,6 @@
   "tip.stagelite.extra_mic": "How many blocks from the microphone voices are picked up.",
   "gui.stagelite.track": "Music: %s",
   "track.stagelite.none": "None",
-  "tip.stagelite.track": "Disc that loops. Shift = back to None."
+  "tip.stagelite.track": "Disc that loops. Shift = back to None.",
+  "effect.stagelite.beat": "Beat"
 }

@@ -152,5 +152,6 @@
   "tip.stagelite.extra_mic": "A cuántos bloques del micrófono se capta la voz.",
   "gui.stagelite.track": "Música: %s",
   "track.stagelite.none": "Ninguna",
-  "tip.stagelite.track": "Disco que suena en bucle. Shift = volver a Ninguna."
+  "tip.stagelite.track": "Disco que suena en bucle. Shift = volver a Ninguna.",
+  "effect.stagelite.beat": "Ritmo"
 }

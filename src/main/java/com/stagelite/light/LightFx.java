@@ -18,6 +18,12 @@ public final class LightFx {
                 float phase = sec * d.speed * 0.2f;
                 return 0.15f + 0.85f * (0.5f + 0.5f * FxMath.sin(phase * Mth.TWO_PI));
             }
+            case BEAT: {
+                // velocidad 1..10 -> 70..160 BPM
+                double beats = sec * (60 + d.speed * 10) / 60.0;
+                float frac = (float) (beats - Math.floor(beats));
+                return 0.10f + 0.90f * (float) Math.exp(-4.0 * frac);
+            }
             case STROBE: {
                 float phase = sec * d.speed * 1.5f;
                 float frac = phase - (float) Math.floor(phase);
