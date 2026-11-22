@@ -24,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @ForgeVoicechatPlugin
 public class StageLiteVoicePlugin implements VoicechatPlugin {
+    private static final int MAX_SPEAKERS_PER_MIC = 24;
     private static final Map<String, LocationalAudioChannel> CHANNELS = new ConcurrentHashMap<>();
 
     @Override
@@ -55,9 +56,8 @@ public class StageLiteVoicePlugin implements VoicechatPlugin {
             return;
         }
 
-        java.util.List<StageLightBlockEntity> all = LightRegistry.all();
-        for (StageLightBlockEntity mic : all) {
-            if (mic.type() != FixtureType.MIC || !mic.data.on || mic.data.group <= 0 || mic.getLevel() != sender.level()) {
+        for (StageLightBlockEntity mic : LightRegistry.mics()) {
+            if (mic.isRemoved() || !mic.data.on || mic.data.group <= 0 || mic.getLevel() != sender.level()) {
                 continue;
             }
             double radius = 1 + mic.data.extra;
@@ -65,12 +65,16 @@ public class StageLiteVoicePlugin implements VoicechatPlugin {
                     mic.getBlockPos().getZ() + 0.5) > radius * radius) {
                 continue;
             }
-            for (StageLightBlockEntity speaker : all) {
-                if (speaker.type() != FixtureType.SPEAKER || !speaker.data.on || speaker.data.intensity <= 0
+            int sent = 0;
+            for (StageLightBlockEntity speaker : LightRegistry.speakers()) {
+                if (speaker.isRemoved() || !speaker.data.on || speaker.data.intensity <= 0
                         || speaker.data.group != mic.data.group || speaker.getLevel() != mic.getLevel()) {
                     continue;
                 }
                 send(api, sender, speaker, opus);
+                if (++sent >= MAX_SPEAKERS_PER_MIC) {
+                    break;
+                }
             }
         }
     }

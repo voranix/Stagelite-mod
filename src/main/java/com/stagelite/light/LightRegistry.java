@@ -17,6 +17,17 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class LightRegistry {
     private static final Map<ResourceKey<Level>, Set<StageLightBlockEntity>> LIGHTS = new ConcurrentHashMap<>();
 
+    private static final Set<StageLightBlockEntity> MICS = ConcurrentHashMap.newKeySet();
+    private static final Set<StageLightBlockEntity> SPEAKERS = ConcurrentHashMap.newKeySet();
+
+    public static Set<StageLightBlockEntity> mics() {
+        return MICS;
+    }
+
+    public static Set<StageLightBlockEntity> speakers() {
+        return SPEAKERS;
+    }
+
     private LightRegistry() {
     }
 
@@ -26,9 +37,17 @@ public final class LightRegistry {
             return;
         }
         LIGHTS.computeIfAbsent(level.dimension(), k -> ConcurrentHashMap.newKeySet()).add(be);
+        FixtureType t = be.type();
+        if (t == FixtureType.MIC) {
+            MICS.add(be);
+        } else if (t == FixtureType.SPEAKER) {
+            SPEAKERS.add(be);
+        }
     }
 
     public static void remove(StageLightBlockEntity be) {
+        MICS.remove(be);
+        SPEAKERS.remove(be);
         for (Set<StageLightBlockEntity> set : LIGHTS.values()) {
             set.remove(be);
         }
@@ -48,6 +67,8 @@ public final class LightRegistry {
     }
 
     public static void clear() {
+        MICS.clear();
+        SPEAKERS.clear();
         LIGHTS.clear();
     }
 }

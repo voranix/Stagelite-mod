@@ -122,6 +122,11 @@ public class StageLightBlock extends Block implements EntityBlock {
         if (!type.ticks() || beType != ModBlockEntities.STAGE_LIGHT.get()) {
             return null;
         }
+        // Humo, fuego y musica solo trabajan en el cliente; los fuegos artificiales solo en el servidor.
+        boolean serverWork = type == FixtureType.FIREWORK;
+        if (level.isClientSide == serverWork) {
+            return null;
+        }
         return (lvl, p, st, be) -> {
             if (be instanceof StageLightBlockEntity light) {
                 light.tick(lvl);

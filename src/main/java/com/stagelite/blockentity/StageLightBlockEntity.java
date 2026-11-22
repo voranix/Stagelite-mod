@@ -33,6 +33,8 @@ public class StageLightBlockEntity extends BlockEntity {
 
     private AABB renderBox;
     private int fireworkCooldown = 20;
+    private static long launchTick = Long.MIN_VALUE;
+    private static int launchesThisTick;
 
     public StageLightBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.STAGE_LIGHT.get(), pos, state);
@@ -74,19 +76,27 @@ public class StageLightBlockEntity extends BlockEntity {
         if (floorTime != Long.MIN_VALUE && Math.abs(now - floorTime) < 40) {
             return;
         }
-        floorTime = now + (worldPosition.hashCode() & 15);
         int minX = worldPosition.getX();
         int maxX = minX;
         int minZ = worldPosition.getZ();
         int maxZ = minZ;
-        for (StageLightBlockEntity e : floorCluster(lvl, worldPosition, data.group)) {
+        java.util.List<StageLightBlockEntity> cluster = floorCluster(lvl, worldPosition, data.group);
+        for (StageLightBlockEntity e : cluster) {
             minX = Math.min(minX, e.worldPosition.getX());
             maxX = Math.max(maxX, e.worldPosition.getX());
             minZ = Math.min(minZ, e.worldPosition.getZ());
             maxZ = Math.max(maxZ, e.worldPosition.getZ());
         }
-        floorCx = (minX + maxX + 1) / 2f;
-        floorCz = (minZ + maxZ + 1) / 2f;
+        float cx = (minX + maxX + 1) / 2f;
+        float cz = (minZ + maxZ + 1) / 2f;
+        // Se comparte con toda la pista: solo una baldosa recalcula cada ~2 s
+        for (StageLightBlockEntity e : cluster) {
+            e.floorCx = cx;
+            e.floorCz = cz;
+            e.floorTime = now;
+        }
+        floorCx = cx;
+        floorCz = cz;
     }
 
     /** Servidor: una baldosa nueva copia el estado de una vecina (asi se une a la pista). */
@@ -128,7 +138,17 @@ public class StageLightBlockEntity extends BlockEntity {
             }
         } else if (type == FixtureType.FIREWORK && StageLiteConfig.FIREWORKS_ENABLED.get()) {
             if (--fireworkCooldown <= 0) {
-                int interval = Math.max(20, 220 - data.speed * 20);
+                long now = lvl.getGameTime();
+                if (now != launchTick) {
+                    launchTick = now;
+                    launchesThisTick = 0;
+                }
+                if (launchesThisTick >= 4) {
+                    fireworkCooldown = 1 + lvl.random.nextInt(10); // se reparte para no lanzar todos juntos
+                    return;
+                }
+                launchesThisTick++;
+                int interval = Math.max(30, 220 - data.speed * 20);
                 fireworkCooldown = interval;
                 Effects.launchFirework(lvl, worldPosition, getBlockState().getValue(StageLightBlock.FACING), data);
             }
