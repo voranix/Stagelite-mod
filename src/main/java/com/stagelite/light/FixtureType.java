@@ -25,7 +25,11 @@ public enum FixtureType {
     /** Holograma: muestra una imagen desde un link web. */
     HOLOGRAM("hologram", 0.5f, 0f),
     /** Baldosa de pista de baile: se une con las vecinas y forma patrones. */
-    FLOOR("dance_floor", 0f, 0f);
+    FLOOR("dance_floor", 0f, 0f),
+    /** Parlante: reproduce musica y la voz de los microfonos de su grupo. */
+    SPEAKER("speaker", 0f, 0f),
+    /** Microfono: capta la voz de los jugadores cercanos (Simple Voice Chat) y la manda a los parlantes de su grupo. */
+    MIC("microphone", 0f, 0f);
 
     private final String id;
     private final float beamStart;
@@ -68,7 +72,7 @@ public enum FixtureType {
 
     /** Admite color. */
     public boolean usesColor() {
-        return this != FIRE;
+        return this != FIRE && !isAudio();
     }
 
     /** Usa los faders de ancho y largo del haz. */
@@ -78,7 +82,7 @@ public enum FixtureType {
 
     /** Necesita ejecutarse cada tick (particulas, fuegos artificiales). */
     public boolean ticks() {
-        return this == SMOKE || this == FIRE || this == FIREWORK;
+        return this == SMOKE || this == FIRE || this == FIREWORK || this == SPEAKER;
     }
 
     /** Clave del fader extra (null si no tiene). */
@@ -96,6 +100,10 @@ public enum FixtureType {
                 return "extra_disco";
             case HOLOGRAM:
                 return "extra_hologram";
+            case SPEAKER:
+                return "extra_speaker";
+            case MIC:
+                return "extra_mic";
             default:
                 return null;
         }
@@ -115,6 +123,10 @@ public enum FixtureType {
     /** Admite inclinacion fija. */
     public boolean tiltable() {
         return hasBeam() || this == LASER;
+    }
+
+    public boolean isAudio() {
+        return this == SPEAKER || this == MIC;
     }
 
     public boolean isFloor() {
@@ -138,6 +150,8 @@ public enum FixtureType {
         switch (this) {
             case SMOKE:
             case FIREWORK:
+            case SPEAKER:
+            case MIC:
                 return 0;
             case FIRE:
                 return 12;
@@ -207,6 +221,13 @@ public enum FixtureType {
                 d.extra = 5;
                 d.speed = 3;
                 d.effect = Effect.RAINBOW;
+                break;
+            case SPEAKER:
+                d.intensity = 80;
+                d.extra = 5;
+                break;
+            case MIC:
+                d.extra = 3;
                 break;
             case FLOOR:
                 d.color = 0xFF2090;

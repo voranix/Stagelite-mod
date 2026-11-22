@@ -143,5 +143,14 @@
   "effect.stagelite.checker": "Checker",
   "effect.stagelite.spiral": "Spiral",
   "effect.stagelite.stripes": "Stripes",
-  "effect.stagelite.sparkle": "Sparkle"
+  "effect.stagelite.sparkle": "Sparkle",
+  "block.stagelite.speaker": "Speaker",
+  "block.stagelite.microphone": "Microphone",
+  "fader.stagelite.extra_speaker": "Range",
+  "fader.stagelite.extra_mic": "Range",
+  "tip.stagelite.extra_speaker": "How far the speaker can be heard (8 to 80 blocks). Volume comes from intensity.",
+  "tip.stagelite.extra_mic": "How many blocks from the microphone voices are picked up.",
+  "gui.stagelite.track": "Music: %s",
+  "track.stagelite.none": "None",
+  "tip.stagelite.track": "Disc that loops. Shift = back to None."
 }

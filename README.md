@@ -4,13 +4,13 @@ Mod de **luces de escenario simples** para **Minecraft Forge 1.20.1**, pensado p
 
 Sin DMX ni software externo: color, brillo, efectos, movimiento y programación básica de shows, con un panel de faders como una mesa de luces.
 
-> **Estado: primera versión (0.9.3). El código nunca se ha compilado ni probado en el juego** (se escribió sin acceso a los repositorios de Forge). Es posible que haya que corregir algún error de compilación o detalle visual. Ver "Primer arranque".
+> **Estado: primera versión (0.9.4). El código nunca se ha compilado ni probado en el juego** (se escribió sin acceso a los repositorios de Forge). Es posible que haya que corregir algún error de compilación o detalle visual. Ver "Primer arranque".
 
 ## Obtener el .jar (sin instalar nada)
 
 1. Crea un repositorio en GitHub y sube todo el contenido de esta carpeta.
 2. Ve a la pestaña **Actions**. El workflow **Build StageLite** se ejecuta solo (o pulsa *Run workflow*).
-3. Cuando termine (unos minutos), entra en la ejecución y descarga el artefacto **stagelite-jar**: dentro está `stagelite-0.9.3.jar`.
+3. Cuando termine (unos minutos), entra en la ejecución y descarga el artefacto **stagelite-jar**: dentro está `stagelite-0.9.4.jar`.
 4. Pon ese `.jar` en la carpeta `mods` del servidor **y** de cada jugador (hace falta en ambos lados). Requiere Forge 1.20.1 (47.x).
 
 Si el workflow falla, abre el paso "Compilar": el mensaje dice qué línea corregir. Se puede pegar a Claude Code para que lo arregle.
@@ -27,7 +27,7 @@ Si el workflow falla, abre el paso "Compilar": el mensaje dice qué línea corre
 Se colocan mirando hacia la cara donde haces clic (en el techo apuntan hacia abajo). Son **indestructibles en supervivencia**: solo se quitan en creativo. Los jugadores sin permiso no pueden cambiarlas.
 
 
-## Dispositivos nuevos (0.9.3)
+## Dispositivos nuevos (0.9.4)
 
 Todos se colocan, se abren con clic derecho (solo staff) y se pueden meter en **grupos** (1-99), así que funcionan con la consola, las escenas, los shows y `/stagelite`.
 
@@ -55,6 +55,10 @@ Clic derecho (staff). Muestra los grupos que tengan luces **cargadas**. **Haz cl
 - El láser no se corta con bloques (atraviesa paredes); los rayos de la bola disco tampoco. Los rayos de la bola siempre se dibujan de frente a la cámara.
 - Los fuegos artificiales son cohetes de Minecraft: su explosión hace daño cerca. Se pueden desactivar con `fireworksEnabled = false` en `stagelite-common.toml`.
 - La versión del protocolo de red cambió: servidor y jugadores deben tener la misma versión del mod.
+
+## Parlantes y micrófonos
+- **Parlante** (`stagelite:speaker`): botón *Música* (clic = siguiente disco, 16 en total; Shift = volver a Ninguna) y suena en bucle. *Intensidad* = volumen, *Alcance* = hasta dónde se oye (8–80 bloques). Con `/stagelite group <n> track <0-16>` cambias la música de todo un grupo.
+- **Micrófono** (`stagelite:microphone`): con **Simple Voice Chat** instalado (servidor y clientes), la voz de quien habla a menos de *Alcance*+1 bloques sale por todos los parlantes de su mismo grupo (el grupo debe ser 1 o más). Sin Simple Voice Chat el mod funciona igual, solo que el micrófono no hace nada.
 
 ## Pista de baile
 Bloque `stagelite:dance_floor`: cada baldosa tiene luz propia. Las baldosas pegadas (por los 4 lados y del mismo grupo) forman **una sola pista**: al colocar una nueva copia el estilo de su vecina, y al editar cualquiera (clic derecho) cambia toda la pista conectada. Para separar una zona, ponle otro número de grupo a una baldosa (solo cambia esa).
@@ -127,7 +131,7 @@ Escenas y shows se guardan con el mundo. Solo afectan a luces **en chunks cargad
 Requisitos: **JDK 17**. El wrapper de Gradle (`gradlew`) no está incluido: abre la carpeta en IntelliJ como proyecto Gradle, o copia `gradlew`, `gradlew.bat` y `gradle/` del MDK oficial de Forge 1.20.1.
 
 ```
-./gradlew build        # genera build/libs/stagelite-0.9.3.jar
+./gradlew build        # genera build/libs/stagelite-0.9.4.jar
 ./gradlew runClient    # abre Minecraft con el mod para probar
 ./gradlew runServer    # servidor de pruebas
 ```

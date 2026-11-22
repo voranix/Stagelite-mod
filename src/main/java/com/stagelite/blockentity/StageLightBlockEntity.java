@@ -110,6 +110,13 @@ public class StageLightBlockEntity extends BlockEntity {
     /** Se llama cada tick en cliente y servidor para humo, fuego y fuegos artificiales. */
     public void tick(Level lvl) {
         FixtureType type = type();
+        if (type == FixtureType.SPEAKER) {
+            if (lvl.isClientSide) {
+                net.minecraftforge.fml.DistExecutor.unsafeRunWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT,
+                        () -> () -> com.stagelite.client.SpeakerSounds.update(this));
+            }
+            return;
+        }
         if (!data.on || data.intensity <= 0) {
             return;
         }
@@ -136,15 +143,24 @@ public class StageLightBlockEntity extends BlockEntity {
         }
     }
 
+    private void stopSpeaker() {
+        if (level != null && level.isClientSide) {
+            net.minecraftforge.fml.DistExecutor.unsafeRunWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT,
+                    () -> () -> com.stagelite.client.SpeakerSounds.stop(this));
+        }
+    }
+
     @Override
     public void setRemoved() {
         super.setRemoved();
+        stopSpeaker();
         LightRegistry.remove(this);
     }
 
     @Override
     public void onChunkUnloaded() {
         super.onChunkUnloaded();
+        stopSpeaker();
         LightRegistry.remove(this);
     }
 

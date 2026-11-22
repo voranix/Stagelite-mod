@@ -143,5 +143,14 @@
   "effect.stagelite.checker": "Ajedrez",
   "effect.stagelite.spiral": "Espiral",
   "effect.stagelite.stripes": "Rayas",
-  "effect.stagelite.sparkle": "Destellos"
+  "effect.stagelite.sparkle": "Destellos",
+  "block.stagelite.speaker": "Parlante",
+  "block.stagelite.microphone": "Micrófono",
+  "fader.stagelite.extra_speaker": "Alcance",
+  "fader.stagelite.extra_mic": "Alcance",
+  "tip.stagelite.extra_speaker": "Hasta dónde se oye el parlante (8 a 80 bloques). El volumen sale de la intensidad.",
+  "tip.stagelite.extra_mic": "A cuántos bloques del micrófono se capta la voz.",
+  "gui.stagelite.track": "Música: %s",
+  "track.stagelite.none": "Ninguna",
+  "tip.stagelite.track": "Disco que suena en bucle. Shift = volver a Ninguna."
 }

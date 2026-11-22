@@ -43,10 +43,16 @@ minecraft {
     }
 }
 
+repositories {
+    maven { url = 'https://maven.maxhenkel.de/repository/public' }
+}
+
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+    // API de Simple Voice Chat (solo para compilar; el mod funciona sin el)
+    compileOnly "de.maxhenkel.voicechat:voicechat-api:2.5.0"
 }
 
 tasks.named('processResources', ProcessResources).configure {

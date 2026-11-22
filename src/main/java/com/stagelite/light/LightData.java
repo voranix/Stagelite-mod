@@ -41,6 +41,9 @@ public class LightData {
     public String url = "";
     /** Holograma: true = siempre mira al jugador. */
     public boolean billboard = true;
+    /** Parlante: musica que suena (0 = ninguna, 1..16 = discos del juego). */
+    public int track = 0;
+    public static final int MAX_TRACK = 16;
     public static final int MAX_URL = 256;
 
     public void clamp() {
@@ -55,6 +58,7 @@ public class LightData {
         extra = Mth.clamp(extra, 1, 10);
         tilt = Mth.clamp(tilt, -90, 90);
         yaw = Mth.clamp(yaw, -90, 90);
+        track = Mth.clamp(track, 0, MAX_TRACK);
         url = cleanUrl(url);
     }
 
@@ -93,6 +97,7 @@ public class LightData {
         this.extra = o.extra;
         this.url = o.url;
         this.billboard = o.billboard;
+        this.track = o.track;
     }
 
     /** Copia solo el "look" (lo que guarda una escena): no cambia el grupo ni el largo. */
@@ -133,6 +138,7 @@ public class LightData {
         t.putInt("yaw", yaw);
         t.putString("url", url);
         t.putBoolean("billboard", billboard);
+        t.putInt("track", track);
     }
 
     public void load(CompoundTag t) {
@@ -152,6 +158,7 @@ public class LightData {
         if (t.contains("yaw")) yaw = t.getInt("yaw");
         if (t.contains("url")) url = t.getString("url");
         if (t.contains("billboard")) billboard = t.getBoolean("billboard");
+        if (t.contains("track")) track = t.getInt("track");
         clamp();
     }
 

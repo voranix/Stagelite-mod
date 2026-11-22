@@ -128,6 +128,12 @@ public final class StageLiteCommands {
                                             int v = IntegerArgumentType.getInteger(ctx, "value");
                                             return editGroup(ctx, d -> d.intensity = v);
                                         })))
+                        .then(Commands.literal("track")
+                                .then(Commands.argument("track", IntegerArgumentType.integer(0, LightData.MAX_TRACK))
+                                        .executes(ctx -> {
+                                            int v = IntegerArgumentType.getInteger(ctx, "track");
+                                            return editGroup(ctx, d -> d.track = v);
+                                        })))
                         .then(Commands.literal("effect")
                                 .then(Commands.argument("effect", StringArgumentType.word())
                                         .suggests(EFFECT_SUGGESTIONS)

@@ -108,8 +108,10 @@ public class StageLightScreen extends Screen {
             fx += FADER_PITCH;
         }
         fx += 8;
-        addFader(fx, fy, "speed", 1, 10, data.speed, 0xA070FF, v -> data.speed = v);
-        fx += FADER_PITCH;
+        if (!type.isAudio()) {
+            addFader(fx, fy, "speed", 1, 10, data.speed, 0xA070FF, v -> data.speed = v);
+            fx += FADER_PITCH;
+        }
         if (type.animates()) {
             addFader(fx, fy, "movespeed", 1, 10, data.moveSpeed, 0xA070FF, v -> data.moveSpeed = v);
             fx += FADER_PITCH;
@@ -135,13 +137,23 @@ public class StageLightScreen extends Screen {
         int bw = 110;
         int by = fy;
 
-        addRenderableWidget(Button.builder(effectLabel(), btn -> {
-                    data.effect = data.effect.next(type.isFloor());
-                    btn.setMessage(effectLabel());
-                    commit();
-                }).bounds(bx, by, bw, 20)
-                .tooltip(Tooltip.create(Component.translatable("tip.stagelite.effect"))).build());
-        by += 24;
+        if (type == FixtureType.SPEAKER) {
+            addRenderableWidget(Button.builder(trackLabel(), btn -> {
+                        data.track = (data.track + (hasShiftDown() ? LightData.MAX_TRACK : 1)) % (LightData.MAX_TRACK + 1);
+                        btn.setMessage(trackLabel());
+                        commit();
+                    }).bounds(bx, by, bw, 20)
+                    .tooltip(Tooltip.create(Component.translatable("tip.stagelite.track"))).build());
+            by += 24;
+        } else if (!type.isAudio()) {
+            addRenderableWidget(Button.builder(effectLabel(), btn -> {
+                        data.effect = data.effect.next(type.isFloor());
+                        btn.setMessage(effectLabel());
+                        commit();
+                    }).bounds(bx, by, bw, 20)
+                    .tooltip(Tooltip.create(Component.translatable("tip.stagelite.effect"))).build());
+            by += 24;
+        }
 
         if (type.animates()) {
             addRenderableWidget(Button.builder(movementLabel(), btn -> {
@@ -315,6 +327,12 @@ public class StageLightScreen extends Screen {
             faderB.setSilently(rgb & 255);
         }
         commit();
+    }
+
+    private Component trackLabel() {
+        Component name = data.track == 0 ? Component.translatable("track.stagelite.none")
+                : Component.literal(com.stagelite.client.SpeakerSounds.trackName(data.track));
+        return Component.translatable("gui.stagelite.track", name);
     }
 
     private Component effectLabel() {
