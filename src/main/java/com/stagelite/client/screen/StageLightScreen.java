@@ -99,8 +99,10 @@ public class StageLightScreen extends Screen {
                     v -> data.color = (data.color & 0xFFFF00) | v);
             fx += FADER_PITCH + 8;
         }
-        addFader(fx, fy, "intensity", 0, 100, data.intensity, 0xFFD060, v -> data.intensity = v);
-        fx += FADER_PITCH;
+        if (type != FixtureType.MIC) {
+            addFader(fx, fy, "intensity", 0, 100, data.intensity, 0xFFD060, v -> data.intensity = v);
+            fx += FADER_PITCH;
+        }
         if (type.usesBeamSize()) {
             addFader(fx, fy, "spread", 1, 40, data.spread, 0xC0C0C0, v -> data.spread = v);
             fx += FADER_PITCH;
