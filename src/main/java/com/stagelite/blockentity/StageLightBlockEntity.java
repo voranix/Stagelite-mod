@@ -26,6 +26,11 @@ public class StageLightBlockEntity extends BlockEntity {
     public float clippedLength = -1f;
     public long clipTime = Long.MIN_VALUE;
 
+    // Cache solo del cliente: centro de la pista conectada.
+    public float floorCx;
+    public float floorCz;
+    public long floorTime = Long.MIN_VALUE;
+
     private AABB renderBox;
     private int fireworkCooldown = 20;
 
@@ -33,6 +38,68 @@ public class StageLightBlockEntity extends BlockEntity {
         super(ModBlockEntities.STAGE_LIGHT.get(), pos, state);
         if (state.getBlock() instanceof StageLightBlock block) {
             block.fixtureType().applyDefaults(data);
+        }
+    }
+
+    /** Baldosas de pista conectadas (vecinas por los 4 lados, mismo grupo y altura). Maximo 1024. */
+    public static java.util.List<StageLightBlockEntity> floorCluster(Level lvl, BlockPos start, int group) {
+        java.util.List<StageLightBlockEntity> out = new java.util.ArrayList<>();
+        java.util.Set<BlockPos> seen = new java.util.HashSet<>();
+        java.util.ArrayDeque<BlockPos> queue = new java.util.ArrayDeque<>();
+        queue.add(start);
+        seen.add(start);
+        net.minecraft.core.Direction[] dirs = {net.minecraft.core.Direction.NORTH, net.minecraft.core.Direction.SOUTH,
+                net.minecraft.core.Direction.EAST, net.minecraft.core.Direction.WEST};
+        while (!queue.isEmpty() && out.size() < 1024) {
+            BlockPos p = queue.poll();
+            if (!lvl.hasChunkAt(p)) {
+                continue;
+            }
+            if (lvl.getBlockEntity(p) instanceof StageLightBlockEntity e && e.type().isFloor() && e.data.group == group) {
+                out.add(e);
+                for (net.minecraft.core.Direction dir : dirs) {
+                    BlockPos n = p.relative(dir);
+                    if (seen.add(n)) {
+                        queue.add(n);
+                    }
+                }
+            }
+        }
+        return out;
+    }
+
+    /** Cliente: calcula (cada ~2 s) el centro de la pista conectada para los patrones. */
+    public void updateFloorCenter(Level lvl) {
+        long now = lvl.getGameTime();
+        if (floorTime != Long.MIN_VALUE && Math.abs(now - floorTime) < 40) {
+            return;
+        }
+        floorTime = now + (worldPosition.hashCode() & 15);
+        int minX = worldPosition.getX();
+        int maxX = minX;
+        int minZ = worldPosition.getZ();
+        int maxZ = minZ;
+        for (StageLightBlockEntity e : floorCluster(lvl, worldPosition, data.group)) {
+            minX = Math.min(minX, e.worldPosition.getX());
+            maxX = Math.max(maxX, e.worldPosition.getX());
+            minZ = Math.min(minZ, e.worldPosition.getZ());
+            maxZ = Math.max(maxZ, e.worldPosition.getZ());
+        }
+        floorCx = (minX + maxX + 1) / 2f;
+        floorCz = (minZ + maxZ + 1) / 2f;
+    }
+
+    /** Servidor: una baldosa nueva copia el estado de una vecina (asi se une a la pista). */
+    public void joinNeighbors() {
+        if (level == null || level.isClientSide || !type().isFloor()) {
+            return;
+        }
+        for (net.minecraft.core.Direction dir : new net.minecraft.core.Direction[]{net.minecraft.core.Direction.NORTH,
+                net.minecraft.core.Direction.SOUTH, net.minecraft.core.Direction.EAST, net.minecraft.core.Direction.WEST}) {
+            if (level.getBlockEntity(worldPosition.relative(dir)) instanceof StageLightBlockEntity n && n.type().isFloor()) {
+                applyAndSync(n.data);
+                return;
+            }
         }
     }
 
@@ -119,6 +186,7 @@ public class StageLightBlockEntity extends BlockEntity {
             data.load(tag.getCompound("light"));
         }
         renderBox = null;
+        floorTime = Long.MIN_VALUE;
         clipTime = Long.MIN_VALUE;
     }
 
@@ -137,6 +205,10 @@ public class StageLightBlockEntity extends BlockEntity {
     @Override
     public AABB getRenderBoundingBox() {
         if (renderBox == null) {
+            if (type().isFloor()) {
+                renderBox = new AABB(worldPosition).expandTowards(0, 1, 0);
+                return renderBox;
+            }
             renderBox = new AABB(worldPosition).inflate(LightData.MAX_LENGTH + 2);
         }
         return renderBox;

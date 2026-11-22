@@ -53,6 +53,7 @@ public class StageLightBlock extends Block implements EntityBlock {
     public static final BooleanProperty TILTED = BooleanProperty.create("tilted");
 
     private static final VoxelShape SHAPE = Block.box(3, 3, 3, 13, 13, 13);
+    private static final VoxelShape FLOOR_SHAPE = Block.box(0, 0, 0, 16, 15, 16);
 
     private final FixtureType type;
 
@@ -87,7 +88,16 @@ public class StageLightBlock extends Block implements EntityBlock {
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        return SHAPE;
+        return type.isFloor() ? FLOOR_SHAPE : SHAPE;
+    }
+
+    @Override
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable net.minecraft.world.entity.LivingEntity placer,
+                            net.minecraft.world.item.ItemStack stack) {
+        super.setPlacedBy(level, pos, state, placer, stack);
+        if (!level.isClientSide && level.getBlockEntity(pos) instanceof StageLightBlockEntity be) {
+            be.joinNeighbors();
+        }
     }
 
     @Override

@@ -47,7 +47,15 @@ public class UpdateLightPacket {
             }
             BlockEntity be = level.getBlockEntity(msg.pos);
             if (be instanceof StageLightBlockEntity light) {
-                light.applyAndSync(LightData.fromTag(msg.tag));
+                LightData incoming = LightData.fromTag(msg.tag);
+                if (light.type().isFloor() && incoming.group == light.data.group) {
+                    // La pista conectada (mismo grupo) se edita junta
+                    for (StageLightBlockEntity tile : StageLightBlockEntity.floorCluster(level, msg.pos, light.data.group)) {
+                        tile.applyAndSync(incoming);
+                    }
+                } else {
+                    light.applyAndSync(incoming);
+                }
             }
         });
         ctx.get().setPacketHandled(true);

@@ -126,6 +126,9 @@ public class StageLightRenderer implements BlockEntityRenderer<StageLightBlockEn
                     renderLaser(be, pose, buffers, d, facing, time, r, g, b, bright);
                 }
                 return;
+            case FLOOR:
+                renderFloor(be, level, pose, buffers, d, time);
+                return;
             case DISCO:
                 renderDisco(be.getBlockPos(), pose, buffers, packedLight, packedOverlay, d, time, lit, r, g, b, bright);
                 return;
@@ -243,6 +246,50 @@ public class StageLightRenderer implements BlockEntityRenderer<StageLightBlockEn
         vertex(vc, m, bx + px, by + py, bz + pz, r, g, b, a1);
         vertex(vc, m, ax + px, ay + py, az + pz, r, g, b, a0);
         vertex(vc, m, ax - px, ay - py, az - pz, r, g, b, a0);
+    }
+
+    // ------------------------------------------------------------------ pista de baile
+
+    private static void renderFloor(StageLightBlockEntity be, Level level, PoseStack pose, MultiBufferSource buffers,
+                                    LightData d, float time) {
+        if (!d.on || d.intensity <= 0) {
+            return;
+        }
+        be.updateFloorCenter(level);
+        int rgb = LightFx.floorColor(d, be.getBlockPos().getX(), be.getBlockPos().getZ(), be.floorCx, be.floorCz, time);
+        float r = (rgb >> 16 & 255) / 255f;
+        float g = (rgb >> 8 & 255) / 255f;
+        float b = (rgb & 255) / 255f;
+        if (r + g + b < 0.01f) {
+            return;
+        }
+        VertexConsumer vc = buffers.getBuffer(ModRenderTypes.BEAM);
+        Matrix4f m = pose.last().pose();
+        float y = 15f / 16f + 0.003f;
+        float lo = 1f / 16f;
+        float hi = 15f / 16f;
+        vertex(vc, m, lo, y, lo, r, g, b, 0.95f);
+        vertex(vc, m, lo, y, hi, r, g, b, 0.95f);
+        vertex(vc, m, hi, y, hi, r, g, b, 0.95f);
+        vertex(vc, m, hi, y, lo, r, g, b, 0.95f);
+        // halo suave sobre la baldosa
+        float y2 = y + 0.35f;
+        vertex(vc, m, lo, y, lo, r, g, b, 0.22f);
+        vertex(vc, m, hi, y, lo, r, g, b, 0.22f);
+        vertex(vc, m, hi, y2, lo, r, g, b, 0f);
+        vertex(vc, m, lo, y2, lo, r, g, b, 0f);
+        vertex(vc, m, lo, y, hi, r, g, b, 0.22f);
+        vertex(vc, m, hi, y, hi, r, g, b, 0.22f);
+        vertex(vc, m, hi, y2, hi, r, g, b, 0f);
+        vertex(vc, m, lo, y2, hi, r, g, b, 0f);
+        vertex(vc, m, lo, y, lo, r, g, b, 0.22f);
+        vertex(vc, m, lo, y, hi, r, g, b, 0.22f);
+        vertex(vc, m, lo, y2, hi, r, g, b, 0f);
+        vertex(vc, m, lo, y2, lo, r, g, b, 0f);
+        vertex(vc, m, hi, y, lo, r, g, b, 0.22f);
+        vertex(vc, m, hi, y, hi, r, g, b, 0.22f);
+        vertex(vc, m, hi, y2, hi, r, g, b, 0f);
+        vertex(vc, m, hi, y2, lo, r, g, b, 0f);
     }
 
     // ------------------------------------------------------------------ bola disco

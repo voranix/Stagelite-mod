@@ -7,7 +7,14 @@ public enum Effect {
     STATIC("static"),
     PULSE("pulse"),
     STROBE("strobe"),
-    RAINBOW("rainbow");
+    RAINBOW("rainbow"),
+    // Patrones de la pista de baile (usan la posicion de cada baldosa para formar figuras)
+    WAVE("wave"),
+    RIPPLE("ripple"),
+    CHECKER("checker"),
+    SPIRAL("spiral"),
+    STRIPES("stripes"),
+    SPARKLE("sparkle");
 
     private final String id;
 
@@ -22,6 +29,20 @@ public enum Effect {
     /** Clave de traduccion. */
     public String key() {
         return "effect.stagelite." + id;
+    }
+
+    /** Solo tiene sentido en la pista de baile. */
+    public boolean floorOnly() {
+        return ordinal() > RAINBOW.ordinal();
+    }
+
+    /** Siguiente efecto; si floor es false se saltan los patrones de pista. */
+    public Effect next(boolean floor) {
+        Effect e = this;
+        do {
+            e = e.next();
+        } while (!floor && e.floorOnly());
+        return e;
     }
 
     public Effect next() {

@@ -23,7 +23,9 @@ public enum FixtureType {
     /** Bola disco con reflejos. */
     DISCO("disco_ball", 0f, 0f),
     /** Holograma: muestra una imagen desde un link web. */
-    HOLOGRAM("hologram", 0.5f, 0f);
+    HOLOGRAM("hologram", 0.5f, 0f),
+    /** Baldosa de pista de baile: se une con las vecinas y forma patrones. */
+    FLOOR("dance_floor", 0f, 0f);
 
     private final String id;
     private final float beamStart;
@@ -115,6 +117,10 @@ public enum FixtureType {
         return hasBeam() || this == LASER;
     }
 
+    public boolean isFloor() {
+        return this == FLOOR;
+    }
+
     public boolean usesUrl() {
         return this == HOLOGRAM;
     }
@@ -139,6 +145,8 @@ public enum FixtureType {
                 return Mth.ceil(d.intensity * 8 / 100f);
             case HOLOGRAM:
                 return Mth.ceil(d.intensity * 6 / 100f);
+            case FLOOR:
+                return Mth.ceil(d.intensity * 9 / 100f);
             case LASER:
                 return Mth.ceil(d.intensity * 5 / 100f);
             default:
@@ -199,6 +207,11 @@ public enum FixtureType {
                 d.extra = 5;
                 d.speed = 3;
                 d.effect = Effect.RAINBOW;
+                break;
+            case FLOOR:
+                d.color = 0xFF2090;
+                d.effect = Effect.CHECKER;
+                d.speed = 5;
                 break;
             case HOLOGRAM:
                 d.color = 0xFFFFFF;

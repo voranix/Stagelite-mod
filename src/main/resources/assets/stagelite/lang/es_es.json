@@ -136,5 +136,12 @@
   "fader.stagelite.movespeed": "V.mov",
   "tip.stagelite.movespeed": "Velocidad del movimiento y del giro (separada de la velocidad de los efectos).",
   "block.stagelite.molinete": "Molinete (13x13)",
-  "message.stagelite.molinete_no_space": "No hay espacio libre para el molinete (necesita 13x13 bloques y 5 de alto sin obstáculos)."
+  "message.stagelite.molinete_no_space": "No hay espacio libre para el molinete (necesita 13x13 bloques y 5 de alto sin obstáculos).",
+  "block.stagelite.dance_floor": "Pista de baile",
+  "effect.stagelite.wave": "Ola",
+  "effect.stagelite.ripple": "Ondas",
+  "effect.stagelite.checker": "Ajedrez",
+  "effect.stagelite.spiral": "Espiral",
+  "effect.stagelite.stripes": "Rayas",
+  "effect.stagelite.sparkle": "Destellos"
 }

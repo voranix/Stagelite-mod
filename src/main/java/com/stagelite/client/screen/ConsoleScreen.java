@@ -156,7 +156,7 @@ public class ConsoleScreen extends Screen {
             addRenderableWidget(yaw);
 
             addRenderableWidget(Button.builder(Component.translatable(g.look.effect.key()), btn -> {
-                        g.look.effect = g.look.effect.next();
+                        g.look.effect = g.look.effect.next(g.counts[FixtureType.FLOOR.ordinal()] > 0);
                         btn.setMessage(Component.translatable(g.look.effect.key()));
                         send(ConsoleActionPacket.GROUP_EFFECT, gn, g.look.effect.ordinal(), "");
                     }).bounds(x, yEff, STRIP_W, 16)

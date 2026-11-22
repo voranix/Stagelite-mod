@@ -136,7 +136,7 @@ public class StageLightScreen extends Screen {
         int by = fy;
 
         addRenderableWidget(Button.builder(effectLabel(), btn -> {
-                    data.effect = data.effect.next();
+                    data.effect = data.effect.next(type.isFloor());
                     btn.setMessage(effectLabel());
                     commit();
                 }).bounds(bx, by, bw, 20)

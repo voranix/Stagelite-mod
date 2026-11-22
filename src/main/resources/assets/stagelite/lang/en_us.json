@@ -136,5 +136,12 @@
   "fader.stagelite.movespeed": "M.spd",
   "tip.stagelite.movespeed": "Speed of the movement and spin (separate from effect speed).",
   "block.stagelite.molinete": "Molinete (13x13)",
-  "message.stagelite.molinete_no_space": "Not enough free space for the molinete (needs a clear 13x13 area, 5 blocks high)."
+  "message.stagelite.molinete_no_space": "Not enough free space for the molinete (needs a clear 13x13 area, 5 blocks high).",
+  "block.stagelite.dance_floor": "Dance Floor",
+  "effect.stagelite.wave": "Wave",
+  "effect.stagelite.ripple": "Ripple",
+  "effect.stagelite.checker": "Checker",
+  "effect.stagelite.spiral": "Spiral",
+  "effect.stagelite.stripes": "Stripes",
+  "effect.stagelite.sparkle": "Sparkle"
 }
