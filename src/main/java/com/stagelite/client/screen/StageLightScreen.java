@@ -148,6 +148,13 @@ public class StageLightScreen extends Screen {
         int by = fy;
 
         if (type == FixtureType.SPEAKER) {
+            addRenderableWidget(Button.builder(linkLabel(), btn -> {
+                        data.linked = false;
+                        btn.setMessage(linkLabel());
+                        commit();
+                    }).bounds(bx, by, bw, 20)
+                    .tooltip(Tooltip.create(Component.translatable("tip.stagelite.speaker_link"))).build());
+            by += 24;
             addRenderableWidget(Button.builder(trackLabel(), btn -> {
                         data.track = (data.track + (hasShiftDown() ? LightData.MAX_TRACK : 1)) % (LightData.MAX_TRACK + 1);
                         btn.setMessage(trackLabel());
@@ -362,6 +369,14 @@ public class StageLightScreen extends Screen {
 
     private Component aspectLabel() {
         return Component.translatable("gui.stagelite.aspect", com.stagelite.video.DisplayPlane.RATIO_NAMES[Math.max(0, Math.min(LightData.ASPECTS - 1, data.aspect))]);
+    }
+
+    private Component linkLabel() {
+        if (!data.linked) {
+            return Component.translatable("gui.stagelite.speaker_unlinked");
+        }
+        net.minecraft.core.BlockPos p = net.minecraft.core.BlockPos.of(data.link);
+        return Component.translatable("gui.stagelite.speaker_linked", p.getX(), p.getY(), p.getZ());
     }
 
     private Component trackLabel() {

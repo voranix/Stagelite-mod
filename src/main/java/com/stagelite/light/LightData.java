@@ -47,6 +47,9 @@ public class LightData {
     /** Pantallas: proporcion 0=16:9, 1=9:16, 2=4:3, 3=1:1, 4=21:9. */
     public int aspect = 0;
     public static final int ASPECTS = 5;
+    /** Parlante conectado a una pantalla: reproduce su audio (suma volumen y alcance). */
+    public boolean linked = false;
+    public long link = 0L;
     public static final int MAX_URL = 256;
 
     public void clamp() {
@@ -103,6 +106,8 @@ public class LightData {
         this.billboard = o.billboard;
         this.track = o.track;
         this.aspect = o.aspect;
+        this.linked = o.linked;
+        this.link = o.link;
     }
 
     /** Copia solo el "look" (lo que guarda una escena): no cambia el grupo ni el largo. */
@@ -145,6 +150,8 @@ public class LightData {
         t.putBoolean("billboard", billboard);
         t.putInt("track", track);
         t.putInt("aspect", aspect);
+        t.putBoolean("linked", linked);
+        t.putLong("link", link);
     }
 
     public void load(CompoundTag t) {
@@ -166,6 +173,8 @@ public class LightData {
         if (t.contains("billboard")) billboard = t.getBoolean("billboard");
         if (t.contains("track")) track = t.getInt("track");
         if (t.contains("aspect")) aspect = t.getInt("aspect");
+        if (t.contains("linked")) linked = t.getBoolean("linked");
+        if (t.contains("link")) link = t.getLong("link");
         clamp();
     }
 

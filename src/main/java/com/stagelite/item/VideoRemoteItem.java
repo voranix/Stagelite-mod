@@ -70,7 +70,39 @@ public class VideoRemoteItem extends Item {
 
     @Override
     public InteractionResult useOn(UseOnContext ctx) {
-        return handle(ctx.getLevel(), ctx.getPlayer(), ctx.getItemInHand());
+        Level level = ctx.getLevel();
+        if (!level.isClientSide && ctx.getPlayer() instanceof ServerPlayer sp
+                && level.getBlockEntity(ctx.getClickedPos()) instanceof StageLightBlockEntity speaker
+                && speaker.type() == FixtureType.SPEAKER) {
+            return handleSpeaker(level, sp, ctx.getItemInHand(), speaker);
+        }
+        return handle(level, ctx.getPlayer(), ctx.getItemInHand());
+    }
+
+    /** Clic derecho a un parlante con el control enlazado: lo conecta a esa pantalla (agachado: lo desconecta). */
+    private InteractionResult handleSpeaker(Level level, ServerPlayer sp, ItemStack stack, StageLightBlockEntity speaker) {
+        if (!StageLiteConfig.canEdit(sp)) {
+            sp.displayClientMessage(Component.translatable("message.stagelite.no_permission"), true);
+            return InteractionResult.FAIL;
+        }
+        com.stagelite.light.LightData nd = new com.stagelite.light.LightData();
+        nd.copyFrom(speaker.data);
+        if (sp.isShiftKeyDown()) {
+            nd.linked = false;
+            speaker.applyAndSync(nd);
+            sp.displayClientMessage(Component.translatable("message.stagelite.speaker_unlinked"), true);
+            return InteractionResult.CONSUME;
+        }
+        BlockPos screen = linked(stack, level);
+        if (screen == null || !(level.getBlockEntity(screen) instanceof StageLightBlockEntity be) || !be.type().isVideo()) {
+            sp.displayClientMessage(Component.translatable("message.stagelite.speaker_need_screen").withStyle(ChatFormatting.YELLOW), true);
+            return InteractionResult.CONSUME;
+        }
+        nd.linked = true;
+        nd.link = screen.asLong();
+        speaker.applyAndSync(nd);
+        sp.displayClientMessage(Component.translatable("message.stagelite.speaker_linked").withStyle(ChatFormatting.GREEN), true);
+        return InteractionResult.CONSUME;
     }
 
     @Override

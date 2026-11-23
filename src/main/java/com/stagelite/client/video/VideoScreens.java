@@ -39,6 +39,7 @@ import java.util.WeakHashMap;
 @Mod.EventBusSubscriber(modid = StageLite.MODID, value = Dist.CLIENT)
 public final class VideoScreens {
     private static final Set<StageLightBlockEntity> TRACKED = Collections.newSetFromMap(new WeakHashMap<>());
+    private static final Set<StageLightBlockEntity> SPEAKERS = Collections.newSetFromMap(new WeakHashMap<>());
     private static final Map<StageLightBlockEntity, Session> ACTIVE = new HashMap<>();
     private static final Map<StageLightBlockEntity, DisplayPlane> PLANES = new HashMap<>();
 
@@ -57,10 +58,15 @@ public final class VideoScreens {
     }
 
     public static void track(StageLightBlockEntity be) {
-        TRACKED.add(be);
+        if (be.type() == com.stagelite.light.FixtureType.SPEAKER) {
+            SPEAKERS.add(be);
+        } else {
+            TRACKED.add(be);
+        }
     }
 
     public static void untrack(StageLightBlockEntity be) {
+        SPEAKERS.remove(be);
         TRACKED.remove(be);
         Session s = ACTIVE.remove(be);
         if (s != null && s.browser != null) {
@@ -108,8 +114,14 @@ public final class VideoScreens {
                 continue; // proyector sin superficie
             }
             PLANES.put(be, plane);
-            double reach = d.length + (ACTIVE.containsKey(be) ? 32 : 16);
-            if (plane.center.distanceToSqr(eye) <= reach * reach) {
+            double margin = ACTIVE.containsKey(be) ? 32 : 16;
+            boolean near = plane.center.distanceTo(eye) <= d.length + margin;
+            for (StageLightBlockEntity sp : speakersOf(be)) {
+                if (Vec3.atCenterOf(sp.getBlockPos()).distanceTo(eye) <= sp.data.extra * 8.0 + margin) {
+                    near = true;
+                }
+            }
+            if (near) {
                 wanted.add(be);
             }
         }
@@ -166,8 +178,12 @@ public final class VideoScreens {
             // volumen segun distancia, velocidad, bucle
             s.plane = PLANES.get(be);
             double dist = s.plane == null ? 0 : s.plane.center.distanceTo(eye);
-            double fall = Math.max(0.0, 1.0 - dist / Math.max(1.0, d.length));
-            double volume = d.intensity / 100.0 * fall * fall;
+            // La pantalla suena desde si misma y desde cada parlante conectado: mas parlantes cerca = mas fuerte
+            double sum = falloff(dist, d.length);
+            for (StageLightBlockEntity sp : speakersOf(be)) {
+                sum += sp.data.intensity / 100.0 * falloff(Vec3.atCenterOf(sp.getBlockPos()).distanceTo(eye), sp.data.extra * 8.0);
+            }
+            double volume = Math.min(1.0, d.intensity / 100.0 * sum);
             String state = String.format(Locale.ROOT, "%.2f|%.2f|%b", volume, rate(d.speed), d.billboard);
             if (!state.equals(s.lastState) || s.sinceSend >= 40) {
                 s.lastState = state;
@@ -175,6 +191,23 @@ public final class VideoScreens {
                 McefBridge.js(s.browser, script(volume, rate(d.speed), d.billboard));
             }
         }
+    }
+
+    private static double falloff(double dist, double range) {
+        double f = Math.max(0.0, 1.0 - dist / Math.max(1.0, range));
+        return f * f;
+    }
+
+    /** Parlantes encendidos conectados a esta pantalla. */
+    private static List<StageLightBlockEntity> speakersOf(StageLightBlockEntity screen) {
+        List<StageLightBlockEntity> out = new ArrayList<>();
+        long key = screen.getBlockPos().asLong();
+        for (StageLightBlockEntity sp : SPEAKERS) {
+            if (!sp.isRemoved() && sp.data.linked && sp.data.link == key && sp.data.on && sp.getLevel() == screen.getLevel()) {
+                out.add(sp);
+            }
+        }
+        return out;
     }
 
     private static void closeAll() {

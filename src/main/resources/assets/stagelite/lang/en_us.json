@@ -180,5 +180,11 @@
   "fader.stagelite.throw": "Distance",
   "tip.stagelite.throw": "How many blocks it projects (stops at the first wall, floor or ceiling).",
   "gui.stagelite.aspect": "Ratio: %s",
-  "tip.stagelite.aspect": "Image shape: 16:9, 9:16 (vertical, ideal for TikTok), 4:3, 1:1 or 21:9."
+  "tip.stagelite.aspect": "Image shape: 16:9, 9:16 (vertical, ideal for TikTok), 4:3, 1:1 or 21:9.",
+  "gui.stagelite.speaker_unlinked": "Screen: none",
+  "gui.stagelite.speaker_linked": "Screen: %s %s %s (remove)",
+  "tip.stagelite.speaker_link": "To connect: link the remote to a screen and right-click the speaker. You can disconnect it here.",
+  "message.stagelite.speaker_linked": "Speaker connected: it now plays the screen's audio.",
+  "message.stagelite.speaker_unlinked": "Speaker disconnected.",
+  "message.stagelite.speaker_need_screen": "First link the remote to a screen (aim at the picture and right-click), then right-click the speaker."
 }

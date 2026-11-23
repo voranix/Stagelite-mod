@@ -180,5 +180,11 @@
   "fader.stagelite.throw": "Distancia",
   "tip.stagelite.throw": "A cuántos bloques de distancia proyecta (se detiene en la primera pared, suelo o techo).",
   "gui.stagelite.aspect": "Proporción: %s",
-  "tip.stagelite.aspect": "Forma de la imagen: 16:9, 9:16 (vertical, ideal para TikTok), 4:3, 1:1 o 21:9."
+  "tip.stagelite.aspect": "Forma de la imagen: 16:9, 9:16 (vertical, ideal para TikTok), 4:3, 1:1 o 21:9.",
+  "gui.stagelite.speaker_unlinked": "Pantalla: ninguna",
+  "gui.stagelite.speaker_linked": "Pantalla: %s %s %s (quitar)",
+  "tip.stagelite.speaker_link": "Para conectar: enlaza el control a una pantalla y haz clic derecho en el parlante. Aquí puedes desconectarlo.",
+  "message.stagelite.speaker_linked": "Parlante conectado: ahora suena el audio de la pantalla.",
+  "message.stagelite.speaker_unlinked": "Parlante desconectado.",
+  "message.stagelite.speaker_need_screen": "Primero enlaza el control a una pantalla (apunta a la imagen y clic derecho), luego haz clic derecho en el parlante."
 }

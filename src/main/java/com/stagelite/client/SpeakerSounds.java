@@ -34,7 +34,7 @@ public final class SpeakerSounds {
 
     public static void update(StageLightBlockEntity be) {
         LightData d = be.data;
-        boolean want = d.on && d.intensity > 0 && d.track > 0 && d.track <= NAMES.length;
+        boolean want = d.on && d.intensity > 0 && d.track > 0 && d.track <= NAMES.length && !d.linked;
         Playing cur = PLAYING.get(be);
         float volume = Math.max(0.05f, d.extra * 8f / 16f) * Math.max(0.05f, d.intensity / 100f);
         // el alcance depende de "volume" con atenuacion lineal (16 bloques por unidad)
