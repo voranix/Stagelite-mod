@@ -8,6 +8,9 @@ public final class ClientConfig {
     public static final ForgeConfigSpec.IntValue RENDER_DISTANCE;
     public static final ForgeConfigSpec.IntValue BEAM_SIDES;
     public static final ForgeConfigSpec.BooleanValue HOLOGRAMS_ENABLED;
+    public static final ForgeConfigSpec.BooleanValue VIDEOS_ENABLED;
+    public static final ForgeConfigSpec.IntValue VIDEO_MAX_SCREENS;
+    public static final ForgeConfigSpec.IntValue VIDEO_WIDTH;
 
     static {
         ForgeConfigSpec.Builder b = new ForgeConfigSpec.Builder();
@@ -20,6 +23,15 @@ public final class ClientConfig {
         HOLOGRAMS_ENABLED = b
                 .comment("Descargar y mostrar las imagenes de los hologramas. Ponlo en false si no quieres que tu cliente se conecte a links externos.")
                 .define("hologramsEnabled", true);
+        VIDEOS_ENABLED = b
+                .comment("Reproducir los videos de las pantallas (necesita el mod MCEF). Ponlo en false si no quieres que tu cliente cargue videos externos.")
+                .define("videosEnabled", true);
+        VIDEO_MAX_SCREENS = b
+                .comment("Maximo de pantallas de video reproduciendose a la vez en tu cliente (las mas cercanas). Menos = menos lag.")
+                .defineInRange("videoMaxScreens", 2, 1, 4);
+        VIDEO_WIDTH = b
+                .comment("Resolucion horizontal del video (el alto sale en 16:9). Menos = mas fluido.")
+                .defineInRange("videoWidth", 854, 320, 1920);
         SPEC = b.build();
     }
 

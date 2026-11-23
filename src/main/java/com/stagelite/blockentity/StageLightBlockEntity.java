@@ -160,10 +160,17 @@ public class StageLightBlockEntity extends BlockEntity {
         super.onLoad();
         if (level != null && !level.isClientSide) {
             LightRegistry.add(this);
+        } else if (level != null && type().isVideo()) {
+            net.minecraftforge.fml.DistExecutor.unsafeRunWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT,
+                    () -> () -> com.stagelite.client.video.VideoScreens.track(this));
         }
     }
 
     private void stopSpeaker() {
+        if (level != null && level.isClientSide && type().isVideo()) {
+            net.minecraftforge.fml.DistExecutor.unsafeRunWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT,
+                    () -> () -> com.stagelite.client.video.VideoScreens.untrack(this));
+        }
         if (level != null && level.isClientSide) {
             net.minecraftforge.fml.DistExecutor.unsafeRunWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT,
                     () -> () -> com.stagelite.client.SpeakerSounds.stop(this));

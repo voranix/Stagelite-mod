@@ -29,7 +29,9 @@ public enum FixtureType {
     /** Parlante: reproduce musica y la voz de los microfonos de su grupo. */
     SPEAKER("speaker", 0f, 0f),
     /** Microfono: capta la voz de los jugadores cercanos (Simple Voice Chat) y la manda a los parlantes de su grupo. */
-    MIC("microphone", 0f, 0f);
+    MIC("microphone", 0f, 0f),
+    /** Pantalla de video (MCEF): link a un video con sonido, volumen, velocidad y tamano. */
+    SCREEN("video_screen", 0f, 0f);
 
     private final String id;
     private final float beamStart;
@@ -72,7 +74,7 @@ public enum FixtureType {
 
     /** Admite color. */
     public boolean usesColor() {
-        return this != FIRE && !isAudio();
+        return this != FIRE && !isAudio() && !isVideo();
     }
 
     /** Usa los faders de ancho y largo del haz. */
@@ -102,6 +104,8 @@ public enum FixtureType {
                 return "extra_hologram";
             case SPEAKER:
                 return "extra_speaker";
+            case SCREEN:
+                return "extra_screen";
             case MIC:
                 return "extra_mic";
             default:
@@ -125,6 +129,10 @@ public enum FixtureType {
         return hasBeam() || this == LASER;
     }
 
+    public boolean isVideo() {
+        return this == SCREEN;
+    }
+
     public boolean isAudio() {
         return this == SPEAKER || this == MIC;
     }
@@ -134,7 +142,7 @@ public enum FixtureType {
     }
 
     public boolean usesUrl() {
-        return this == HOLOGRAM;
+        return this == HOLOGRAM || this == SCREEN;
     }
 
     public static FixtureType byId(int index) {
@@ -152,6 +160,7 @@ public enum FixtureType {
             case FIREWORK:
             case SPEAKER:
             case MIC:
+            case SCREEN:
                 return 0;
             case FIRE:
                 return 12;
@@ -221,6 +230,13 @@ public enum FixtureType {
                 d.extra = 5;
                 d.speed = 3;
                 d.effect = Effect.RAINBOW;
+                break;
+            case SCREEN:
+                d.intensity = 70;
+                d.speed = 4;
+                d.length = 24;
+                d.extra = 3;
+                d.billboard = true; // aqui significa "bucle"
                 break;
             case SPEAKER:
                 d.intensity = 80;

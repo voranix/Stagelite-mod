@@ -82,12 +82,27 @@ public class StageLightBlock extends Block implements EntityBlock {
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         LightData defaults = new LightData();
         type.applyDefaults(defaults);
+        if (type.isVideo()) {
+            return defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
+        }
         return defaultBlockState().setValue(FACING, context.getClickedFace())
                 .setValue(LIGHT, type.lightLevel(defaults));
     }
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        if (type.isVideo()) {
+            switch (state.getValue(FACING)) {
+                case SOUTH:
+                    return Block.box(0, 0, 0, 16, 16, 2);
+                case EAST:
+                    return Block.box(0, 0, 0, 2, 16, 16);
+                case WEST:
+                    return Block.box(14, 0, 0, 16, 16, 16);
+                default:
+                    return Block.box(0, 0, 14, 16, 16, 16);
+            }
+        }
         return type.isFloor() ? FLOOR_SHAPE : SHAPE;
     }
 
