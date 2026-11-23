@@ -136,7 +136,7 @@ public class StageLightBlock extends Block implements EntityBlock {
             for (int y = 0; y < slb.type.partsH(); y++) {
                 BlockPos p = origin.offset(right.getStepX() * x, y, right.getStepZ() * x);
                 if (!p.equals(skip) && (level.getBlockState(p).getBlock() instanceof SpeakerPartBlock || p.equals(origin))) {
-                    level.setBlock(p, Blocks.AIR.defaultBlockState(), 35);
+                    level.setBlock(p, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 35);
                 }
             }
         }
