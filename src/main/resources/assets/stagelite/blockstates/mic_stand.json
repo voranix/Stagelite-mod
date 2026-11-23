@@ -1,7 +1,64 @@
 {
  "variants": {
-  "": {
-   "model": "stagelite:block/mic_stand"
+  "facing=north,tilt=0": {
+   "model": "stagelite:block/mic_stand_0"
+  },
+  "facing=north,tilt=1": {
+   "model": "stagelite:block/mic_stand_1"
+  },
+  "facing=north,tilt=2": {
+   "model": "stagelite:block/mic_stand_2"
+  },
+  "facing=north,tilt=3": {
+   "model": "stagelite:block/mic_stand_3"
+  },
+  "facing=east,tilt=0": {
+   "model": "stagelite:block/mic_stand_0",
+   "y": 90
+  },
+  "facing=east,tilt=1": {
+   "model": "stagelite:block/mic_stand_1",
+   "y": 90
+  },
+  "facing=east,tilt=2": {
+   "model": "stagelite:block/mic_stand_2",
+   "y": 90
+  },
+  "facing=east,tilt=3": {
+   "model": "stagelite:block/mic_stand_3",
+   "y": 90
+  },
+  "facing=south,tilt=0": {
+   "model": "stagelite:block/mic_stand_0",
+   "y": 180
+  },
+  "facing=south,tilt=1": {
+   "model": "stagelite:block/mic_stand_1",
+   "y": 180
+  },
+  "facing=south,tilt=2": {
+   "model": "stagelite:block/mic_stand_2",
+   "y": 180
+  },
+  "facing=south,tilt=3": {
+   "model": "stagelite:block/mic_stand_3",
+   "y": 180
+  },
+  "facing=west,tilt=0": {
+   "model": "stagelite:block/mic_stand_0",
+   "y": 270
+  },
+  "facing=west,tilt=1": {
+   "model": "stagelite:block/mic_stand_1",
+   "y": 270
+  },
+  "facing=west,tilt=2": {
+   "model": "stagelite:block/mic_stand_2",
+   "y": 270
+  },
+  "facing=west,tilt=3": {
+   "model": "stagelite:block/mic_stand_3",
+   "y": 270
   }
  }
 }

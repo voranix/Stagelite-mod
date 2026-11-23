@@ -80,6 +80,17 @@ public class VideoRemoteItem extends Item {
                 return handleSpeaker(level, sp, ctx.getItemInHand(), speaker);
             }
         }
+        // Clic directo sobre una pantalla / proyector / marco aun sin enlazar: lo enlaza
+        if (!level.isClientSide && ctx.getPlayer() instanceof ServerPlayer sp2 && StageLiteConfig.canEdit(sp2)
+                && !sp2.isShiftKeyDown()
+                && level.getBlockEntity(ctx.getClickedPos()) instanceof StageLightBlockEntity screen
+                && screen.type().isVideo() && !screen.getBlockPos().equals(linked(ctx.getItemInHand(), level))) {
+            CompoundTag tag = ctx.getItemInHand().getOrCreateTag();
+            tag.putLong("Link", screen.getBlockPos().asLong());
+            tag.putString("Dim", level.dimension().location().toString());
+            sp2.displayClientMessage(Component.translatable("message.stagelite.remote_linked").withStyle(ChatFormatting.GREEN), true);
+            return InteractionResult.CONSUME;
+        }
         return handle(level, ctx.getPlayer(), ctx.getItemInHand());
     }
 

@@ -56,23 +56,13 @@ public final class ModBlocks {
     public static final RegistryObject<Block> PROJECTOR_STAND = BLOCKS.register("projector_stand", () ->
             new com.stagelite.block.ShapedBlock(com.stagelite.block.ShapedBlock.boxes(
                     new double[]{3, 0, 3, 13, 1, 13}, new double[]{7, 1, 7, 9, 12, 9}, new double[]{2, 12, 2, 14, 14, 14})));
-    public static final RegistryObject<Block> MIC_STAND = BLOCKS.register("mic_stand", () ->
-            new com.stagelite.block.ShapedBlock(com.stagelite.block.ShapedBlock.boxes(
-                    new double[]{4, 0, 4, 12, 1, 12}, new double[]{7, 1, 7, 9, 14, 9}, new double[]{6, 14, 6, 10, 16, 10})));
+    public static final RegistryObject<Block> MIC_STAND = BLOCKS.register("mic_stand", com.stagelite.block.MicStandBlock::new);
     public static final RegistryObject<Item> TRUSS_ITEM = ITEMS.register("truss", () -> new BlockItem(TRUSS.get(), new Item.Properties()));
     public static final RegistryObject<Item> STAGE_PLATFORM_ITEM = ITEMS.register("stage_platform", () -> new BlockItem(STAGE_PLATFORM.get(), new Item.Properties()));
     public static final RegistryObject<Item> PROJECTOR_STAND_ITEM = ITEMS.register("projector_stand", () -> new BlockItem(PROJECTOR_STAND.get(), new Item.Properties()));
     public static final RegistryObject<Item> MIC_STAND_ITEM = ITEMS.register("mic_stand", () -> new BlockItem(MIC_STAND.get(), new Item.Properties()));
 
-    // ---- Uniformes (teñibles) y accesos
-    public static final RegistryObject<Item> UNIFORM_CAP = ITEMS.register("uniform_cap", () ->
-            new net.minecraft.world.item.DyeableArmorItem(net.minecraft.world.item.ArmorMaterials.LEATHER, net.minecraft.world.item.ArmorItem.Type.HELMET, new Item.Properties()));
-    public static final RegistryObject<Item> UNIFORM_JACKET = ITEMS.register("uniform_jacket", () ->
-            new net.minecraft.world.item.DyeableArmorItem(net.minecraft.world.item.ArmorMaterials.LEATHER, net.minecraft.world.item.ArmorItem.Type.CHESTPLATE, new Item.Properties()));
-    public static final RegistryObject<Item> UNIFORM_PANTS = ITEMS.register("uniform_pants", () ->
-            new net.minecraft.world.item.DyeableArmorItem(net.minecraft.world.item.ArmorMaterials.LEATHER, net.minecraft.world.item.ArmorItem.Type.LEGGINGS, new Item.Properties()));
-    public static final RegistryObject<Item> UNIFORM_BOOTS = ITEMS.register("uniform_boots", () ->
-            new net.minecraft.world.item.DyeableArmorItem(net.minecraft.world.item.ArmorMaterials.LEATHER, net.minecraft.world.item.ArmorItem.Type.BOOTS, new Item.Properties()));
+    // ---- Accesos
     public static final RegistryObject<Item> WRISTBAND = ITEMS.register("wristband", () -> new com.stagelite.item.WristbandItem(new Item.Properties().stacksTo(16)));
     public static final RegistryObject<Item> CREDENTIAL_VIP = ITEMS.register("credential_vip", () -> new Item(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> CREDENTIAL_STAFF = ITEMS.register("credential_staff", () -> new Item(new Item.Properties().stacksTo(1)));

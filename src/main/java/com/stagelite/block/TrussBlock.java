@@ -26,16 +26,16 @@ public class TrussBlock extends Block {
     public static final BooleanProperty UP = BlockStateProperties.UP;
     public static final BooleanProperty DOWN = BlockStateProperties.DOWN;
 
-    private static final VoxelShape CORE = Block.box(4, 4, 4, 12, 12, 12);
+    private static final VoxelShape CORE = Block.box(2, 2, 2, 14, 14, 14);
     private static final VoxelShape[] ARMS = new VoxelShape[6];
 
     static {
-        ARMS[Direction.NORTH.get3DDataValue()] = Block.box(4, 4, 0, 12, 12, 4);
-        ARMS[Direction.SOUTH.get3DDataValue()] = Block.box(4, 4, 12, 12, 12, 16);
-        ARMS[Direction.WEST.get3DDataValue()] = Block.box(0, 4, 4, 4, 12, 12);
-        ARMS[Direction.EAST.get3DDataValue()] = Block.box(12, 4, 4, 16, 12, 12);
-        ARMS[Direction.UP.get3DDataValue()] = Block.box(4, 12, 4, 12, 16, 12);
-        ARMS[Direction.DOWN.get3DDataValue()] = Block.box(4, 0, 4, 12, 4, 12);
+        ARMS[Direction.NORTH.get3DDataValue()] = Block.box(2, 2, 0, 14, 14, 2);
+        ARMS[Direction.SOUTH.get3DDataValue()] = Block.box(2, 2, 14, 14, 14, 16);
+        ARMS[Direction.WEST.get3DDataValue()] = Block.box(0, 2, 2, 2, 14, 14);
+        ARMS[Direction.EAST.get3DDataValue()] = Block.box(14, 2, 2, 16, 14, 14);
+        ARMS[Direction.UP.get3DDataValue()] = Block.box(2, 14, 2, 14, 16, 14);
+        ARMS[Direction.DOWN.get3DDataValue()] = Block.box(2, 0, 2, 14, 2, 14);
     }
 
     public TrussBlock() {

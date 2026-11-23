@@ -198,12 +198,9 @@
   "block.stagelite.stage_platform": "Stage Platform",
   "block.stagelite.projector_stand": "Projector Stand",
   "block.stagelite.mic_stand": "Microphone Stand",
-  "item.stagelite.uniform_cap": "Uniform Cap",
-  "item.stagelite.uniform_jacket": "Uniform Jacket",
-  "item.stagelite.uniform_pants": "Uniform Pants",
-  "item.stagelite.uniform_boots": "Uniform Boots",
   "item.stagelite.wristband": "Access Wristband",
   "item.stagelite.credential_vip": "VIP Credential",
   "item.stagelite.credential_staff": "Staff Credential",
-  "item.stagelite.credential_backstage": "Backstage Credential"
+  "item.stagelite.credential_backstage": "Backstage Credential",
+  "message.stagelite.mic_tilt": "Microphone tilt: %s"
 }

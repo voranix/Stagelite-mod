@@ -187,6 +187,11 @@ public class StageLightBlock extends Block implements EntityBlock {
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player,
                                  InteractionHand hand, BlockHitResult hit) {
+        // Con el control remoto en la mano, el clic lo maneja el control (enlazar pantallas / conectar parlantes).
+        if (player.getMainHandItem().getItem() instanceof com.stagelite.item.VideoRemoteItem
+                || player.getOffhandItem().getItem() instanceof com.stagelite.item.VideoRemoteItem) {
+            return InteractionResult.PASS;
+        }
         if (!level.isClientSide && player instanceof ServerPlayer serverPlayer) {
             if (StageLiteConfig.canEdit(serverPlayer)) {
                 BlockEntity be = level.getBlockEntity(pos);

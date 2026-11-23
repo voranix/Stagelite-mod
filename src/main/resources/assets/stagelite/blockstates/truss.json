@@ -1,60 +1,63 @@
 {
  "multipart": [
   {
+   "when": {
+    "OR": [
+     {
+      "north": "true"
+     },
+     {
+      "south": "true"
+     }
+    ]
+   },
    "apply": {
-    "model": "stagelite:block/truss_core"
+    "model": "stagelite:block/truss_tube"
    }
   },
   {
    "when": {
-    "north": "true"
+    "OR": [
+     {
+      "east": "true"
+     },
+     {
+      "west": "true"
+     }
+    ]
    },
    "apply": {
-    "model": "stagelite:block/truss_arm"
-   }
-  },
-  {
-   "when": {
-    "east": "true"
-   },
-   "apply": {
-    "model": "stagelite:block/truss_arm",
+    "model": "stagelite:block/truss_tube",
     "y": 90
    }
   },
   {
    "when": {
-    "south": "true"
+    "OR": [
+     {
+      "up": "true"
+     },
+     {
+      "down": "true"
+     }
+    ]
    },
    "apply": {
-    "model": "stagelite:block/truss_arm",
-    "y": 180
+    "model": "stagelite:block/truss_tube",
+    "x": 90
    }
   },
   {
    "when": {
-    "west": "true"
+    "north": "false",
+    "south": "false",
+    "east": "false",
+    "west": "false",
+    "up": "false",
+    "down": "false"
    },
    "apply": {
-    "model": "stagelite:block/truss_arm",
-    "y": 270
-   }
-  },
-  {
-   "when": {
-    "up": "true"
-   },
-   "apply": {
-    "model": "stagelite:block/truss_arm",
-    "x": 270
-   }
-  },
-  {
-   "when": {
-    "down": "true"
-   },
-   "apply": {
-    "model": "stagelite:block/truss_arm",
+    "model": "stagelite:block/truss_tube",
     "x": 90
    }
   }

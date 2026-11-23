@@ -26,15 +26,6 @@ public final class ModTabs {
                         output.accept(ModBlocks.STAGE_PLATFORM_ITEM.get());
                         output.accept(ModBlocks.PROJECTOR_STAND_ITEM.get());
                         output.accept(ModBlocks.MIC_STAND_ITEM.get());
-                        int[] uniformColors = {0x1B1B22, 0xF2F2F2, 0xC62828, 0x1E4FA3, 0x2E7D32};
-                        for (int c : uniformColors) {
-                            for (net.minecraft.world.item.Item it : new net.minecraft.world.item.Item[]{
-                                    ModBlocks.UNIFORM_CAP.get(), ModBlocks.UNIFORM_JACKET.get(), ModBlocks.UNIFORM_PANTS.get(), ModBlocks.UNIFORM_BOOTS.get()}) {
-                                ItemStack st = new ItemStack(it);
-                                ((net.minecraft.world.item.DyeableLeatherItem) it).setColor(st, c);
-                                output.accept(st);
-                            }
-                        }
                         int[] bandColors = {0xFFFFFF, 0xFF2D95, 0x39FF14, 0xFFE600, 0x00B7FF, 0xB026FF, 0xFF6A00};
                         for (int c : bandColors) {
                             ItemStack st = new ItemStack(ModBlocks.WRISTBAND.get());
