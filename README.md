@@ -194,3 +194,4 @@ com.stagelite
 ## Licencia
 
 Sin definir (`All Rights Reserved` en `gradle.properties`). Cámbiala antes de publicar el repositorio.
+
