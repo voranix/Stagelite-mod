@@ -58,7 +58,7 @@ public final class VideoScreens {
     }
 
     public static void track(StageLightBlockEntity be) {
-        if (be.type() == com.stagelite.light.FixtureType.SPEAKER) {
+        if (be.type().isSpeaker()) {
             SPEAKERS.add(be);
         } else {
             TRACKED.add(be);
@@ -117,7 +117,7 @@ public final class VideoScreens {
             double margin = ACTIVE.containsKey(be) ? 32 : 16;
             boolean near = plane.center.distanceTo(eye) <= d.length + margin;
             for (StageLightBlockEntity sp : speakersOf(be)) {
-                if (Vec3.atCenterOf(sp.getBlockPos()).distanceTo(eye) <= sp.data.extra * 8.0 + margin) {
+                if (com.stagelite.light.SpeakerGeometry.center(sp).distanceTo(eye) <= sp.data.extra * 8.0 + margin) {
                     near = true;
                 }
             }
@@ -181,7 +181,7 @@ public final class VideoScreens {
             // La pantalla suena desde si misma y desde cada parlante conectado: mas parlantes cerca = mas fuerte
             double sum = falloff(dist, d.length);
             for (StageLightBlockEntity sp : speakersOf(be)) {
-                sum += sp.data.intensity / 100.0 * falloff(Vec3.atCenterOf(sp.getBlockPos()).distanceTo(eye), sp.data.extra * 8.0);
+                sum += sp.type().audioGain() * sp.data.intensity / 100.0 * falloff(com.stagelite.light.SpeakerGeometry.center(sp).distanceTo(eye), sp.data.extra * 8.0);
             }
             double volume = Math.min(1.0, d.intensity / 100.0 * sum);
             String state = String.format(Locale.ROOT, "%.2f|%.2f|%b", volume, rate(d.speed), d.billboard);

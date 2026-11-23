@@ -40,7 +40,7 @@ public final class LightRegistry {
         FixtureType t = be.type();
         if (t == FixtureType.MIC) {
             MICS.add(be);
-        } else if (t == FixtureType.SPEAKER) {
+        } else if (t.isSpeaker()) {
             SPEAKERS.add(be);
         }
     }

@@ -28,6 +28,10 @@ public enum FixtureType {
     FLOOR("dance_floor", 0f, 0f),
     /** Parlante: reproduce musica y la voz de los microfonos de su grupo. */
     SPEAKER("speaker", 0f, 0f),
+    /** Parlante mediano: 2 de ancho x 2 de alto. */
+    SPEAKER_M("speaker_medium", 0f, 0f),
+    /** Parlante grande: 4 de ancho x 3 de alto. */
+    SPEAKER_L("speaker_large", 0f, 0f),
     /** Microfono: capta la voz de los jugadores cercanos (Simple Voice Chat) y la manda a los parlantes de su grupo. */
     MIC("microphone", 0f, 0f),
     /** Pantalla de video (MCEF): link a un video con sonido, volumen, velocidad y tamano. */
@@ -88,7 +92,7 @@ public enum FixtureType {
 
     /** Necesita ejecutarse cada tick (particulas, fuegos artificiales). */
     public boolean ticks() {
-        return this == SMOKE || this == FIRE || this == FIREWORK || this == SPEAKER;
+        return this == SMOKE || this == FIRE || this == FIREWORK || isSpeaker();
     }
 
     /** Clave del fader extra (null si no tiene). */
@@ -107,6 +111,8 @@ public enum FixtureType {
             case HOLOGRAM:
                 return "extra_hologram";
             case SPEAKER:
+            case SPEAKER_M:
+            case SPEAKER_L:
                 return "extra_speaker";
             case SCREEN:
             case FRAME:
@@ -140,7 +146,26 @@ public enum FixtureType {
     }
 
     public boolean isAudio() {
-        return this == SPEAKER || this == MIC;
+        return isSpeaker() || this == MIC;
+    }
+
+    public boolean isSpeaker() {
+        return this == SPEAKER || this == SPEAKER_M || this == SPEAKER_L;
+    }
+
+    /** Ancho en bloques (parlantes grandes). */
+    public int partsW() {
+        return this == SPEAKER_M ? 2 : this == SPEAKER_L ? 4 : 1;
+    }
+
+    /** Alto en bloques (parlantes grandes). */
+    public int partsH() {
+        return this == SPEAKER_M ? 2 : this == SPEAKER_L ? 3 : 1;
+    }
+
+    /** Cuanto suma al audio de una pantalla conectada (los grandes suenan mas fuerte). */
+    public double audioGain() {
+        return this == SPEAKER_M ? 1.5 : this == SPEAKER_L ? 2.0 : 1.0;
     }
 
     public boolean isFloor() {
@@ -165,6 +190,8 @@ public enum FixtureType {
             case SMOKE:
             case FIREWORK:
             case SPEAKER:
+            case SPEAKER_M:
+            case SPEAKER_L:
             case MIC:
             case SCREEN:
             case FRAME:
@@ -260,6 +287,14 @@ public enum FixtureType {
                 d.length = 24;
                 d.extra = 3;
                 d.billboard = true; // aqui significa "bucle"
+                break;
+            case SPEAKER_M:
+                d.intensity = 80;
+                d.extra = 7;
+                break;
+            case SPEAKER_L:
+                d.intensity = 90;
+                d.extra = 9;
                 break;
             case SPEAKER:
                 d.intensity = 80;

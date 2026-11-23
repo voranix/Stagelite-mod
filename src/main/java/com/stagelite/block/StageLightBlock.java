@@ -82,6 +82,9 @@ public class StageLightBlock extends Block implements EntityBlock {
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         LightData defaults = new LightData();
         type.applyDefaults(defaults);
+        if (type.partsW() > 1) {
+            return defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
+        }
         if (type == FixtureType.PROJECTOR) {
             // el proyector apunta hacia donde miras
             return defaultBlockState().setValue(FACING, context.getNearestLookingDirection());
@@ -95,6 +98,9 @@ public class StageLightBlock extends Block implements EntityBlock {
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        if (type.partsW() > 1) {
+            return net.minecraft.world.phys.shapes.Shapes.block();
+        }
         if (type.isVideo() && type != FixtureType.PROJECTOR) {
             switch (state.getValue(FACING)) {
                 case SOUTH:
@@ -117,6 +123,31 @@ public class StageLightBlock extends Block implements EntityBlock {
         if (!level.isClientSide && level.getBlockEntity(pos) instanceof StageLightBlockEntity be) {
             be.joinNeighbors();
         }
+    }
+
+    /** Quita todas las piezas de un parlante grande (menos la posicion "skip", que ya se esta rompiendo). */
+    public static void removeSpeaker(Level level, BlockPos origin, BlockPos skip) {
+        BlockState os = level.getBlockState(origin);
+        if (!(os.getBlock() instanceof StageLightBlock slb) || !slb.type.isSpeaker() || slb.type.partsW() <= 1) {
+            return;
+        }
+        Direction right = os.getValue(FACING).getCounterClockWise();
+        for (int x = 0; x < slb.type.partsW(); x++) {
+            for (int y = 0; y < slb.type.partsH(); y++) {
+                BlockPos p = origin.offset(right.getStepX() * x, y, right.getStepZ() * x);
+                if (!p.equals(skip) && (level.getBlockState(p).getBlock() instanceof SpeakerPartBlock || p.equals(origin))) {
+                    level.setBlock(p, Blocks.AIR.defaultBlockState(), 35);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+        if (!level.isClientSide && type.partsW() > 1) {
+            removeSpeaker(level, pos, pos);
+        }
+        super.playerWillDestroy(level, pos, state, player);
     }
 
     @Override

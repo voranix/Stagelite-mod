@@ -186,5 +186,9 @@
   "tip.stagelite.speaker_link": "Para conectar: enlaza el control a una pantalla y haz clic derecho en el parlante. Aquí puedes desconectarlo.",
   "message.stagelite.speaker_linked": "Parlante conectado: ahora suena el audio de la pantalla.",
   "message.stagelite.speaker_unlinked": "Parlante desconectado.",
-  "message.stagelite.speaker_need_screen": "Primero enlaza el control a una pantalla (apunta a la imagen y clic derecho), luego haz clic derecho en el parlante."
+  "message.stagelite.speaker_need_screen": "Primero enlaza el control a una pantalla (apunta a la imagen y clic derecho), luego haz clic derecho en el parlante.",
+  "block.stagelite.speaker_medium": "Parlante mediano (2x2)",
+  "block.stagelite.speaker_large": "Parlante grande (4x3)",
+  "block.stagelite.speaker_part": "Parlante",
+  "message.stagelite.speaker_no_space": "No hay espacio libre: este parlante necesita %s de ancho y %s de alto (a la derecha y arriba del bloque donde haces clic)."
 }

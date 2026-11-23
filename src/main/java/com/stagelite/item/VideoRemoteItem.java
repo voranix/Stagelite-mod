@@ -71,10 +71,14 @@ public class VideoRemoteItem extends Item {
     @Override
     public InteractionResult useOn(UseOnContext ctx) {
         Level level = ctx.getLevel();
-        if (!level.isClientSide && ctx.getPlayer() instanceof ServerPlayer sp
-                && level.getBlockEntity(ctx.getClickedPos()) instanceof StageLightBlockEntity speaker
-                && speaker.type() == FixtureType.SPEAKER) {
-            return handleSpeaker(level, sp, ctx.getItemInHand(), speaker);
+        if (!level.isClientSide && ctx.getPlayer() instanceof ServerPlayer sp) {
+            BlockPos at = ctx.getClickedPos();
+            if (level.getBlockState(at).getBlock() instanceof com.stagelite.block.SpeakerPartBlock) {
+                at = com.stagelite.block.SpeakerPartBlock.origin(level.getBlockState(at), at);
+            }
+            if (level.getBlockEntity(at) instanceof StageLightBlockEntity speaker && speaker.type().isSpeaker()) {
+                return handleSpeaker(level, sp, ctx.getItemInHand(), speaker);
+            }
         }
         return handle(level, ctx.getPlayer(), ctx.getItemInHand());
     }

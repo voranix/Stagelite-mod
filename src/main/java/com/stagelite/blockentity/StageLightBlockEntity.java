@@ -120,7 +120,7 @@ public class StageLightBlockEntity extends BlockEntity {
     /** Se llama cada tick en cliente y servidor para humo, fuego y fuegos artificiales. */
     public void tick(Level lvl) {
         FixtureType type = type();
-        if (type == FixtureType.SPEAKER) {
+        if (type.isSpeaker()) {
             if (lvl.isClientSide) {
                 net.minecraftforge.fml.DistExecutor.unsafeRunWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT,
                         () -> () -> com.stagelite.client.SpeakerSounds.update(this));
@@ -160,14 +160,14 @@ public class StageLightBlockEntity extends BlockEntity {
         super.onLoad();
         if (level != null && !level.isClientSide) {
             LightRegistry.add(this);
-        } else if (level != null && (type().isVideo() || type() == FixtureType.SPEAKER)) {
+        } else if (level != null && (type().isVideo() || type().isSpeaker())) {
             net.minecraftforge.fml.DistExecutor.unsafeRunWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT,
                     () -> () -> com.stagelite.client.video.VideoScreens.track(this));
         }
     }
 
     private void stopSpeaker() {
-        if (level != null && level.isClientSide && (type().isVideo() || type() == FixtureType.SPEAKER)) {
+        if (level != null && level.isClientSide && (type().isVideo() || type().isSpeaker())) {
             net.minecraftforge.fml.DistExecutor.unsafeRunWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT,
                     () -> () -> com.stagelite.client.video.VideoScreens.untrack(this));
         }

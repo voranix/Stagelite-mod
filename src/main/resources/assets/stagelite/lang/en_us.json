@@ -186,5 +186,9 @@
   "tip.stagelite.speaker_link": "To connect: link the remote to a screen and right-click the speaker. You can disconnect it here.",
   "message.stagelite.speaker_linked": "Speaker connected: it now plays the screen's audio.",
   "message.stagelite.speaker_unlinked": "Speaker disconnected.",
-  "message.stagelite.speaker_need_screen": "First link the remote to a screen (aim at the picture and right-click), then right-click the speaker."
+  "message.stagelite.speaker_need_screen": "First link the remote to a screen (aim at the picture and right-click), then right-click the speaker.",
+  "block.stagelite.speaker_medium": "Medium Speaker (2x2)",
+  "block.stagelite.speaker_large": "Large Speaker (4x3)",
+  "block.stagelite.speaker_part": "Speaker",
+  "message.stagelite.speaker_no_space": "Not enough free space: this speaker needs %s wide and %s tall (to the right and above the block you click)."
 }

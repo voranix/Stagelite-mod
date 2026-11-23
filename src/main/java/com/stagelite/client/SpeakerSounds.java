@@ -55,7 +55,7 @@ public final class SpeakerSounds {
         p.sound = new SimpleSoundInstance(new ResourceLocation("minecraft", "music_disc." + NAMES[d.track - 1]),
                 SoundSource.RECORDS, vol * Math.max(0.05f, d.intensity / 100f), 1f, RandomSource.create(), true, 0,
                 SoundInstance.Attenuation.LINEAR,
-                be.getBlockPos().getX() + 0.5, be.getBlockPos().getY() + 0.5, be.getBlockPos().getZ() + 0.5, false);
+                com.stagelite.light.SpeakerGeometry.center(be).x, com.stagelite.light.SpeakerGeometry.center(be).y, com.stagelite.light.SpeakerGeometry.center(be).z, false);
         Minecraft.getInstance().getSoundManager().play(p.sound);
         PLAYING.put(be, p);
     }

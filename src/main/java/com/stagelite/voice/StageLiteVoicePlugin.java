@@ -87,8 +87,9 @@ public class StageLiteVoicePlugin implements VoicechatPlugin {
         }
         LocationalAudioChannel channel = CHANNELS.computeIfAbsent(key, k -> {
             UUID id = UUID.nameUUIDFromBytes(("stagelite:" + k).getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            net.minecraft.world.phys.Vec3 c = com.stagelite.light.SpeakerGeometry.center(speaker);
             return api.createLocationalAudioChannel(id, api.fromServerLevel(speaker.getLevel()),
-                    api.createPosition(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5));
+                    api.createPosition(c.x, c.y, c.z));
         });
         if (channel != null) {
             channel.setDistance(Math.max(8f, speaker.data.extra * 8f));

@@ -35,6 +35,9 @@ public final class ModBlocks {
     public static final RegistryObject<Block> HOLOGRAM = registerLight(FixtureType.HOLOGRAM);
     public static final RegistryObject<Block> DANCE_FLOOR = registerLight(FixtureType.FLOOR);
     public static final RegistryObject<Block> SPEAKER = registerLight(FixtureType.SPEAKER);
+    public static final RegistryObject<Block> SPEAKER_MEDIUM = registerLight(FixtureType.SPEAKER_M, true);
+    public static final RegistryObject<Block> SPEAKER_LARGE = registerLight(FixtureType.SPEAKER_L, true);
+    public static final RegistryObject<Block> SPEAKER_PART = BLOCKS.register("speaker_part", com.stagelite.block.SpeakerPartBlock::new);
     public static final RegistryObject<Block> MICROPHONE = registerLight(FixtureType.MIC);
     public static final RegistryObject<Block> VIDEO_SCREEN = registerLight(FixtureType.SCREEN);
     public static final RegistryObject<Block> VIDEO_FRAME = registerLight(FixtureType.FRAME);
@@ -55,8 +58,14 @@ public final class ModBlocks {
     }
 
     private static RegistryObject<Block> registerLight(FixtureType type) {
+        return registerLight(type, false);
+    }
+
+    private static RegistryObject<Block> registerLight(FixtureType type, boolean multi) {
         RegistryObject<Block> block = BLOCKS.register(type.id(), () -> new StageLightBlock(type));
-        RegistryObject<Item> item = ITEMS.register(type.id(), () -> new BlockItem(block.get(), new Item.Properties()));
+        RegistryObject<Item> item = ITEMS.register(type.id(), () -> multi
+                ? new com.stagelite.block.MultiSpeakerItem((StageLightBlock) block.get(), new Item.Properties())
+                : new BlockItem(block.get(), new Item.Properties()));
         LIGHT_BLOCKS.add(block);
         LIGHT_ITEMS.add(item);
         return block;

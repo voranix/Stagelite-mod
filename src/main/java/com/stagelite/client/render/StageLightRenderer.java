@@ -121,6 +121,8 @@ public class StageLightRenderer implements BlockEntityRenderer<StageLightBlockEn
             case FIRE:
             case FIREWORK:
             case SPEAKER:
+            case SPEAKER_M:
+            case SPEAKER_L:
             case MIC:
             case SCREEN:
             case FRAME:
