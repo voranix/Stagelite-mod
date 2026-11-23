@@ -184,11 +184,11 @@ public final class VideoScreens {
                 sum += sp.type().audioGain() * sp.data.intensity / 100.0 * falloff(com.stagelite.light.SpeakerGeometry.center(sp).distanceTo(eye), sp.data.extra * 8.0);
             }
             double volume = Math.min(1.0, d.intensity / 100.0 * sum);
-            String state = String.format(Locale.ROOT, "%.2f|%.2f|%b", volume, rate(d.speed), d.billboard);
+            String state = String.format(Locale.ROOT, "%.2f|%.2f|%b|%b", volume, rate(d.speed), d.billboard, d.skipAds);
             if (!state.equals(s.lastState) || s.sinceSend >= 40) {
                 s.lastState = state;
                 s.sinceSend = 0;
-                McefBridge.js(s.browser, script(volume, rate(d.speed), d.billboard));
+                McefBridge.js(s.browser, script(volume, rate(d.speed), d.billboard, d.skipAds));
             }
         }
     }
@@ -229,11 +229,11 @@ public final class VideoScreens {
         return table[Math.max(0, Math.min(9, speed - 1))];
     }
 
-    private static String script(double volume, double rate, boolean loop) {
+    private static String script(double volume, double rate, boolean loop, boolean skipAds) {
         return "(function(){if(location.hostname.indexOf('youtube.com')>=0&&!document.getElementById('sl-style')){"
                 + "var st=document.createElement('style');st.id='sl-style';"
                 + "st.textContent='ytd-masthead,#masthead-container,#secondary,#below,#comments,#guide,tp-yt-app-drawer,ytd-miniplayer,"
-                + ".ytp-chrome-bottom,.ytp-chrome-top,.ytp-gradient-top,.ytp-gradient-bottom,.ytp-pause-overlay,.ytp-endscreen-content,.ytp-ce-element,.ytp-cards-teaser{display:none!important}"
+                + ".ytp-chrome-bottom,.ytp-chrome-top,.ytp-gradient-top,.ytp-gradient-bottom,.ytp-pause-overlay,.ytp-endscreen-content,.ytp-ce-element,.ytp-cards-teaser,.ytp-ad-overlay-container,.ytp-ad-image-overlay,.ytp-ad-text-overlay,ytd-ad-slot-renderer,#player-ads,.ytp-suggested-action,.ytp-paid-content-overlay{display:none!important}"
                 + "html,body{overflow:hidden!important;background:#000!important}"
                 + "#movie_player{position:fixed!important;top:0!important;left:0!important;width:100vw!important;height:100vh!important;z-index:2147483647!important;background:#000!important}"
                 + ".html5-video-container{width:100%!important;height:100%!important}"
@@ -242,7 +242,18 @@ public final class VideoScreens {
                 + "var im=(document.contentType&&document.contentType.indexOf('image/')===0&&document.images.length===1)?document.images[0]:null;"
                 + "if(im){document.documentElement.style.background='#000';document.body.style.cssText='margin:0;background:#000';"
                 + "im.style.cssText='position:fixed;top:0;left:0;width:100vw;height:100vh;object-fit:contain;margin:0';return;}"
+                + "window.__slSkip=" + skipAds + ";"
+                + "if(location.hostname.indexOf('youtube.com')>=0&&!window.__slAdTimer){window.__slAdTimer=setInterval(function(){"
+                + "var pl=document.getElementById('movie_player'),vv=document.querySelector('video');"
+                + "var ad=!!(pl&&pl.classList.contains('ad-showing'));"
+                + "if(window.__slSkip){var b=document.querySelector('.ytp-skip-ad-button,.ytp-ad-skip-button,.ytp-ad-skip-button-modern,.ytp-ad-skip-button-container button');if(b)b.click();}"
+                + "if(ad&&window.__slSkip&&vv){window.__slWasAd=true;vv.muted=true;vv.playbackRate=16;"
+                + "if(isFinite(vv.duration)&&vv.duration>0&&vv.currentTime<vv.duration-0.1)vv.currentTime=vv.duration-0.05;}"
+                + "else if(window.__slWasAd&&!ad&&vv){window.__slWasAd=false;vv.muted=window.__slMuted;vv.volume=window.__slVol;vv.playbackRate=window.__slRate;"
+                + "if(vv.paused){var q=vv.play();if(q&&q.catch)q.catch(function(){});}}},250);}"
                 + "var v=document.querySelector('video');if(!v)return;"
+                + "window.__slMuted=" + (volume <= 0.001) + ";window.__slVol=" + String.format(Locale.ROOT, "%.3f", Math.max(0, Math.min(1, volume))) + ";window.__slRate=" + String.format(Locale.ROOT, "%.2f", rate) + ";"
+                + "if(window.__slSkip&&window.__slWasAd)return;"
                 + "document.documentElement.style.background='#000';if(document.body)document.body.style.background='#000';"
                 + "v.controls=false;v.style.objectFit='contain';"
                 + "v.muted=" + (volume <= 0.001) + ";v.volume=" + String.format(Locale.ROOT, "%.3f", Math.max(0, Math.min(1, volume))) + ";"

@@ -190,5 +190,8 @@
   "block.stagelite.speaker_medium": "Parlante mediano (2x2)",
   "block.stagelite.speaker_large": "Parlante grande (4x3)",
   "block.stagelite.speaker_part": "Parlante",
-  "message.stagelite.speaker_no_space": "No hay espacio libre: este parlante necesita %s de ancho y %s de alto (a la derecha y arriba del bloque donde haces clic)."
+  "message.stagelite.speaker_no_space": "No hay espacio libre: este parlante necesita %s de ancho y %s de alto (a la derecha y arriba del bloque donde haces clic).",
+  "gui.stagelite.ads_off": "Sin ads",
+  "gui.stagelite.ads_on": "Con ads",
+  "tip.stagelite.ads": "Salta o silencia los anuncios de YouTube automáticamente (puede dejar de funcionar si YouTube cambia su página)."
 }

@@ -190,5 +190,8 @@
   "block.stagelite.speaker_medium": "Medium Speaker (2x2)",
   "block.stagelite.speaker_large": "Large Speaker (4x3)",
   "block.stagelite.speaker_part": "Speaker",
-  "message.stagelite.speaker_no_space": "Not enough free space: this speaker needs %s wide and %s tall (to the right and above the block you click)."
+  "message.stagelite.speaker_no_space": "Not enough free space: this speaker needs %s wide and %s tall (to the right and above the block you click).",
+  "gui.stagelite.ads_off": "No ads",
+  "gui.stagelite.ads_on": "Ads",
+  "tip.stagelite.ads": "Automatically skips or mutes YouTube ads (may stop working if YouTube changes its page)."
 }

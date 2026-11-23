@@ -46,6 +46,8 @@ public class LightData {
     public static final int MAX_TRACK = 16;
     /** Pantallas: proporcion 0=16:9, 1=9:16, 2=4:3, 3=1:1, 4=21:9. */
     public int aspect = 0;
+    /** Video: salta/silencia los anuncios de YouTube. */
+    public boolean skipAds = true;
     public static final int ASPECTS = 5;
     /** Parlante conectado a una pantalla: reproduce su audio (suma volumen y alcance). */
     public boolean linked = false;
@@ -106,6 +108,7 @@ public class LightData {
         this.billboard = o.billboard;
         this.track = o.track;
         this.aspect = o.aspect;
+        this.skipAds = o.skipAds;
         this.linked = o.linked;
         this.link = o.link;
     }
@@ -150,6 +153,7 @@ public class LightData {
         t.putBoolean("billboard", billboard);
         t.putInt("track", track);
         t.putInt("aspect", aspect);
+        t.putBoolean("skipAds", skipAds);
         t.putBoolean("linked", linked);
         t.putLong("link", link);
     }
@@ -173,6 +177,7 @@ public class LightData {
         if (t.contains("billboard")) billboard = t.getBoolean("billboard");
         if (t.contains("track")) track = t.getInt("track");
         if (t.contains("aspect")) aspect = t.getInt("aspect");
+        if (t.contains("skipAds")) skipAds = t.getBoolean("skipAds");
         if (t.contains("linked")) linked = t.getBoolean("linked");
         if (t.contains("link")) link = t.getLong("link");
         clamp();

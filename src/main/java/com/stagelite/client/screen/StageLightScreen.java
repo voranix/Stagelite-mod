@@ -187,8 +187,16 @@ public class StageLightScreen extends Screen {
                         data.billboard = !data.billboard;
                         btn.setMessage(billboardLabel());
                         commit();
-                    }).bounds(bx, by, bw, 20)
+                    }).bounds(bx, by, type.isVideo() ? 54 : bw, 20)
                     .tooltip(Tooltip.create(Component.translatable(type.isVideo() ? "tip.stagelite.loop" : "tip.stagelite.billboard"))).build());
+            if (type.isVideo()) {
+                addRenderableWidget(Button.builder(adsLabel(), btn -> {
+                            data.skipAds = !data.skipAds;
+                            btn.setMessage(adsLabel());
+                            commit();
+                        }).bounds(bx + 56, by, bw - 56, 20)
+                        .tooltip(Tooltip.create(Component.translatable("tip.stagelite.ads"))).build());
+            }
             by += 24;
         }
 
@@ -340,6 +348,10 @@ public class StageLightScreen extends Screen {
             }
         }
         return super.keyPressed(key, scancode, mods);
+    }
+
+    private Component adsLabel() {
+        return Component.translatable(data.skipAds ? "gui.stagelite.ads_off" : "gui.stagelite.ads_on");
     }
 
     private Component billboardLabel() {
