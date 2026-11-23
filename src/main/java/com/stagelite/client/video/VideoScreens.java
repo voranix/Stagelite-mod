@@ -123,6 +123,9 @@ public final class VideoScreens {
         for (StageLightBlockEntity be : wanted) {
             LightData d = be.data;
             String url = normalize(d.url);
+            if (url == null) {
+                continue; // link corto de TikTok: se esta resolviendo
+            }
             Session s = ACTIVE.get(be);
             if (s == null) {
                 int w = ClientConfig.VIDEO_WIDTH.get();
@@ -192,11 +195,76 @@ public final class VideoScreens {
                 + "if(v.paused){var p=v.play();if(p&&p.catch)p.catch(function(){});}})();";
     }
 
-    /** Convierte links de YouTube a su version "embed" con reproduccion automatica. */
+    private static final Map<String, String> SHORT_TIKTOK = new java.util.concurrent.ConcurrentHashMap<>();
+
+    private static boolean isShortTikTok(String low) {
+        return low.contains("vm.tiktok.com/") || low.contains("vt.tiktok.com/") || low.contains("tiktok.com/t/");
+    }
+
+    private static String tiktokPlayer(String id) {
+        return "https://www.tiktok.com/player/v1/" + id + "?music_info=0&description=0&controls=0&autoplay=1&loop=1";
+    }
+
+    /** Sigue (en segundo plano) las redirecciones de un link corto de TikTok hasta el link completo. */
+    private static void resolveShort(String url) {
+        if (SHORT_TIKTOK.putIfAbsent(url, "") != null) {
+            return;
+        }
+        Thread t = new Thread(() -> {
+            String cur = url;
+            try {
+                for (int hop = 0; hop < 5; hop++) {
+                    java.net.HttpURLConnection c = (java.net.HttpURLConnection) new java.net.URL(cur).openConnection();
+                    c.setInstanceFollowRedirects(false);
+                    c.setConnectTimeout(5000);
+                    c.setReadTimeout(5000);
+                    c.setRequestProperty("User-Agent", "Mozilla/5.0");
+                    int code = c.getResponseCode();
+                    String loc = c.getHeaderField("Location");
+                    c.disconnect();
+                    if (code >= 300 && code < 400 && loc != null) {
+                        cur = loc.startsWith("http") ? loc : new java.net.URL(new java.net.URL(cur), loc).toString();
+                        String id = tiktokId(cur);
+                        if (id != null) {
+                            SHORT_TIKTOK.put(url, tiktokPlayer(id));
+                            return;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+            } catch (Exception ignored) {
+            }
+            SHORT_TIKTOK.put(url, url); // no se pudo: se intenta cargar tal cual
+        }, "stagelite-tiktok");
+        t.setDaemon(true);
+        t.start();
+    }
+
+    private static String tiktokId(String u) {
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile("/(?:video|player/v1|embed/v2|embed)/(\\d{8,25})").matcher(u);
+        return m.find() ? m.group(1) : null;
+    }
+
+    /** Convierte links de YouTube y TikTok a su reproductor embebido. Devuelve null mientras se resuelve un link corto. */
     static String normalize(String url) {
         String u = url.trim();
         String id = null;
         String low = u.toLowerCase(Locale.ROOT);
+        if (low.contains("tiktok.com")) {
+            if (isShortTikTok(low)) {
+                String done = SHORT_TIKTOK.get(u);
+                if (done == null) {
+                    resolveShort(u);
+                    return null;
+                }
+                return done.isEmpty() ? null : done;
+            }
+            String tid = tiktokId(u);
+            if (tid != null) {
+                return tiktokPlayer(tid);
+            }
+        }
         try {
             if (low.contains("youtube.com/watch")) {
                 int i = u.indexOf("v=");
