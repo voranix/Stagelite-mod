@@ -153,5 +153,17 @@
   "gui.stagelite.track": "Música: %s",
   "track.stagelite.none": "Ninguna",
   "tip.stagelite.track": "Disco que suena en bucle. Shift = volver a Ninguna.",
-  "effect.stagelite.beat": "Ritmo"
+  "effect.stagelite.beat": "Ritmo",
+  "block.stagelite.video_screen": "Pantalla de video",
+  "fader.stagelite.volume": "Volumen",
+  "tip.stagelite.volume": "Volumen del video (baja con la distancia). 0 = silencio.",
+  "fader.stagelite.screen_range": "Alcance",
+  "tip.stagelite.screen_range": "A cuántos bloques se oye y se carga el video.",
+  "fader.stagelite.extra_screen": "Tamaño",
+  "tip.stagelite.extra_screen": "Ancho de la pantalla (2 a 20 bloques, siempre 16:9).",
+  "gui.stagelite.loop_on": "Bucle: sí",
+  "gui.stagelite.loop_off": "Bucle: no",
+  "tip.stagelite.loop": "Repite el video al terminar.",
+  "gui.stagelite.restart": "Reiniciar",
+  "tip.stagelite.restart": "Vuelve a cargar el video desde el inicio para todos."
 }

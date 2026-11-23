@@ -1,0 +1,42 @@
+{
+ "parent": "minecraft:block/block",
+ "textures": {
+  "particle": "stagelite:block/video_frame",
+  "front": "stagelite:block/video_front",
+  "frame": "stagelite:block/video_frame"
+ },
+ "elements": [
+  {
+   "from": [
+    0,
+    0,
+    14
+   ],
+   "to": [
+    16,
+    16,
+    16
+   ],
+   "faces": {
+    "north": {
+     "texture": "#front"
+    },
+    "south": {
+     "texture": "#frame"
+    },
+    "east": {
+     "texture": "#frame"
+    },
+    "west": {
+     "texture": "#frame"
+    },
+    "up": {
+     "texture": "#frame"
+    },
+    "down": {
+     "texture": "#frame"
+    }
+   }
+  }
+ ]
+}

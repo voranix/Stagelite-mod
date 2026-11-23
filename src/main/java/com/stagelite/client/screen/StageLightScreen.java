@@ -100,7 +100,11 @@ public class StageLightScreen extends Screen {
             fx += FADER_PITCH + 8;
         }
         if (type != FixtureType.MIC) {
-            addFader(fx, fy, "intensity", 0, 100, data.intensity, 0xFFD060, v -> data.intensity = v);
+            addFader(fx, fy, type.isVideo() ? "volume" : "intensity", 0, 100, data.intensity, 0xFFD060, v -> data.intensity = v);
+            fx += FADER_PITCH;
+        }
+        if (type.isVideo()) {
+            addFader(fx, fy, "screen_range", LightData.MIN_LENGTH, LightData.MAX_LENGTH, data.length, 0xC0C0C0, v -> data.length = v);
             fx += FADER_PITCH;
         }
         if (type.usesBeamSize()) {
@@ -147,7 +151,7 @@ public class StageLightScreen extends Screen {
                     }).bounds(bx, by, bw, 20)
                     .tooltip(Tooltip.create(Component.translatable("tip.stagelite.track"))).build());
             by += 24;
-        } else if (!type.isAudio()) {
+        } else if (!type.isAudio() && !type.isVideo()) {
             addRenderableWidget(Button.builder(effectLabel(), btn -> {
                         data.effect = data.effect.next(type.isFloor());
                         btn.setMessage(effectLabel());
@@ -173,7 +177,16 @@ public class StageLightScreen extends Screen {
                         btn.setMessage(billboardLabel());
                         commit();
                     }).bounds(bx, by, bw, 20)
-                    .tooltip(Tooltip.create(Component.translatable("tip.stagelite.billboard"))).build());
+                    .tooltip(Tooltip.create(Component.translatable(type.isVideo() ? "tip.stagelite.loop" : "tip.stagelite.billboard"))).build());
+            by += 24;
+        }
+
+        if (type.isVideo()) {
+            addRenderableWidget(Button.builder(Component.translatable("gui.stagelite.restart"), btn -> {
+                        data.track = (data.track + 1) % (LightData.MAX_TRACK + 1);
+                        commit();
+                    }).bounds(bx, by, bw, 20)
+                    .tooltip(Tooltip.create(Component.translatable("tip.stagelite.restart"))).build());
             by += 24;
         }
 
@@ -218,9 +231,11 @@ public class StageLightScreen extends Screen {
                 }
             });
             addRenderableWidget(urlBox);
-            addRenderableWidget(Button.builder(Component.translatable("gui.stagelite.pick_file"), btn -> pickFile())
-                    .bounds(left + PANEL_W - 126, top + 152, 126, 18)
-                    .tooltip(Tooltip.create(Component.translatable("tip.stagelite.pick_file"))).build());
+            if (!type.isVideo()) {
+                addRenderableWidget(Button.builder(Component.translatable("gui.stagelite.pick_file"), btn -> pickFile())
+                        .bounds(left + PANEL_W - 126, top + 152, 126, 18)
+                        .tooltip(Tooltip.create(Component.translatable("tip.stagelite.pick_file"))).build());
+            }
         }
     }
 
@@ -291,7 +306,7 @@ public class StageLightScreen extends Screen {
 
     @Override
     public void onFilesDrop(List<Path> paths) {
-        if (type.usesUrl() && !paths.isEmpty()) {
+        if (type == FixtureType.HOLOGRAM && !paths.isEmpty()) {
             importFile(paths.get(0).toString());
         }
     }
@@ -310,6 +325,9 @@ public class StageLightScreen extends Screen {
     }
 
     private Component billboardLabel() {
+        if (type.isVideo()) {
+            return Component.translatable(data.billboard ? "gui.stagelite.loop_on" : "gui.stagelite.loop_off");
+        }
         return Component.translatable(data.billboard ? "gui.stagelite.billboard_on" : "gui.stagelite.billboard_off");
     }
 

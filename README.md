@@ -56,6 +56,10 @@ Clic derecho (staff). Muestra los grupos que tengan luces **cargadas**. **Haz cl
 - Los fuegos artificiales son cohetes de Minecraft: su explosión hace daño cerca. Se pueden desactivar con `fireworksEnabled = false` en `stagelite-common.toml`.
 - La versión del protocolo de red cambió: servidor y jugadores deben tener la misma versión del mod.
 
+## Pantalla de video
+Bloque `stagelite:video_screen` (se coloca mirando hacia ti). Pega en la casilla un **link directo a un video** (.mp4 / .webm) o un link de **YouTube**; para un video de tu computador, súbelo a tu hosting y usa ese link. Necesita el mod **MCEF** en el cliente (en el servidor no hace falta); sin MCEF no reproduce y no da error.
+Controles: *Volumen* (baja con la distancia), *Velocidad* (0,25x a 4x, el 4 es normal), *Alcance* (hasta dónde se oye y se carga), *Tamaño* (2–20 bloques de ancho, 16:9), *Bucle*, *Reiniciar* y encendido/apagado (pausa). También responde a grupos y a la consola. Para cuidar el rendimiento, cada jugador solo reproduce las 2 pantallas más cercanas (`videoMaxScreens` en la config del cliente) y el video se carga solo cuando estás dentro del alcance.
+
 ## Parlantes y micrófonos
 - **Parlante** (`stagelite:speaker`): botón *Música* (clic = siguiente disco, 16 en total; Shift = volver a Ninguna) y suena en bucle. *Intensidad* = volumen, *Alcance* = hasta dónde se oye (8–80 bloques). Con `/stagelite group <n> track <0-16>` cambias la música de todo un grupo.
 - **Micrófono** (`stagelite:microphone`): con **Simple Voice Chat** instalado (servidor y clientes), la voz de quien habla a menos de *Alcance*+1 bloques sale por todos los parlantes de su mismo grupo (el grupo debe ser 1 o más). Sin Simple Voice Chat el mod funciona igual, solo que el micrófono no hace nada.
