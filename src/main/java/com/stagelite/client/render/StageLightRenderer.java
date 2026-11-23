@@ -123,6 +123,8 @@ public class StageLightRenderer implements BlockEntityRenderer<StageLightBlockEn
             case SPEAKER:
             case MIC:
             case SCREEN:
+            case FRAME:
+            case PROJECTOR:
                 return; // solo particulas / cohetes / bloques funcionales sin haz
             case LASER:
                 if (beamVisible) {

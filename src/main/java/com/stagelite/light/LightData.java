@@ -44,6 +44,9 @@ public class LightData {
     /** Parlante: musica que suena (0 = ninguna, 1..16 = discos del juego). */
     public int track = 0;
     public static final int MAX_TRACK = 16;
+    /** Pantallas: proporcion 0=16:9, 1=9:16, 2=4:3, 3=1:1, 4=21:9. */
+    public int aspect = 0;
+    public static final int ASPECTS = 5;
     public static final int MAX_URL = 256;
 
     public void clamp() {
@@ -59,6 +62,7 @@ public class LightData {
         tilt = Mth.clamp(tilt, -90, 90);
         yaw = Mth.clamp(yaw, -90, 90);
         track = Mth.clamp(track, 0, MAX_TRACK);
+        aspect = Mth.clamp(aspect, 0, ASPECTS - 1);
         url = cleanUrl(url);
     }
 
@@ -98,6 +102,7 @@ public class LightData {
         this.url = o.url;
         this.billboard = o.billboard;
         this.track = o.track;
+        this.aspect = o.aspect;
     }
 
     /** Copia solo el "look" (lo que guarda una escena): no cambia el grupo ni el largo. */
@@ -139,6 +144,7 @@ public class LightData {
         t.putString("url", url);
         t.putBoolean("billboard", billboard);
         t.putInt("track", track);
+        t.putInt("aspect", aspect);
     }
 
     public void load(CompoundTag t) {
@@ -159,6 +165,7 @@ public class LightData {
         if (t.contains("url")) url = t.getString("url");
         if (t.contains("billboard")) billboard = t.getBoolean("billboard");
         if (t.contains("track")) track = t.getInt("track");
+        if (t.contains("aspect")) aspect = t.getInt("aspect");
         clamp();
     }
 

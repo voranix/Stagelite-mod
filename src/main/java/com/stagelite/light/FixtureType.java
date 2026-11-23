@@ -31,7 +31,11 @@ public enum FixtureType {
     /** Microfono: capta la voz de los jugadores cercanos (Simple Voice Chat) y la manda a los parlantes de su grupo. */
     MIC("microphone", 0f, 0f),
     /** Pantalla de video (MCEF): link a un video con sonido, volumen, velocidad y tamano. */
-    SCREEN("video_screen", 0f, 0f);
+    SCREEN("video_screen", 0f, 0f),
+    /** Marco / letrero multimedia: imagen o video pegado a la pared. */
+    FRAME("video_frame", 0f, 0f),
+    /** Proyector: proyecta la imagen o el video sobre la primera superficie que encuentra. */
+    PROJECTOR("video_projector", 0f, 0f);
 
     private final String id;
     private final float beamStart;
@@ -105,6 +109,8 @@ public enum FixtureType {
             case SPEAKER:
                 return "extra_speaker";
             case SCREEN:
+            case FRAME:
+            case PROJECTOR:
                 return "extra_screen";
             case MIC:
                 return "extra_mic";
@@ -130,7 +136,7 @@ public enum FixtureType {
     }
 
     public boolean isVideo() {
-        return this == SCREEN;
+        return this == SCREEN || this == FRAME || this == PROJECTOR;
     }
 
     public boolean isAudio() {
@@ -142,7 +148,7 @@ public enum FixtureType {
     }
 
     public boolean usesUrl() {
-        return this == HOLOGRAM || this == SCREEN;
+        return this == HOLOGRAM || isVideo();
     }
 
     public static FixtureType byId(int index) {
@@ -161,6 +167,8 @@ public enum FixtureType {
             case SPEAKER:
             case MIC:
             case SCREEN:
+            case FRAME:
+            case PROJECTOR:
                 return 0;
             case FIRE:
                 return 12;
@@ -230,6 +238,21 @@ public enum FixtureType {
                 d.extra = 5;
                 d.speed = 3;
                 d.effect = Effect.RAINBOW;
+                break;
+            case FRAME:
+                d.intensity = 70;
+                d.speed = 4;
+                d.length = 16;
+                d.extra = 2;
+                d.billboard = true;
+                break;
+            case PROJECTOR:
+                d.intensity = 70;
+                d.speed = 4;
+                d.length = 32;
+                d.range = 30; // distancia de proyeccion
+                d.extra = 4;
+                d.billboard = true;
                 break;
             case SCREEN:
                 d.intensity = 70;

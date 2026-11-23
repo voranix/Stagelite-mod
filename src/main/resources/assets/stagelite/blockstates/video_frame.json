@@ -1,0 +1,25 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "stagelite:block/video_frame"
+    },
+    "facing=east": {
+      "model": "stagelite:block/video_frame",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "stagelite:block/video_frame",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "stagelite:block/video_frame",
+      "y": 270
+    },
+    "facing=up": {
+      "model": "stagelite:block/video_frame"
+    },
+    "facing=down": {
+      "model": "stagelite:block/video_frame"
+    }
+  }
+}

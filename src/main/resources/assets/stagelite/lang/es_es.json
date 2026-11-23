@@ -160,7 +160,7 @@
   "fader.stagelite.screen_range": "Alcance",
   "tip.stagelite.screen_range": "A cuántos bloques se oye y se carga el video.",
   "fader.stagelite.extra_screen": "Tamaño",
-  "tip.stagelite.extra_screen": "Ancho de la pantalla (2 a 20 bloques, siempre 16:9).",
+  "tip.stagelite.extra_screen": "Tamaño de la imagen (el lado más largo). Pantalla: 2 a 20 bloques, marco: 1 a 10, proyector: 3 a 30.",
   "gui.stagelite.loop_on": "Bucle: sí",
   "gui.stagelite.loop_off": "Bucle: no",
   "tip.stagelite.loop": "Repite el video al terminar.",
@@ -174,5 +174,11 @@
   "message.stagelite.remote_unlinked": "Control desenlazado.",
   "message.stagelite.remote_hint": "Apunta a una pantalla y haz clic derecho para enlazar el control.",
   "message.stagelite.remote_missing": "La pantalla enlazada ya no existe o no está cargada. Enlaza otra.",
-  "message.stagelite.remote_far": "Estás demasiado lejos de la pantalla enlazada."
+  "message.stagelite.remote_far": "Estás demasiado lejos de la pantalla enlazada.",
+  "block.stagelite.video_frame": "Marco multimedia",
+  "block.stagelite.video_projector": "Proyector",
+  "fader.stagelite.throw": "Distancia",
+  "tip.stagelite.throw": "A cuántos bloques de distancia proyecta (se detiene en la primera pared, suelo o techo).",
+  "gui.stagelite.aspect": "Proporción: %s",
+  "tip.stagelite.aspect": "Forma de la imagen: 16:9, 9:16 (vertical, ideal para TikTok), 4:3, 1:1 o 21:9."
 }

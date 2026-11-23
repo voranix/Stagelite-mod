@@ -37,6 +37,8 @@ public final class ModBlocks {
     public static final RegistryObject<Block> SPEAKER = registerLight(FixtureType.SPEAKER);
     public static final RegistryObject<Block> MICROPHONE = registerLight(FixtureType.MIC);
     public static final RegistryObject<Block> VIDEO_SCREEN = registerLight(FixtureType.SCREEN);
+    public static final RegistryObject<Block> VIDEO_FRAME = registerLight(FixtureType.FRAME);
+    public static final RegistryObject<Block> VIDEO_PROJECTOR = registerLight(FixtureType.PROJECTOR);
 
     public static final RegistryObject<Block> MOLINETE = BLOCKS.register("molinete", MolineteBlock::new);
     public static final RegistryObject<Item> MOLINETE_ITEM = ITEMS.register("molinete",

@@ -106,7 +106,7 @@ public class VideoRemoteItem extends Item {
             sp.displayClientMessage(Component.translatable("message.stagelite.remote_hint").withStyle(ChatFormatting.YELLOW), true);
             return InteractionResult.CONSUME;
         }
-        if (!level.isLoaded(linked) || !(level.getBlockEntity(linked) instanceof StageLightBlockEntity be) || be.type() != FixtureType.SCREEN) {
+        if (!level.isLoaded(linked) || !(level.getBlockEntity(linked) instanceof StageLightBlockEntity be) || !be.type().isVideo()) {
             sp.displayClientMessage(Component.translatable("message.stagelite.remote_missing").withStyle(ChatFormatting.RED), true);
             return InteractionResult.CONSUME;
         }
@@ -127,32 +127,15 @@ public class VideoRemoteItem extends Item {
         StageLightBlockEntity best = null;
         double bestT = REACH;
         for (StageLightBlockEntity be : LightRegistry.all()) {
-            if (be.getLevel() != level || be.type() != FixtureType.SCREEN) {
+            if (be.getLevel() != level || !be.type().isVideo()) {
                 continue;
             }
-            Direction f = be.getBlockState().getValue(com.stagelite.block.StageLightBlock.FACING);
-            if (f.getAxis() == Direction.Axis.Y) {
-                f = Direction.NORTH;
-            }
-            double cx = be.getBlockPos().getX() + 0.5 - f.getStepX() * 0.375 + f.getStepX() * 0.004;
-            double cy = be.getBlockPos().getY() + 0.5;
-            double cz = be.getBlockPos().getZ() + 0.5 - f.getStepZ() * 0.375 + f.getStepZ() * 0.004;
-            double denom = look.x * f.getStepX() + look.z * f.getStepZ();
-            if (denom >= -1e-4) {
-                continue; // la pantalla mira hacia otro lado
-            }
-            double t = ((cx - eye.x) * f.getStepX() + (cz - eye.z) * f.getStepZ()) / denom;
-            if (t < 0.05 || t > bestT) {
+            com.stagelite.video.DisplayPlane plane = com.stagelite.video.DisplayPlane.of(level, be);
+            if (plane == null) {
                 continue;
             }
-            Direction r = f.getCounterClockWise();
-            double dx = eye.x + look.x * t - cx;
-            double dy = eye.y + look.y * t - cy;
-            double dz = eye.z + look.z * t - cz;
-            double u = dx * r.getStepX() + dz * r.getStepZ();
-            double hw = be.data.extra;          // mitad del ancho (extra * 2 / 2)
-            double hh = be.data.extra * 9.0 / 16.0;
-            if (Math.abs(u) <= hw && Math.abs(dy) <= hh) {
+            double t = plane.hit(eye, look, bestT);
+            if (t > 0) {
                 best = be;
                 bestT = t;
             }

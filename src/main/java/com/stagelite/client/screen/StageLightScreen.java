@@ -103,6 +103,10 @@ public class StageLightScreen extends Screen {
             addFader(fx, fy, type.isVideo() || type == FixtureType.SPEAKER ? "volume" : "intensity", 0, 100, data.intensity, 0xFFD060, v -> data.intensity = v);
             fx += FADER_PITCH;
         }
+        if (type == FixtureType.PROJECTOR) {
+            addFader(fx, fy, "throw", 4, 64, Math.max(4, data.range), 0xC0C0C0, v -> data.range = v);
+            fx += FADER_PITCH;
+        }
         if (type.isVideo()) {
             addFader(fx, fy, "screen_range", LightData.MIN_LENGTH, LightData.MAX_LENGTH, data.length, 0xC0C0C0, v -> data.length = v);
             fx += FADER_PITCH;
@@ -182,6 +186,13 @@ public class StageLightScreen extends Screen {
         }
 
         if (type.isVideo()) {
+            addRenderableWidget(Button.builder(aspectLabel(), btn -> {
+                        data.aspect = (data.aspect + 1) % LightData.ASPECTS;
+                        btn.setMessage(aspectLabel());
+                        commit();
+                    }).bounds(bx, by, bw, 20)
+                    .tooltip(Tooltip.create(Component.translatable("tip.stagelite.aspect"))).build());
+            by += 24;
             addRenderableWidget(Button.builder(Component.translatable("gui.stagelite.restart"), btn -> {
                         data.track = (data.track + 1) % (LightData.MAX_TRACK + 1);
                         commit();
@@ -347,6 +358,10 @@ public class StageLightScreen extends Screen {
             faderB.setSilently(rgb & 255);
         }
         commit();
+    }
+
+    private Component aspectLabel() {
+        return Component.translatable("gui.stagelite.aspect", com.stagelite.video.DisplayPlane.RATIO_NAMES[Math.max(0, Math.min(LightData.ASPECTS - 1, data.aspect))]);
     }
 
     private Component trackLabel() {

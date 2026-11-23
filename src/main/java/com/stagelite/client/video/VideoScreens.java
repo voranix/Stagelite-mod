@@ -11,6 +11,7 @@ import com.stagelite.block.StageLightBlock;
 import com.stagelite.blockentity.StageLightBlockEntity;
 import com.stagelite.config.ClientConfig;
 import com.stagelite.light.LightData;
+import com.stagelite.video.DisplayPlane;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.core.Direction;
@@ -39,6 +40,7 @@ import java.util.WeakHashMap;
 public final class VideoScreens {
     private static final Set<StageLightBlockEntity> TRACKED = Collections.newSetFromMap(new WeakHashMap<>());
     private static final Map<StageLightBlockEntity, Session> ACTIVE = new HashMap<>();
+    private static final Map<StageLightBlockEntity, DisplayPlane> PLANES = new HashMap<>();
 
     private static final class Session {
         Object browser;
@@ -48,6 +50,7 @@ public final class VideoScreens {
         String lastState = "";
         int age;
         int sinceSend;
+        DisplayPlane plane;
     }
 
     private VideoScreens() {
@@ -88,6 +91,7 @@ public final class VideoScreens {
             return;
         }
         Vec3 eye = mc.player.getEyePosition();
+        PLANES.clear();
 
         // candidatas: encendidas, con link y dentro de alcance (+margen para no abrir/cerrar en el limite)
         List<StageLightBlockEntity> wanted = new ArrayList<>();
@@ -99,12 +103,17 @@ public final class VideoScreens {
             if (!d.on || d.url.isEmpty()) {
                 continue;
             }
+            DisplayPlane plane = DisplayPlane.of(mc.level, be);
+            if (plane == null) {
+                continue; // proyector sin superficie
+            }
+            PLANES.put(be, plane);
             double reach = d.length + (ACTIVE.containsKey(be) ? 32 : 16);
-            if (dist2(be, eye) <= reach * reach) {
+            if (plane.center.distanceToSqr(eye) <= reach * reach) {
                 wanted.add(be);
             }
         }
-        wanted.sort((a, b) -> Double.compare(dist2(a, eye), dist2(b, eye)));
+        wanted.sort((a, b) -> Double.compare(PLANES.get(a).center.distanceToSqr(eye), PLANES.get(b).center.distanceToSqr(eye)));
         int max = ClientConfig.VIDEO_MAX_SCREENS.get();
         if (wanted.size() > max) {
             wanted = new ArrayList<>(wanted.subList(0, max));
@@ -155,7 +164,8 @@ public final class VideoScreens {
             }
 
             // volumen segun distancia, velocidad, bucle
-            double dist = Math.sqrt(dist2(be, eye));
+            s.plane = PLANES.get(be);
+            double dist = s.plane == null ? 0 : s.plane.center.distanceTo(eye);
             double fall = Math.max(0.0, 1.0 - dist / Math.max(1.0, d.length));
             double volume = d.intensity / 100.0 * fall * fall;
             String state = String.format(Locale.ROOT, "%.2f|%.2f|%b", volume, rate(d.speed), d.billboard);
@@ -196,6 +206,9 @@ public final class VideoScreens {
                 + ".html5-video-container{width:100%!important;height:100%!important}"
                 + "video{position:absolute!important;left:0!important;top:0!important;width:100%!important;height:100%!important;object-fit:contain!important}';"
                 + "document.head.appendChild(st);}"
+                + "var im=(document.contentType&&document.contentType.indexOf('image/')===0&&document.images.length===1)?document.images[0]:null;"
+                + "if(im){document.documentElement.style.background='#000';document.body.style.cssText='margin:0;background:#000';"
+                + "im.style.cssText='position:fixed;top:0;left:0;width:100vw;height:100vh;object-fit:contain;margin:0';return;}"
                 + "var v=document.querySelector('video');if(!v)return;"
                 + "document.documentElement.style.background='#000';if(document.body)document.body.style.background='#000';"
                 + "v.controls=false;v.style.objectFit='contain';"
@@ -323,17 +336,10 @@ public final class VideoScreens {
             if (s.tex < 0 || be.isRemoved()) {
                 continue;
             }
-            Direction f = be.getBlockState().getValue(StageLightBlock.FACING);
-            if (f.getAxis() == Direction.Axis.Y) {
-                f = Direction.NORTH;
+            DisplayPlane pl = s.plane;
+            if (pl == null) {
+                continue;
             }
-            Direction r = f.getCounterClockWise();
-            double width = be.data.extra * 2.0;
-            double hw = width / 2.0;
-            double hh = width * 9.0 / 32.0;
-            double cx = be.getBlockPos().getX() + 0.5 - f.getStepX() * 0.375 + f.getStepX() * 0.004;
-            double cy = be.getBlockPos().getY() + 0.5;
-            double cz = be.getBlockPos().getZ() + 0.5 - f.getStepZ() * 0.375 + f.getStepZ() * 0.004;
 
             pose.pushPose();
             pose.translate(-cam.x, -cam.y, -cam.z);
@@ -345,13 +351,13 @@ public final class VideoScreens {
             RenderSystem.enableDepthTest();
             BufferBuilder bb = Tesselator.getInstance().getBuilder();
             bb.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-            float rx = (float) (r.getStepX() * hw);
-            float rz = (float) (r.getStepZ() * hw);
-            float uy = (float) hh;
-            vtx(bb, m, cx - rx, cy + uy, cz - rz, 0f, 0f);
-            vtx(bb, m, cx + rx, cy + uy, cz + rz, 1f, 0f);
-            vtx(bb, m, cx + rx, cy - uy, cz + rz, 1f, 1f);
-            vtx(bb, m, cx - rx, cy - uy, cz - rz, 0f, 1f);
+            Vec3 rr = pl.right.scale(pl.hw);
+            Vec3 uu = pl.up.scale(pl.hh);
+            Vec3 c = pl.center;
+            vtx(bb, m, c.x - rr.x + uu.x, c.y - rr.y + uu.y, c.z - rr.z + uu.z, 0f, 0f);
+            vtx(bb, m, c.x + rr.x + uu.x, c.y + rr.y + uu.y, c.z + rr.z + uu.z, 1f, 0f);
+            vtx(bb, m, c.x + rr.x - uu.x, c.y + rr.y - uu.y, c.z + rr.z - uu.z, 1f, 1f);
+            vtx(bb, m, c.x - rr.x - uu.x, c.y - rr.y - uu.y, c.z - rr.z - uu.z, 0f, 1f);
             Tesselator.getInstance().end();
             RenderSystem.enableCull();
             pose.popPose();

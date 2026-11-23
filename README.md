@@ -4,13 +4,13 @@ Mod de **luces de escenario simples** para **Minecraft Forge 1.20.1**, pensado p
 
 Sin DMX ni software externo: color, brillo, efectos, movimiento y programación básica de shows, con un panel de faders como una mesa de luces.
 
-> **Estado: primera versión (0.9.12). El código nunca se ha compilado ni probado en el juego** (se escribió sin acceso a los repositorios de Forge). Es posible que haya que corregir algún error de compilación o detalle visual. Ver "Primer arranque".
+> **Estado: primera versión (0.9.13). El código nunca se ha compilado ni probado en el juego** (se escribió sin acceso a los repositorios de Forge). Es posible que haya que corregir algún error de compilación o detalle visual. Ver "Primer arranque".
 
 ## Obtener el .jar (sin instalar nada)
 
 1. Crea un repositorio en GitHub y sube todo el contenido de esta carpeta.
 2. Ve a la pestaña **Actions**. El workflow **Build StageLite** se ejecuta solo (o pulsa *Run workflow*).
-3. Cuando termine (unos minutos), entra en la ejecución y descarga el artefacto **stagelite-jar**: dentro está `stagelite-0.9.12.jar`.
+3. Cuando termine (unos minutos), entra en la ejecución y descarga el artefacto **stagelite-jar**: dentro está `stagelite-0.9.13.jar`.
 4. Pon ese `.jar` en la carpeta `mods` del servidor **y** de cada jugador (hace falta en ambos lados). Requiere Forge 1.20.1 (47.x).
 
 Si el workflow falla, abre el paso "Compilar": el mensaje dice qué línea corregir. Se puede pegar a Claude Code para que lo arregle.
@@ -27,7 +27,7 @@ Si el workflow falla, abre el paso "Compilar": el mensaje dice qué línea corre
 Se colocan mirando hacia la cara donde haces clic (en el techo apuntan hacia abajo). Son **indestructibles en supervivencia**: solo se quitan en creativo. Los jugadores sin permiso no pueden cambiarlas.
 
 
-## Dispositivos nuevos (0.9.12)
+## Dispositivos nuevos (0.9.13)
 
 Todos se colocan, se abren con clic derecho (solo staff) y se pueden meter en **grupos** (1-99), así que funcionan con la consola, las escenas, los shows y `/stagelite`.
 
@@ -59,6 +59,12 @@ Clic derecho (staff). Muestra los grupos que tengan luces **cargadas**. **Haz cl
 ## Pantalla de video
 Bloque `stagelite:video_screen` (se coloca mirando hacia ti). Pega en la casilla un **link directo a un video** (.mp4 / .webm) un link de **YouTube** o de **TikTok** (también los cortos `vm.tiktok.com`); para un video de tu computador, súbelo a tu hosting y usa ese link. Necesita el mod **MCEF** en el cliente (en el servidor no hace falta); sin MCEF no reproduce y no da error.
 Controles: *Volumen* (baja con la distancia), *Velocidad* (0,25x a 4x, el 4 es normal), *Alcance* (hasta dónde se oye y se carga), *Tamaño* (2–20 bloques de ancho, 16:9), *Bucle*, *Reiniciar* y encendido/apagado (pausa). También responde a grupos y a la consola. Para cuidar el rendimiento, cada jugador solo reproduce las 2 pantallas más cercanas (`videoMaxScreens` en la config del cliente) y el video se carga solo cuando estás dentro del alcance.
+
+### Pantalla, marco y proyector (estilo WaterFrames)
+- **Pantalla de video** (`video_screen`): imagen grande, 2–20 bloques.
+- **Marco multimedia** (`video_frame`): imagen o video pegado a la pared como un cuadro, 1–10 bloques.
+- **Proyector** (`video_projector`): apunta hacia donde miras y proyecta sobre la primera pared, suelo o techo que encuentre (fader *Distancia*, hasta 64 bloques), 3–30 bloques.
+Los tres aceptan links de video (MP4/WebM), YouTube, TikTok e **imágenes** (PNG/JPG/GIF), con *Proporción* (16:9, 9:16, 4:3, 1:1, 21:9), volumen, velocidad, bucle, reiniciar y pausa. El control remoto funciona con los tres.
 
 ### Control de pantalla (remoto)
 Ítem `stagelite:video_remote`. **Apunta a la imagen de una pantalla y haz clic derecho** para enlazarlo (funciona aunque haya una pared detrás). Después, **clic derecho en cualquier otro lado** abre el panel de esa pantalla (link, volumen, velocidad, tamaño, bucle, reiniciar, pausa) hasta a 96 bloques. Agachado + clic derecho lo desenlaza. Solo staff.
@@ -142,7 +148,7 @@ Escenas y shows se guardan con el mundo. Solo afectan a luces **en chunks cargad
 Requisitos: **JDK 17**. El wrapper de Gradle (`gradlew`) no está incluido: abre la carpeta en IntelliJ como proyecto Gradle, o copia `gradlew`, `gradlew.bat` y `gradle/` del MDK oficial de Forge 1.20.1.
 
 ```
-./gradlew build        # genera build/libs/stagelite-0.9.12.jar
+./gradlew build        # genera build/libs/stagelite-0.9.13.jar
 ./gradlew runClient    # abre Minecraft con el mod para probar
 ./gradlew runServer    # servidor de pruebas
 ```

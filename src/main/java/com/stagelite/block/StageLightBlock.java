@@ -82,6 +82,10 @@ public class StageLightBlock extends Block implements EntityBlock {
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         LightData defaults = new LightData();
         type.applyDefaults(defaults);
+        if (type == FixtureType.PROJECTOR) {
+            // el proyector apunta hacia donde miras
+            return defaultBlockState().setValue(FACING, context.getNearestLookingDirection());
+        }
         if (type.isVideo()) {
             return defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
         }
@@ -91,7 +95,7 @@ public class StageLightBlock extends Block implements EntityBlock {
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        if (type.isVideo()) {
+        if (type.isVideo() && type != FixtureType.PROJECTOR) {
             switch (state.getValue(FACING)) {
                 case SOUTH:
                     return Block.box(0, 0, 0, 16, 16, 2);
