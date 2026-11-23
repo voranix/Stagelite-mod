@@ -100,7 +100,7 @@ public class StageLightScreen extends Screen {
             fx += FADER_PITCH + 8;
         }
         if (type != FixtureType.MIC) {
-            addFader(fx, fy, type.isVideo() ? "volume" : "intensity", 0, 100, data.intensity, 0xFFD060, v -> data.intensity = v);
+            addFader(fx, fy, type.isVideo() || type == FixtureType.SPEAKER ? "volume" : "intensity", 0, 100, data.intensity, 0xFFD060, v -> data.intensity = v);
             fx += FADER_PITCH;
         }
         if (type.isVideo()) {

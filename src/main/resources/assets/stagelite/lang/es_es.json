@@ -156,7 +156,7 @@
   "effect.stagelite.beat": "Ritmo",
   "block.stagelite.video_screen": "Pantalla de video",
   "fader.stagelite.volume": "Volumen",
-  "tip.stagelite.volume": "Volumen del video (baja con la distancia). 0 = silencio.",
+  "tip.stagelite.volume": "Volumen. 0 = silencio (en los videos baja además con la distancia).",
   "fader.stagelite.screen_range": "Alcance",
   "tip.stagelite.screen_range": "A cuántos bloques se oye y se carga el video.",
   "fader.stagelite.extra_screen": "Tamaño",

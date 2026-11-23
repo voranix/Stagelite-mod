@@ -156,7 +156,7 @@
   "effect.stagelite.beat": "Beat",
   "block.stagelite.video_screen": "Video Screen",
   "fader.stagelite.volume": "Volume",
-  "tip.stagelite.volume": "Video volume (fades with distance). 0 = mute.",
+  "tip.stagelite.volume": "Volume. 0 = mute (video volume also fades with distance).",
   "fader.stagelite.screen_range": "Range",
   "tip.stagelite.screen_range": "How many blocks away the video is heard and loaded.",
   "fader.stagelite.extra_screen": "Size",
