@@ -303,6 +303,13 @@ public class StageLightRenderer implements BlockEntityRenderer<StageLightBlockEn
     private static final int DISCO_LON = 12;
     private static final float DISCO_R = 0.27f;
 
+    private static float h01(int i, int k, int salt) {
+        int h = i * 374761393 + k * 668265263 + salt * 1274126177;
+        h = (h ^ (h >>> 13)) * 1274126177;
+        h ^= h >>> 16;
+        return (h & 0xFFFFFF) / 16777216f;
+    }
+
     private static void renderDisco(net.minecraft.core.BlockPos blockPos, PoseStack pose, MultiBufferSource buffers, int light, int overlay, LightData d,
                                     float time, boolean lit, float r, float g, float b, float bright) {
         float spin = time * d.speed * 1.2f;
@@ -359,18 +366,32 @@ public class StageLightRenderer implements BlockEntityRenderer<StageLightBlockEn
         float camY = (float) (cam.y - (blockPos.getY() + 0.5));
         float camZ = (float) (cam.z - (blockPos.getZ() + 0.5));
         for (int i = 0; i < rays; i++) {
-            float az = (float) Math.toRadians((i * 137.5f + spin * 1.5f) % 360f);
-            float el = (float) Math.toRadians(-55f + 110f * ((i * 0.618f) % 1f));
-            float ce = FxMath.cos(el);
+            // Cada rayo es un destello: aparece en una direccion al azar, recorre un arco corto y se apaga;
+            // luego reaparece en otro lado. Cada rayo tiene su propio ritmo, asi siempre hay destellos por todas partes.
+            float period = (10f + 14f * h01(i, 0, 1)) * 8f / (d.speed + 2f); // ticks
+            double t = time + h01(i, 0, 2) * 1000.0;
+            long cycle = (long) Math.floor(t / period);
+            float ticks = (float) (t - cycle * (double) period);
+            float phase = ticks / period;
+            int k = (int) (cycle & 0x7FFFFFFF);
+            float env = phase < 0.12f ? phase / 0.12f : (float) Math.exp(-(phase - 0.12f) * 3.5f);
+            env *= 1f - phase * phase * phase * phase * phase * phase;
+            env *= 0.8f + 0.2f * FxMath.sin(time * 1.9f + i * 2.3f); // titileo
+            if (env < 0.03f) {
+                continue;
+            }
+            float az = h01(i, k, 3) * 6.2831855f + (h01(i, k, 6) - 0.5f) * 0.08f * ticks; // barrido corto
+            float sz = -0.92f + 1.7f * h01(i, k, 4);
+            float ce = Mth.sqrt(1f - sz * sz);
             float dx = ce * FxMath.cos(az);
-            float dy = FxMath.sin(el);
+            float dy = sz;
             float dz = ce * FxMath.sin(az);
-            float len = d.length * (0.5f + 0.5f * ((i * 0.37f) % 1f));
+            float len = d.length * (0.35f + 0.65f * h01(i, k, 5)) * (0.4f + 0.6f * Math.min(1f, phase * 8f));
             float cr = r;
             float cg = g;
             float cb = b;
             if (d.effect == com.stagelite.light.Effect.RAINBOW) {
-                int c = Mth.hsvToRgb(((time * 0.01f * d.speed) + i / (float) rays) % 1f, 1f, 1f);
+                int c = Mth.hsvToRgb(h01(i, k, 7), 1f, 1f);
                 cr = (c >> 16 & 255) / 255f;
                 cg = (c >> 8 & 255) / 255f;
                 cb = (c & 255) / 255f;
@@ -395,8 +416,8 @@ public class StageLightRenderer implements BlockEntityRenderer<StageLightBlockEn
             px /= pl;
             py /= pl;
             pz /= pl;
-            ribbon(lv, m, ax, ay, az0, bx, by, bz, px, py, pz, 0.045f, cr, cg, cb, a, a * 0.45f);
-            ribbon(lv, m, ax, ay, az0, bx, by, bz, px, py, pz, 0.14f, cr, cg, cb, a * 0.25f, 0f);
+            ribbon(lv, m, ax, ay, az0, bx, by, bz, px, py, pz, 0.03f + 0.025f * env, cr, cg, cb, a * env, a * env * 0.35f);
+            ribbon(lv, m, ax, ay, az0, bx, by, bz, px, py, pz, 0.09f + 0.07f * env, cr, cg, cb, a * env * 0.25f, 0f);
         }
         pose.popPose();
     }
