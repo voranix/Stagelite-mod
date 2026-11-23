@@ -14,6 +14,15 @@ public final class ClientSetup {
     }
 
     @SubscribeEvent
+    public static void onItemColors(net.minecraftforge.client.event.RegisterColorHandlersEvent.Item event) {
+        event.register((stack, tint) -> tint == 0 && stack.getItem() instanceof net.minecraft.world.item.DyeableLeatherItem d
+                ? 0xFF000000 | d.getColor(stack) : -1,
+                com.stagelite.registry.ModBlocks.UNIFORM_CAP.get(), com.stagelite.registry.ModBlocks.UNIFORM_JACKET.get(),
+                com.stagelite.registry.ModBlocks.UNIFORM_PANTS.get(), com.stagelite.registry.ModBlocks.UNIFORM_BOOTS.get(),
+                com.stagelite.registry.ModBlocks.WRISTBAND.get());
+    }
+
+    @SubscribeEvent
     public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(ModBlockEntities.STAGE_LIGHT.get(), StageLightRenderer::new);
     }

@@ -193,5 +193,17 @@
   "message.stagelite.speaker_no_space": "Not enough free space: this speaker needs %s wide and %s tall (to the right and above the block you click).",
   "gui.stagelite.ads_off": "No ads",
   "gui.stagelite.ads_on": "Ads",
-  "tip.stagelite.ads": "Automatically skips or mutes YouTube ads (may stop working if YouTube changes its page)."
+  "tip.stagelite.ads": "Automatically skips or mutes YouTube ads (may stop working if YouTube changes its page).",
+  "block.stagelite.truss": "Stage Truss",
+  "block.stagelite.stage_platform": "Stage Platform",
+  "block.stagelite.projector_stand": "Projector Stand",
+  "block.stagelite.mic_stand": "Microphone Stand",
+  "item.stagelite.uniform_cap": "Uniform Cap",
+  "item.stagelite.uniform_jacket": "Uniform Jacket",
+  "item.stagelite.uniform_pants": "Uniform Pants",
+  "item.stagelite.uniform_boots": "Uniform Boots",
+  "item.stagelite.wristband": "Access Wristband",
+  "item.stagelite.credential_vip": "VIP Credential",
+  "item.stagelite.credential_staff": "Staff Credential",
+  "item.stagelite.credential_backstage": "Backstage Credential"
 }

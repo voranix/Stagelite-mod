@@ -1,0 +1,62 @@
+{
+ "multipart": [
+  {
+   "apply": {
+    "model": "stagelite:block/truss_core"
+   }
+  },
+  {
+   "when": {
+    "north": "true"
+   },
+   "apply": {
+    "model": "stagelite:block/truss_arm"
+   }
+  },
+  {
+   "when": {
+    "east": "true"
+   },
+   "apply": {
+    "model": "stagelite:block/truss_arm",
+    "y": 90
+   }
+  },
+  {
+   "when": {
+    "south": "true"
+   },
+   "apply": {
+    "model": "stagelite:block/truss_arm",
+    "y": 180
+   }
+  },
+  {
+   "when": {
+    "west": "true"
+   },
+   "apply": {
+    "model": "stagelite:block/truss_arm",
+    "y": 270
+   }
+  },
+  {
+   "when": {
+    "up": "true"
+   },
+   "apply": {
+    "model": "stagelite:block/truss_arm",
+    "x": 270
+   }
+  },
+  {
+   "when": {
+    "down": "true"
+   },
+   "apply": {
+    "model": "stagelite:block/truss_arm",
+    "x": 90
+   }
+  }
+ ]
+}

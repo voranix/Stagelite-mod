@@ -1,0 +1,7 @@
+{
+ "variants": {
+  "": {
+   "model": "stagelite:block/stage_platform"
+  }
+ }
+}

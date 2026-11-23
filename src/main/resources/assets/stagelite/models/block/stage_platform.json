@@ -1,0 +1,8 @@
+{
+ "parent": "minecraft:block/cube_bottom_top",
+ "textures": {
+  "top": "stagelite:block/stage_platform_top",
+  "bottom": "stagelite:block/stage_platform_side",
+  "side": "stagelite:block/stage_platform_side"
+ }
+}

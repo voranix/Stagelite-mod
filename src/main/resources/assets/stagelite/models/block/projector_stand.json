@@ -1,0 +1,104 @@
+{
+ "textures": {
+  "particle": "stagelite:block/stand",
+  "all": "stagelite:block/stand"
+ },
+ "elements": [
+  {
+   "from": [
+    3,
+    0,
+    3
+   ],
+   "to": [
+    13,
+    1,
+    13
+   ],
+   "faces": {
+    "north": {
+     "texture": "#all"
+    },
+    "south": {
+     "texture": "#all"
+    },
+    "east": {
+     "texture": "#all"
+    },
+    "west": {
+     "texture": "#all"
+    },
+    "up": {
+     "texture": "#all"
+    },
+    "down": {
+     "texture": "#all"
+    }
+   }
+  },
+  {
+   "from": [
+    7,
+    1,
+    7
+   ],
+   "to": [
+    9,
+    12,
+    9
+   ],
+   "faces": {
+    "north": {
+     "texture": "#all"
+    },
+    "south": {
+     "texture": "#all"
+    },
+    "east": {
+     "texture": "#all"
+    },
+    "west": {
+     "texture": "#all"
+    },
+    "up": {
+     "texture": "#all"
+    },
+    "down": {
+     "texture": "#all"
+    }
+   }
+  },
+  {
+   "from": [
+    2,
+    12,
+    2
+   ],
+   "to": [
+    14,
+    14,
+    14
+   ],
+   "faces": {
+    "north": {
+     "texture": "#all"
+    },
+    "south": {
+     "texture": "#all"
+    },
+    "east": {
+     "texture": "#all"
+    },
+    "west": {
+     "texture": "#all"
+    },
+    "up": {
+     "texture": "#all"
+    },
+    "down": {
+     "texture": "#all"
+    }
+   }
+  }
+ ]
+}

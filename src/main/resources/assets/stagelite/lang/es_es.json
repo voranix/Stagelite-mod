@@ -193,5 +193,17 @@
   "message.stagelite.speaker_no_space": "No hay espacio libre: este parlante necesita %s de ancho y %s de alto (a la derecha y arriba del bloque donde haces clic).",
   "gui.stagelite.ads_off": "Sin ads",
   "gui.stagelite.ads_on": "Con ads",
-  "tip.stagelite.ads": "Salta o silencia los anuncios de YouTube automáticamente (puede dejar de funcionar si YouTube cambia su página)."
+  "tip.stagelite.ads": "Salta o silencia los anuncios de YouTube automáticamente (puede dejar de funcionar si YouTube cambia su página).",
+  "block.stagelite.truss": "Barra de estructura (truss)",
+  "block.stagelite.stage_platform": "Tarima de escenario",
+  "block.stagelite.projector_stand": "Atril para proyector",
+  "block.stagelite.mic_stand": "Atril para micrófono",
+  "item.stagelite.uniform_cap": "Gorra de uniforme",
+  "item.stagelite.uniform_jacket": "Chaqueta de uniforme",
+  "item.stagelite.uniform_pants": "Pantalón de uniforme",
+  "item.stagelite.uniform_boots": "Botas de uniforme",
+  "item.stagelite.wristband": "Pulsera de acceso",
+  "item.stagelite.credential_vip": "Credencial VIP",
+  "item.stagelite.credential_staff": "Credencial Staff",
+  "item.stagelite.credential_backstage": "Credencial Backstage"
 }
