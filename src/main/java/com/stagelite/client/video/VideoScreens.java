@@ -76,6 +76,23 @@ public final class VideoScreens {
 
     // ------------------------------------------------------------------ logica (cada 5 ticks)
 
+    private static boolean hadActive;
+
+    /** En cualquier menu (incluido ESC) el cursor debe verse normal; si algo lo oculto, se corrige. */
+    private static void restoreCursor(Minecraft mc) {
+        if (mc.screen == null) {
+            return;
+        }
+        try {
+            long w = mc.getWindow().getWindow();
+            if (org.lwjgl.glfw.GLFW.glfwGetInputMode(w, org.lwjgl.glfw.GLFW.GLFW_CURSOR) != org.lwjgl.glfw.GLFW.GLFW_CURSOR_NORMAL) {
+                org.lwjgl.glfw.GLFW.glfwSetInputMode(w, org.lwjgl.glfw.GLFW.GLFW_CURSOR, org.lwjgl.glfw.GLFW.GLFW_CURSOR_NORMAL);
+            }
+            org.lwjgl.glfw.GLFW.glfwSetCursor(w, 0L);
+        } catch (Throwable ignored) {
+        }
+    }
+
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.END) {
@@ -85,6 +102,11 @@ public final class VideoScreens {
         if (mc.level == null || mc.player == null) {
             closeAll();
             return;
+        }
+        // Chromium puede dejar el cursor oculto o cambiado (YouTube lo esconde al reproducir): lo devolvemos al normal en los menus
+        if (!ACTIVE.isEmpty() || hadActive) {
+            restoreCursor(mc);
+            hadActive = !ACTIVE.isEmpty();
         }
         if (mc.level.getGameTime() % 5 != 0) {
             return;
@@ -230,7 +252,9 @@ public final class VideoScreens {
     }
 
     private static String script(double volume, double rate, boolean loop, boolean skipAds) {
-        return "(function(){if(location.hostname.indexOf('youtube.com')>=0&&!document.getElementById('sl-style')){"
+        return "(function(){if(!document.getElementById('sl-cur')&&document.head){var cs=document.createElement('style');cs.id='sl-cur';"
+                + "cs.textContent='*,*:hover,.ytp-autohide,.ytp-autohide *{cursor:default!important}';document.head.appendChild(cs);}"
+                + "if(location.hostname.indexOf('youtube.com')>=0&&!document.getElementById('sl-style')){"
                 + "var st=document.createElement('style');st.id='sl-style';"
                 + "st.textContent='ytd-masthead,#masthead-container,#secondary,#below,#comments,#guide,tp-yt-app-drawer,ytd-miniplayer,"
                 + ".ytp-chrome-bottom,.ytp-chrome-top,.ytp-gradient-top,.ytp-gradient-bottom,.ytp-pause-overlay,.ytp-endscreen-content,.ytp-ce-element,.ytp-cards-teaser,.ytp-ad-overlay-container,.ytp-ad-image-overlay,.ytp-ad-text-overlay,ytd-ad-slot-renderer,#player-ads,.ytp-suggested-action,.ytp-paid-content-overlay{display:none!important}"
