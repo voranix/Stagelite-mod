@@ -165,5 +165,14 @@
   "gui.stagelite.loop_off": "Bucle: no",
   "tip.stagelite.loop": "Repite el video al terminar.",
   "gui.stagelite.restart": "Reiniciar",
-  "tip.stagelite.restart": "Vuelve a cargar el video desde el inicio para todos."
+  "tip.stagelite.restart": "Vuelve a cargar el video desde el inicio para todos.",
+  "item.stagelite.video_remote": "Control de pantalla",
+  "item.stagelite.video_remote.linked": "Enlazado a %s, %s, %s",
+  "item.stagelite.video_remote.unlinked": "Sin enlazar",
+  "item.stagelite.video_remote.help": "Clic derecho a una pantalla = enlazar. Clic derecho en otro lado = abrir el panel. Agachado = desenlazar.",
+  "message.stagelite.remote_linked": "Control enlazado a la pantalla. Haz clic derecho para abrir el panel.",
+  "message.stagelite.remote_unlinked": "Control desenlazado.",
+  "message.stagelite.remote_hint": "Apunta a una pantalla y haz clic derecho para enlazar el control.",
+  "message.stagelite.remote_missing": "La pantalla enlazada ya no existe o no está cargada. Enlaza otra.",
+  "message.stagelite.remote_far": "Estás demasiado lejos de la pantalla enlazada."
 }

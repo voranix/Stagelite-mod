@@ -165,5 +165,14 @@
   "gui.stagelite.loop_off": "Loop: off",
   "tip.stagelite.loop": "Repeat the video when it ends.",
   "gui.stagelite.restart": "Restart",
-  "tip.stagelite.restart": "Reload the video from the start for everyone."
+  "tip.stagelite.restart": "Reload the video from the start for everyone.",
+  "item.stagelite.video_remote": "Screen Remote",
+  "item.stagelite.video_remote.linked": "Linked to %s, %s, %s",
+  "item.stagelite.video_remote.unlinked": "Not linked",
+  "item.stagelite.video_remote.help": "Right-click a screen = link. Right-click elsewhere = open panel. Sneak = unlink.",
+  "message.stagelite.remote_linked": "Remote linked to the screen. Right-click to open the panel.",
+  "message.stagelite.remote_unlinked": "Remote unlinked.",
+  "message.stagelite.remote_hint": "Aim at a screen and right-click to link the remote.",
+  "message.stagelite.remote_missing": "The linked screen no longer exists or is not loaded. Link another one.",
+  "message.stagelite.remote_far": "You are too far from the linked screen."
 }

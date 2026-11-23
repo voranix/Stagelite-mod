@@ -20,6 +20,7 @@ public final class ModTabs {
                     {
                         output.accept(ModBlocks.LIGHT_CONSOLE_ITEM.get());
                         output.accept(ModBlocks.MOLINETE_ITEM.get());
+                        output.accept(ModBlocks.VIDEO_REMOTE.get());
                         ModBlocks.lightItems().forEach(item -> output.accept(item.get()));
                     })
                     .build());

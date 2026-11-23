@@ -187,7 +187,16 @@ public final class VideoScreens {
     }
 
     private static String script(double volume, double rate, boolean loop) {
-        return "(function(){var v=document.querySelector('video');if(!v)return;"
+        return "(function(){if(location.hostname.indexOf('youtube.com')>=0&&!document.getElementById('sl-style')){"
+                + "var st=document.createElement('style');st.id='sl-style';"
+                + "st.textContent='ytd-masthead,#masthead-container,#secondary,#below,#comments,#guide,tp-yt-app-drawer,ytd-miniplayer,"
+                + ".ytp-chrome-bottom,.ytp-chrome-top,.ytp-gradient-top,.ytp-gradient-bottom,.ytp-pause-overlay,.ytp-endscreen-content,.ytp-ce-element,.ytp-cards-teaser{display:none!important}"
+                + "html,body{overflow:hidden!important;background:#000!important}"
+                + "#movie_player{position:fixed!important;top:0!important;left:0!important;width:100vw!important;height:100vh!important;z-index:2147483647!important;background:#000!important}"
+                + ".html5-video-container{width:100%!important;height:100%!important}"
+                + "video{position:absolute!important;left:0!important;top:0!important;width:100%!important;height:100%!important;object-fit:contain!important}';"
+                + "document.head.appendChild(st);}"
+                + "var v=document.querySelector('video');if(!v)return;"
                 + "document.documentElement.style.background='#000';if(document.body)document.body.style.background='#000';"
                 + "v.controls=false;v.style.objectFit='contain';"
                 + "v.muted=" + (volume <= 0.001) + ";v.volume=" + String.format(Locale.ROOT, "%.3f", Math.max(0, Math.min(1, volume))) + ";"
@@ -281,8 +290,8 @@ public final class VideoScreens {
         } catch (RuntimeException ignored) {
         }
         if (id != null && id.matches("[A-Za-z0-9_-]{6,20}")) {
-            return "https://www.youtube.com/embed/" + id
-                    + "?autoplay=1&controls=0&rel=0&modestbranding=1&playsinline=1&loop=1&playlist=" + id;
+            // La pagina normal funciona con cualquier video publico (el modo "embed" da el error 153)
+            return "https://www.youtube.com/watch?v=" + id;
         }
         return u;
     }

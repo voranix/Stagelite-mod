@@ -42,6 +42,9 @@ public final class ModBlocks {
     public static final RegistryObject<Item> MOLINETE_ITEM = ITEMS.register("molinete",
             () -> new MolineteItem(MOLINETE.get(), new Item.Properties()));
 
+    public static final RegistryObject<Item> VIDEO_REMOTE = ITEMS.register("video_remote",
+            () -> new com.stagelite.item.VideoRemoteItem(new Item.Properties()));
+
     public static final RegistryObject<Block> LIGHT_CONSOLE = BLOCKS.register("light_console", LightConsoleBlock::new);
     public static final RegistryObject<Item> LIGHT_CONSOLE_ITEM = ITEMS.register("light_console",
             () -> new BlockItem(LIGHT_CONSOLE.get(), new Item.Properties()));

@@ -42,7 +42,16 @@ public class UpdateLightPacket {
                 return;
             }
             ServerLevel level = sender.serverLevel();
-            if (!level.isLoaded(msg.pos) || sender.distanceToSqr(Vec3.atCenterOf(msg.pos)) > 144.0) {
+            boolean remote = false;
+            for (net.minecraft.world.InteractionHand hand : net.minecraft.world.InteractionHand.values()) {
+                net.minecraft.world.item.ItemStack held = sender.getItemInHand(hand);
+                if (held.getItem() instanceof com.stagelite.item.VideoRemoteItem
+                        && msg.pos.equals(com.stagelite.item.VideoRemoteItem.linked(held, level))
+                        && sender.distanceToSqr(Vec3.atCenterOf(msg.pos)) <= com.stagelite.item.VideoRemoteItem.CONTROL_RANGE * com.stagelite.item.VideoRemoteItem.CONTROL_RANGE) {
+                    remote = true;
+                }
+            }
+            if (!level.isLoaded(msg.pos) || (!remote && sender.distanceToSqr(Vec3.atCenterOf(msg.pos)) > 144.0)) {
                 return;
             }
             BlockEntity be = level.getBlockEntity(msg.pos);
