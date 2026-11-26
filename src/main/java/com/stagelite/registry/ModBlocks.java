@@ -42,6 +42,8 @@ public final class ModBlocks {
     public static final RegistryObject<Block> VIDEO_SCREEN = registerLight(FixtureType.SCREEN);
     public static final RegistryObject<Block> VIDEO_FRAME = registerLight(FixtureType.FRAME);
     public static final RegistryObject<Block> VIDEO_PROJECTOR = registerLight(FixtureType.PROJECTOR);
+    public static final RegistryObject<Block> VIDEO_WALL = registerLight(FixtureType.WALL);
+    public static final RegistryObject<Block> VIDEO_TV = registerLight(FixtureType.TV);
 
     public static final RegistryObject<Block> MOLINETE = BLOCKS.register("molinete", MolineteBlock::new);
     public static final RegistryObject<Item> MOLINETE_ITEM = ITEMS.register("molinete",
@@ -67,6 +69,23 @@ public final class ModBlocks {
     public static final RegistryObject<Item> CREDENTIAL_VIP = ITEMS.register("credential_vip", () -> new Item(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> CREDENTIAL_STAFF = ITEMS.register("credential_staff", () -> new Item(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> CREDENTIAL_BACKSTAGE = ITEMS.register("credential_backstage", () -> new Item(new Item.Properties().stacksTo(1)));
+
+    // ---- Cine
+    public static final RegistryObject<Block> CINEMA_SEAT = BLOCKS.register("cinema_seat", com.stagelite.block.CinemaSeatBlock::new);
+    public static final RegistryObject<Item> CINEMA_SEAT_ITEM = ITEMS.register("cinema_seat", () -> new BlockItem(CINEMA_SEAT.get(), new Item.Properties()));
+    public static final RegistryObject<Item> POPCORN = ITEMS.register("popcorn", () -> new Item(new Item.Properties().stacksTo(16)
+            .food(new net.minecraft.world.food.FoodProperties.Builder().nutrition(4).saturationMod(0.3F).build())));
+    public static final RegistryObject<Item> NACHOS = ITEMS.register("nachos", () -> new Item(new Item.Properties().stacksTo(16)
+            .food(new net.minecraft.world.food.FoodProperties.Builder().nutrition(6).saturationMod(0.5F).build())));
+    public static final RegistryObject<Item> EMPTY_CUP = ITEMS.register("empty_cup", () -> new Item(new Item.Properties()));
+    public static final RegistryObject<Item> DRINK_COLA = drink("drink_cola");
+    public static final RegistryObject<Item> DRINK_ORANGE = drink("drink_orange");
+    public static final RegistryObject<Item> DRINK_LIME = drink("drink_lime");
+
+    private static RegistryObject<Item> drink(String id) {
+        return ITEMS.register(id, () -> new com.stagelite.item.DrinkItem(new Item.Properties().stacksTo(16)
+                .food(new net.minecraft.world.food.FoodProperties.Builder().nutrition(2).saturationMod(0.2F).alwaysEat().build())));
+    }
 
     public static final RegistryObject<Item> VIDEO_REMOTE = ITEMS.register("video_remote",
             () -> new com.stagelite.item.VideoRemoteItem(new Item.Properties()));

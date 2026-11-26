@@ -4,13 +4,13 @@ Mod de **luces de escenario simples** para **Minecraft Forge 1.20.1**, pensado p
 
 Sin DMX ni software externo: color, brillo, efectos, movimiento y programación básica de shows, con un panel de faders como una mesa de luces.
 
-> **Estado: primera versión (0.9.23). El código nunca se ha compilado ni probado en el juego** (se escribió sin acceso a los repositorios de Forge). Es posible que haya que corregir algún error de compilación o detalle visual. Ver "Primer arranque".
+> **Estado: primera versión (0.9.24). El código nunca se ha compilado ni probado en el juego** (se escribió sin acceso a los repositorios de Forge). Es posible que haya que corregir algún error de compilación o detalle visual. Ver "Primer arranque".
 
 ## Obtener el .jar (sin instalar nada)
 
 1. Crea un repositorio en GitHub y sube todo el contenido de esta carpeta.
 2. Ve a la pestaña **Actions**. El workflow **Build StageLite** se ejecuta solo (o pulsa *Run workflow*).
-3. Cuando termine (unos minutos), entra en la ejecución y descarga el artefacto **stagelite-jar**: dentro está `stagelite-0.9.23.jar`.
+3. Cuando termine (unos minutos), entra en la ejecución y descarga el artefacto **stagelite-jar**: dentro está `stagelite-0.9.24.jar`.
 4. Pon ese `.jar` en la carpeta `mods` del servidor **y** de cada jugador (hace falta en ambos lados). Requiere Forge 1.20.1 (47.x).
 
 Si el workflow falla, abre el paso "Compilar": el mensaje dice qué línea corregir. Se puede pegar a Claude Code para que lo arregle.
@@ -27,7 +27,7 @@ Si el workflow falla, abre el paso "Compilar": el mensaje dice qué línea corre
 Se colocan mirando hacia la cara donde haces clic (en el techo apuntan hacia abajo). Son **indestructibles en supervivencia**: solo se quitan en creativo. Los jugadores sin permiso no pueden cambiarlas.
 
 
-## Dispositivos nuevos (0.9.23)
+## Dispositivos nuevos (0.9.24)
 
 Todos se colocan, se abren con clic derecho (solo staff) y se pueden meter en **grupos** (1-99), así que funcionan con la consola, las escenas, los shows y `/stagelite`.
 
@@ -152,7 +152,7 @@ Escenas y shows se guardan con el mundo. Solo afectan a luces **en chunks cargad
 Requisitos: **JDK 17**. El wrapper de Gradle (`gradlew`) no está incluido: abre la carpeta en IntelliJ como proyecto Gradle, o copia `gradlew`, `gradlew.bat` y `gradle/` del MDK oficial de Forge 1.20.1.
 
 ```
-./gradlew build        # genera build/libs/stagelite-0.9.23.jar
+./gradlew build        # genera build/libs/stagelite-0.9.24.jar
 ./gradlew runClient    # abre Minecraft con el mod para probar
 ./gradlew runServer    # servidor de pruebas
 ```
@@ -205,3 +205,9 @@ Sin definir (`All Rights Reserved` en `gradle.properties`). Cámbiala antes de p
 - **Tarima de escenario**, **Atril para proyector** (el proyector va encima) y **Atril para micrófono** (de mesa, con brazo: clic derecho cambia la inclinación del brazo, agachado + clic la baja; así sirve tanto para staff de 1 bloque como para jugadores de 2).
 - **Pulsera de acceso**: también se tiñe con tintes, para distinguir zonas o tipos de entrada.
 - **Credenciales** VIP, Staff y Backstage (ítems de identificación).
+
+## Cine y pantallas grandes
+- **Módulo de pantalla**: pon varios juntos en la misma pared (mismo lado) y se unen en una sola pantalla de hasta **24x24** bloques. La imagen se ajusta a la forma del rectángulo y la esquina inferior izquierda manda (clic derecho en cualquier módulo abre el mismo panel). Acepta links de YouTube, TikTok, MP4/WebM e imágenes; un módulo nuevo hereda el video de la pantalla a la que se une. Si el video está en tu computador, súbelo a un hosting y pega el link directo.
+- **Monitor de TV**: se coloca **solo en paredes** (en el costado de un bloque) y se cae si le quitas la pared. Misma configuración que las pantallas.
+- **Butaca de cine**: clic derecho para sentarte, agachado para levantarte. Mira hacia donde miras al colocarla.
+- **Comida de cine**: Cabritas, Nachos con queso y 3 bebidas (cola, naranja, limón; devuelven el vaso vacío).

@@ -202,5 +202,15 @@
   "item.stagelite.credential_vip": "Credencial VIP",
   "item.stagelite.credential_staff": "Credencial Staff",
   "item.stagelite.credential_backstage": "Credencial Backstage",
-  "message.stagelite.mic_tilt": "Inclinación del micrófono: %s"
+  "message.stagelite.mic_tilt": "Inclinación del micrófono: %s",
+  "block.stagelite.video_wall": "Módulo de pantalla (se une hasta 24x24)",
+  "block.stagelite.video_tv": "Monitor de TV (solo en pared)",
+  "block.stagelite.cinema_seat": "Butaca de cine",
+  "item.stagelite.popcorn": "Cabritas",
+  "item.stagelite.nachos": "Nachos con queso",
+  "item.stagelite.drink_cola": "Bebida cola",
+  "item.stagelite.drink_orange": "Bebida naranja",
+  "item.stagelite.drink_lime": "Bebida limón",
+  "item.stagelite.empty_cup": "Vaso vacío",
+  "entity.stagelite.seat": "Asiento"
 }

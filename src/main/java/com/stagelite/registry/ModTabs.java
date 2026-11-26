@@ -32,6 +32,13 @@ public final class ModTabs {
                             ((net.minecraft.world.item.DyeableLeatherItem) ModBlocks.WRISTBAND.get()).setColor(st, c);
                             output.accept(st);
                         }
+                        output.accept(ModBlocks.CINEMA_SEAT_ITEM.get());
+                        output.accept(ModBlocks.POPCORN.get());
+                        output.accept(ModBlocks.NACHOS.get());
+                        output.accept(ModBlocks.DRINK_COLA.get());
+                        output.accept(ModBlocks.DRINK_ORANGE.get());
+                        output.accept(ModBlocks.DRINK_LIME.get());
+                        output.accept(ModBlocks.EMPTY_CUP.get());
                         output.accept(ModBlocks.CREDENTIAL_VIP.get());
                         output.accept(ModBlocks.CREDENTIAL_STAFF.get());
                         output.accept(ModBlocks.CREDENTIAL_BACKSTAGE.get());

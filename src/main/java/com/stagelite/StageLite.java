@@ -24,6 +24,7 @@ public class StageLite {
         ModBlocks.ITEMS.register(modBus);
         ModBlockEntities.TYPES.register(modBus);
         ModTabs.TABS.register(modBus);
+        com.stagelite.registry.ModEntities.ENTITIES.register(modBus);
 
         modBus.addListener(this::commonSetup);
 

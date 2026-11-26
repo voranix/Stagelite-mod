@@ -23,5 +23,7 @@ public final class ClientSetup {
     @SubscribeEvent
     public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(ModBlockEntities.STAGE_LIGHT.get(), StageLightRenderer::new);
+        event.registerEntityRenderer(com.stagelite.registry.ModEntities.SEAT.get(),
+                net.minecraft.client.renderer.entity.NoopRenderer<com.stagelite.entity.SeatEntity>::new);
     }
 }
