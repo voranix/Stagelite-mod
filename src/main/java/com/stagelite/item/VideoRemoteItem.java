@@ -83,7 +83,7 @@ public class VideoRemoteItem extends Item {
         // Clic directo sobre una pantalla / proyector / marco aun sin enlazar: lo enlaza
         if (!level.isClientSide && ctx.getPlayer() instanceof ServerPlayer sp2 && StageLiteConfig.canEdit(sp2)
                 && !sp2.isShiftKeyDown()
-                && level.getBlockEntity(ctx.getClickedPos()) instanceof StageLightBlockEntity screen
+                && level.getBlockEntity(wallMaster(level, ctx.getClickedPos())) instanceof StageLightBlockEntity screen
                 && screen.type().isVideo() && !screen.getBlockPos().equals(linked(ctx.getItemInHand(), level))) {
             CompoundTag tag = ctx.getItemInHand().getOrCreateTag();
             tag.putLong("Link", screen.getBlockPos().asLong());
@@ -164,6 +164,11 @@ public class VideoRemoteItem extends Item {
         ModNetwork.CHANNEL.send(PacketDistributor.PLAYER.with(() -> sp),
                 new OpenLightScreenPacket(linked, be.type().ordinal(), be.data.toTag()));
         return InteractionResult.CONSUME;
+    }
+
+    private static BlockPos wallMaster(Level level, BlockPos pos) {
+        return level.getBlockEntity(pos) instanceof StageLightBlockEntity b && b.type() == FixtureType.WALL
+                ? com.stagelite.video.WallScreens.master(level, pos) : pos;
     }
 
     /** Pantalla de video a la que apunta el jugador: se prueba contra la imagen (no contra el bloque). */

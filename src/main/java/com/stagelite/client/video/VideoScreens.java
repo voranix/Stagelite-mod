@@ -52,6 +52,8 @@ public final class VideoScreens {
         int age;
         int sinceSend;
         DisplayPlane plane;
+        int w;
+        int h;
     }
 
     private VideoScreens() {
@@ -171,12 +173,15 @@ public final class VideoScreens {
             }
             Session s = ACTIVE.get(be);
             if (s == null) {
-                int w = ClientConfig.VIDEO_WIDTH.get();
-                Object browser = McefBridge.create(url, w, w * 9 / 16);
+                int[] size = browserSize(be);
+                int w = size[0];
+                Object browser = McefBridge.create(url, size[0], size[1]);
                 if (browser == null) {
                     continue;
                 }
                 s = new Session();
+                s.w = size[0];
+                s.h = size[1];
                 s.browser = browser;
                 s.url = d.url;
                 s.restart = d.track;
@@ -187,6 +192,12 @@ public final class VideoScreens {
                 s.age = 0;
                 s.lastState = "";
                 McefBridge.load(s.browser, url);
+            }
+            int[] want = browserSize(be);
+            if (want[0] != s.w || want[1] != s.h) {
+                s.w = want[0];
+                s.h = want[1];
+                McefBridge.resize(s.browser, s.w, s.h);
             }
             s.age += 5;
             s.sinceSend += 5;
@@ -213,6 +224,20 @@ public final class VideoScreens {
                 McefBridge.js(s.browser, script(volume, rate(d.speed), d.billboard, d.skipAds));
             }
         }
+    }
+
+    /** Tamaño del navegador: 16:9 normal; los modulos de pantalla siguen la forma del rectangulo (el lado largo usa el ancho configurado). */
+    private static int[] browserSize(StageLightBlockEntity be) {
+        int base = ClientConfig.VIDEO_WIDTH.get();
+        DisplayPlane p = PLANES.get(be);
+        if (be.type() == com.stagelite.light.FixtureType.WALL && p != null && p.hw > 0 && p.hh > 0) {
+            double ratio = p.hw / p.hh;
+            if (ratio >= 1.0) {
+                return new int[]{base, Math.max(120, (int) Math.round(base / ratio))};
+            }
+            return new int[]{Math.max(120, (int) Math.round(base * ratio)), base};
+        }
+        return new int[]{base, base * 9 / 16};
     }
 
     private static double falloff(double dist, double range) {

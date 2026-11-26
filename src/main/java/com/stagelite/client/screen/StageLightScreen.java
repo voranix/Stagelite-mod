@@ -201,13 +201,15 @@ public class StageLightScreen extends Screen {
         }
 
         if (type.isVideo()) {
-            addRenderableWidget(Button.builder(aspectLabel(), btn -> {
-                        data.aspect = (data.aspect + 1) % LightData.ASPECTS;
-                        btn.setMessage(aspectLabel());
-                        commit();
-                    }).bounds(bx, by, bw, 20)
-                    .tooltip(Tooltip.create(Component.translatable("tip.stagelite.aspect"))).build());
-            by += 24;
+            if (type.usesAspect()) {
+                addRenderableWidget(Button.builder(aspectLabel(), btn -> {
+                            data.aspect = (data.aspect + 1) % LightData.ASPECTS;
+                            btn.setMessage(aspectLabel());
+                            commit();
+                        }).bounds(bx, by, bw, 20)
+                        .tooltip(Tooltip.create(Component.translatable("tip.stagelite.aspect"))).build());
+                by += 24;
+            }
             addRenderableWidget(Button.builder(Component.translatable("gui.stagelite.restart"), btn -> {
                         data.track = (data.track + 1) % (LightData.MAX_TRACK + 1);
                         commit();

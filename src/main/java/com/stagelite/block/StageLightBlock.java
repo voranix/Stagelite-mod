@@ -89,6 +89,15 @@ public class StageLightBlock extends Block implements EntityBlock {
             // el proyector apunta hacia donde miras
             return defaultBlockState().setValue(FACING, context.getNearestLookingDirection());
         }
+        if (type == FixtureType.TV) {
+            // solo en paredes: se coloca en el costado de un bloque y mira hacia afuera
+            Direction face = context.getClickedFace();
+            if (face.getAxis() == Direction.Axis.Y) {
+                return null;
+            }
+            BlockState s = defaultBlockState().setValue(FACING, face);
+            return s.canSurvive(context.getLevel(), context.getClickedPos()) ? s : null;
+        }
         if (type.isVideo()) {
             return defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
         }
@@ -100,6 +109,18 @@ public class StageLightBlock extends Block implements EntityBlock {
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         if (type.partsW() > 1) {
             return net.minecraft.world.phys.shapes.Shapes.block();
+        }
+        if (type == FixtureType.TV) {
+            switch (state.getValue(FACING)) {
+                case SOUTH:
+                    return Block.box(1, 3, 0, 15, 13, 3);
+                case EAST:
+                    return Block.box(0, 3, 1, 3, 13, 15);
+                case WEST:
+                    return Block.box(13, 3, 1, 16, 13, 15);
+                default:
+                    return Block.box(1, 3, 13, 15, 13, 16);
+            }
         }
         if (type.isVideo() && type != FixtureType.PROJECTOR) {
             switch (state.getValue(FACING)) {
@@ -117,11 +138,44 @@ public class StageLightBlock extends Block implements EntityBlock {
     }
 
     @Override
+    public boolean canSurvive(BlockState state, net.minecraft.world.level.LevelReader level, BlockPos pos) {
+        if (type != FixtureType.TV) {
+            return true;
+        }
+        Direction f = state.getValue(FACING);
+        BlockPos back = pos.relative(f.getOpposite());
+        return level.getBlockState(back).isFaceSturdy(level, back, f);
+    }
+
+    @Override
+    public BlockState updateShape(BlockState state, Direction dir, BlockState neighbor, net.minecraft.world.level.LevelAccessor level,
+                                  BlockPos pos, BlockPos neighborPos) {
+        if (type == FixtureType.TV && dir == state.getValue(FACING).getOpposite() && !state.canSurvive(level, pos)) {
+            return net.minecraft.world.level.block.Blocks.AIR.defaultBlockState();
+        }
+        return super.updateShape(state, dir, neighbor, level, pos, neighborPos);
+    }
+
+    @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable net.minecraft.world.entity.LivingEntity placer,
                             net.minecraft.world.item.ItemStack stack) {
         super.setPlacedBy(level, pos, state, placer, stack);
         if (!level.isClientSide && level.getBlockEntity(pos) instanceof StageLightBlockEntity be) {
             be.joinNeighbors();
+            if (type == FixtureType.WALL) {
+                // el modulo nuevo hereda el video de la pantalla a la que se une
+                Direction f = com.stagelite.video.WallScreens.facing(state);
+                Direction r = com.stagelite.video.WallScreens.right(f);
+                for (BlockPos n : new BlockPos[]{pos.relative(r), pos.above(), pos.relative(r.getOpposite()), pos.below()}) {
+                    if (com.stagelite.video.WallScreens.same(level, n, f) && level.getBlockEntity(n) instanceof StageLightBlockEntity nb
+                            && !nb.data.url.isEmpty()) {
+                        LightData copy = new LightData();
+                        copy.copyFrom(nb.data);
+                        be.applyAndSync(copy);
+                        break;
+                    }
+                }
+            }
         }
     }
 
@@ -194,10 +248,11 @@ public class StageLightBlock extends Block implements EntityBlock {
         }
         if (!level.isClientSide && player instanceof ServerPlayer serverPlayer) {
             if (StageLiteConfig.canEdit(serverPlayer)) {
-                BlockEntity be = level.getBlockEntity(pos);
+                BlockPos target = type == FixtureType.WALL ? com.stagelite.video.WallScreens.master(level, pos) : pos;
+                BlockEntity be = level.getBlockEntity(target);
                 if (be instanceof StageLightBlockEntity light) {
                     ModNetwork.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer),
-                            new OpenLightScreenPacket(pos, type.ordinal(), light.data.toTag()));
+                            new OpenLightScreenPacket(target, type.ordinal(), light.data.toTag()));
                 }
             } else {
                 serverPlayer.displayClientMessage(Component.translatable("message.stagelite.no_permission"), true);

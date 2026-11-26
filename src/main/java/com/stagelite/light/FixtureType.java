@@ -36,6 +36,10 @@ public enum FixtureType {
     MIC("microphone", 0f, 0f),
     /** Pantalla de video (MCEF): link a un video con sonido, volumen, velocidad y tamano. */
     SCREEN("video_screen", 0f, 0f),
+    /** Modulo de pantalla: se une con los vecinos (mismo lado) hasta 24x24 y forma una sola pantalla grande. */
+    WALL("video_wall", 0f, 0f),
+    /** Monitor de TV: solo se coloca en paredes. */
+    TV("video_tv", 0f, 0f),
     /** Marco / letrero multimedia: imagen o video pegado a la pared. */
     FRAME("video_frame", 0f, 0f),
     /** Proyector: proyecta la imagen o el video sobre la primera superficie que encuentra. */
@@ -141,8 +145,13 @@ public enum FixtureType {
         return hasBeam() || this == LASER;
     }
 
+    /** Tiene boton de proporcion y tamaño propio (los modulos y la TV ya fijan su forma). */
+    public boolean usesAspect() {
+        return isVideo() && this != WALL && this != TV;
+    }
+
     public boolean isVideo() {
-        return this == SCREEN || this == FRAME || this == PROJECTOR;
+        return this == SCREEN || this == FRAME || this == PROJECTOR || this == WALL || this == TV;
     }
 
     public boolean isAudio() {
@@ -196,6 +205,8 @@ public enum FixtureType {
             case SCREEN:
             case FRAME:
             case PROJECTOR:
+            case WALL:
+            case TV:
                 return 0;
             case FIRE:
                 return 12;
@@ -279,6 +290,18 @@ public enum FixtureType {
                 d.length = 32;
                 d.range = 30; // distancia de proyeccion
                 d.extra = 4;
+                d.billboard = true;
+                break;
+            case WALL:
+                d.intensity = 70;
+                d.speed = 4;
+                d.length = 32;
+                d.billboard = true;
+                break;
+            case TV:
+                d.intensity = 70;
+                d.speed = 4;
+                d.length = 16;
                 d.billboard = true;
                 break;
             case SCREEN:

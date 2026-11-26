@@ -67,6 +67,22 @@ public final class DisplayPlane {
                 up = f.getAxis() == Direction.Axis.Y ? new Vec3(0, 0, -1) : vec(f);
             }
             size = be.data.extra * 3.0;
+        } else if (type == FixtureType.WALL) {
+            f = WallScreens.facing(be.getBlockState());
+            if (!WallScreens.isMaster(level, be.getBlockPos(), f)) {
+                return null; // solo la esquina inferior izquierda dibuja
+            }
+            int[] wh = WallScreens.size(level, be.getBlockPos(), f);
+            Vec3 n = vec(f);
+            Vec3 r = new Vec3(0, 1, 0).cross(n);
+            Vec3 c = new Vec3(px, py, pz).add(r.scale((wh[0] - 1) / 2.0)).add(0, (wh[1] - 1) / 2.0, 0)
+                    .subtract(n.scale(0.375 - 0.004));
+            return new DisplayPlane(c, r, new Vec3(0, 1, 0), n, wh[0] / 2.0, wh[1] / 2.0);
+        } else if (type == FixtureType.TV) {
+            f = WallScreens.facing(be.getBlockState());
+            Vec3 n = vec(f);
+            Vec3 c = new Vec3(px, py, pz).subtract(n.scale(0.3125 - 0.004));
+            return new DisplayPlane(c, new Vec3(0, 1, 0).cross(n), new Vec3(0, 1, 0), n, 0.375, 3.375 / 16.0);
         } else {
             if (f.getAxis() == Direction.Axis.Y) {
                 f = Direction.NORTH;
